@@ -1,0 +1,189 @@
+<?xml version="1.0"?>
+<openerp>
+  <data>
+
+    <!--####################################################################################################################  Anyagigénylés  -->
+<!--
+-->
+    <record id="view_form_szefo_anyagigeny"    model="ir.ui.view">
+      <field name="name">Anyagigény Form</field>
+      <field name="model">szefo.anyagigeny</field>
+      <field name="priority" eval="15"/>
+      <field name="arch" type="xml">
+        <form create="false">
+          <header>
+            <button name="statevissza"        type="object"   string="Állapot vissza"  attrs="{'invisible': [('state','=','uj')]}" groups="szefo.group_anyagigeny_admin" />
+            <field  name="state"              widget="statusbar"/>
+          </header>
+          <group col="4">
+            <field name="anyagigeny" />
+            <field name="mennyiseg" />
+            <field name="felhasznalas_helye" />
+            <field name="indoklas" />
+            <field name="megjegyzes" />
+            <field name="kuldott" />
+            <field name="raktarrol" />
+            <field name="id" />
+            <field name="create_uid"          readonly="1" string="Igénylő"/>
+            <field name="create_date"         readonly="1" string="Igénylés ideje"/>
+            <field name="dontes_uid" />
+            <field name="dontes_ideje" />
+            <field name="beszerzes_uid" />
+            <field name="beszerzes_ideje" />
+            <field name="write_uid"           readonly="1" string="Utoljára módosította"/>
+            <field name="write_date"          readonly="1" string="Módosítás ideje"/>
+          </group>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_tree_szefo_anyagigeny"    model="ir.ui.view">
+      <field name="name">Anyagigény Tree</field>
+      <field name="model">szefo.anyagigeny</field>
+      <field name="priority" eval="15"/>
+      <field name="arch" type="xml">
+        <tree editable="top">
+          <field name="id" />
+          <field name="anyagigeny" />
+          <field name="mennyiseg" />
+          <field name="felhasznalas_helye" />
+          <field name="indoklas" />
+          <field name="megjegyzes" />
+          <field name="kuldott" />
+          <field name="raktarrol" />
+          <field name="state" />
+          <button name="state2elutasit"     type="object"   string="Elutasít"   attrs="{'invisible': [('state','!=','uj')]}"        groups="szefo.group_anyagigeny_manager" />
+          <button name="state2jovahagy"     type="object"   string="Jóváhagy"   attrs="{'invisible': [('state','!=','uj')]}"        groups="szefo.group_anyagigeny_manager" />
+          <button name="state2beszerzes"    type="object"   string="Beszerzés"  attrs="{'invisible': [('state','!=','jovahagy')]}"  groups="szefo.group_anyagigeny_manager" />
+          <button name="state2kesz"         type="object"   string="Teljesült"  attrs="{'invisible': [('state','!=','beszerzes')]}" groups="szefo.group_anyagigeny_manager" />
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_szefo_anyagigeny"    model="ir.ui.view">
+      <field  name="name">Anyagigény Filter</field>
+      <field  name="model">szefo.anyagigeny</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field name="anyagigeny" />
+          <field name="felhasznalas_helye" />
+          <field name="indoklas" />
+          <field name="megjegyzes" />
+          <filter name="filter_uj"        string="Új igény"         domain="[('state','=','uj')]"/>
+          <filter name="filter_elutasit"  string="Elutasítva"       domain="[('state','=','elutasit')]"/>
+          <filter name="filter_jovahagy"  string="Jóváhagyva"       domain="[('state','=','jovahagy')]"/>
+          <filter name="filter_beszerzes" string="Beszerzés alatt"  domain="[('state','=','beszerzes')]"/>
+          <filter name="filter_kesz"      string="Teljesült"        domain="[('state','=','kesz')]"/>
+        </search>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Adattárház fájlok  -->
+    <record id="view_form_files"    model="ir.ui.view">
+      <field name="name">Fájlok Form</field>
+      <field name="model">datawh.files</field>
+      <field name="arch" type="xml">
+        <form>
+          <group col="2">
+            <field name="domain"/>
+            <field name="filetype"/>
+            <field name="filename"/>
+            <field name="path"/>
+            <field name="size"/>
+            <field name="mod_time"/>
+          </group>
+          <field name="documents_ids"/>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_tree_files"    model="ir.ui.view">
+      <field  name="name">Fájlok Tree</field>
+      <field  name="model">datawh.files</field>
+      <field  name="arch" type="xml">
+        <tree>
+          <field name="domain"/>
+          <field name="filetype"/>
+          <field name="filename"/>
+          <field name="size"/>
+          <field name="mod_time"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_form_documents"    model="ir.ui.view">
+      <field name="name">Dokumentumok Form</field>
+      <field name="model">datawh.documents</field>
+      <field name="arch" type="xml">
+        <form>
+          <group col="2">
+            <field name="domain"/>
+            <field name="filetype"/>
+            <field name="doctype"/>
+            <field name="label"/>
+            <field name="errors"/>
+            <field name="reject"                attrs="{'readonly': [('imported','=',True)]}"/>
+            <field name="imported"/>
+            <field name="path"/>
+            <field name="files_id"/>
+            <field name="size"/>
+            <field name="mod_time"/>
+            <field name="document"/>
+          </group>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_tree_documents"    model="ir.ui.view">
+      <field  name="name">Dokumentumok Tree</field>
+      <field  name="model">datawh.documents</field>
+      <field  name="arch" type="xml">
+        <tree>
+          <field name="id"/>
+          <field name="domain"/>
+          <field name="filetype"/>
+          <field name="doctype"/>
+          <field name="label"/>
+          <field name="errors"/>
+          <field name="reject"/>
+          <field name="imported"/>
+          <field name="files_id"/>
+          <field name="size"/>
+          <field name="mod_time"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_documents"    model="ir.ui.view">
+      <field  name="name">Dokumentumok Filter</field>
+      <field  name="model">datawh.documents</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field name="label" />
+          <field name="files_id" />
+          <filter name="filter_import"    string="Importálható"   domain="[('reject','=',False),('imported','=',False)]"/>
+          <filter name="filter_reject"    string="Elvet?"         domain="[('reject','=',True)]"/>
+          <filter name="filter_imported"  string="Importálva?"    domain="[('imported','=',True)]"/>
+        </search>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Actions  -->
+    <act_window id="szefo_anyagigeny"     name="Anyagigénylés"      res_model="szefo.anyagigeny"  view_mode="tree,form"   context="{'search_default_filter_uj': 1}"/>
+    <act_window id="datawh_files"         name="Fájl"               res_model="datawh.files"      view_mode="tree,form"   />
+    <act_window id="datawh_documents"     name="Dokumentum"         res_model="datawh.documents"  view_mode="tree,form"   context="{'search_default_filter_import': 1}"/>
+    <act_window id="datawh_legrand"       name="Dokumentum"         res_model="datawh.documents"  view_mode="tree,form"
+                                                                    domain="[('domain','=','Legrand')]"                   context="{'search_default_filter_import': 1}"/>
+
+    <!--  Menu  items  -->
+    <menuitem id="menu_root" name="SZEFO" sequence="390" />
+
+    <menuitem id="menu_logisztika"        name="Logisztika"         parent="menu_root"            sequence="10" />
+      <menuitem id="menu_anyagigeny"      name="Anyagigénylés"      parent="menu_logisztika"      sequence="10"           action="szefo_anyagigeny" />
+
+    <menuitem id="menu_datawh"            name="Adattárház"         parent="menu_root"            sequence="20" />
+      <menuitem id="menu_files"           name="Fájlok"             parent="menu_datawh"          sequence="10"           action="datawh_files" />
+      <menuitem id="menu_documents"       name="Dokumentumok"       parent="menu_datawh"          sequence="20"           action="datawh_documents" />
+
+  </data>
+</openerp>

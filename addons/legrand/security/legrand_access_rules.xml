@@ -1,0 +1,71 @@
+<?xml version="1.0" ?>
+<openerp>
+    <data noupdate="1">
+        <record id="module_category_legrand" model="ir.module.category">
+            <field name="name">Legrand</field>
+            <field name="sequence">16</field>
+        </record>
+
+        <record id="group_legrand_viewer" model="res.groups">
+            <field name="name">Viewer</field>
+            <field name="category_id" ref="module_category_legrand"/>
+        </record>
+
+        <record id="group_legrand_user" model="res.groups">
+            <field name="name">User</field>
+            <field name="category_id" ref="module_category_legrand"/>
+            <field name="implied_ids" eval="[(4, ref('group_legrand_viewer'))]"/>
+        </record>
+
+        <record id="group_legrand_manager" model="res.groups">
+            <field name="name">Manager</field>
+            <field name="category_id" ref="module_category_legrand"/>
+            <field name="implied_ids" eval="[(4, ref('group_legrand_user'))]"/>
+        </record>
+
+        <record id="group_legrand_director" model="res.groups">
+            <field name="name">Director</field>
+            <field name="category_id" ref="module_category_legrand"/>
+            <field name="implied_ids" eval="[(4, ref('group_legrand_manager'))]"/>
+        </record>
+
+        <record id="group_legrand_admin" model="res.groups">
+            <field name="name">Admin</field>
+            <field name="category_id" ref="module_category_legrand"/>
+            <field name="implied_ids" eval="[(4, ref('group_legrand_director'))]"/>
+            <field name="users" eval="[(4, ref('base.user_root'))]"/>
+        </record>
+
+        <record id="legrand_impex_user_rule"  model="ir.rule">
+            <field name="name">Impex hozzáférés csak tulajdonosnak</field>
+            <field name="model_id" ref="model_legrand_impex"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[('create_uid','=',user.id)]</field>
+        </record>
+    </data>
+
+<!--
+    <data noupdate="0">
+        <record id="legrand_uzem_picking_user_rule"  model="ir.rule">
+            <field name="name">Üzem picking hozzáférés csak a jogosultaknak</field>
+            <field name="model_id" ref="model_legrand_uzem_picking"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[('uzem_id','=',user.sajat_raktar_id.id)]</field>
+        </record>
+
+        <record id="legrand_uzem_move_user_rule"  model="ir.rule">
+            <field name="name">Üzem move hozzáférés csak a jogosultaknak</field>
+            <field name="model_id" ref="model_legrand_uzem_move"/>
+            <field name="global" eval="True"/>
+            <field name="domain_force">[('uzem_id','=',user.sajat_raktar_id.id)]</field>
+        </record>
+
+        <record id="legrand_uzem_keszlet_user_rule"  model="ir.rule">
+            <field name="name">Üzem készlet szűrés saját raktárra, ha nincs beállítva, mindegyik raktárt mutatja</field>
+            <field name="model_id" ref="model_legrand_uzem_keszlet"/>
+            <field name="global" eval="True"/>
+            <field  name="domain_force">['|',('uzem_id','=',user.sajat_raktar_id.id),('false','=',user.sajat_raktar_id.id)]</field>
+        </record>
+    </data>
+-->
+</openerp>

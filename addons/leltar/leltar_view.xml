@@ -1,0 +1,500 @@
+<?xml version="1.0"?>
+<openerp>
+  <data>
+    <!--####################################################################################################################  Parameter  -->
+    <record id="view_tree_leltar_import"    model="ir.ui.view">
+      <field  name="name">Leltár Import Tree</field>
+      <field  name="model">szefo.parameter</field>
+      <field  name="arch" type="xml">
+        <tree create="false" >
+          <button name="import_netto_ertek"   type="object" string="Nettó érték import"       class="oe_highlight" confirm="Könyv szerinti nettó érték importja DominoSoftból" />
+          <button name="import_eszkoz"        type="object" string="Eszközök import"          class="oe_highlight" confirm="Tárgyi eszközök importja DominoSoftból" />
+          <button name="import_felmeres"      type="object" string="Felmérés import"          class="oe_highlight" confirm="Leltár felmérés import DominoSoftból" />
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_tree_leltar_once"    model="ir.ui.view">
+      <field  name="name">Leltár Once Tree</field>
+      <field  name="model">szefo.parameter</field>
+      <field  name="arch" type="xml">
+        <tree create="false" >
+          <button name="employees_from_domino" type="object" string="Alkalmazottak importja DominoSoftból" class="oe_highlight" confirm="Telepítés után végrehajtani, de csak egyszer!" />
+          <button name="akt_leltarkorzet_felmeresbol" type="object" string="Aktuális leltárkörzet felmérésből" class="oe_highlight" confirm="Felmérés import után végrehajtani, de csak egyszer!" />
+        </tree>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Leltár körzet  -->
+    <record id="view_tree_leltar_korzet"    model="ir.ui.view">
+      <field  name="name">Leltár körzet Tree</field>
+      <field  name="model">leltar.korzet</field>
+      <field  name="arch" type="xml">
+        <tree>
+          <field  name="name"/>
+          <field  name="leltarfelelos_id"/>
+        </tree>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Leltár szett  -->
+    <record id="view_form_leltar_szett"    model="ir.ui.view">
+      <field  name="name">Leltár szett Form</field>
+      <field  name="model">leltar.szett</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <form>
+          <div>
+            <button type="object" name="szett_eszkoz_mozgas" string="Szett eszközök mozgatása" confirm="A szettben lévő eszközök átmozgatása a szett raktárkörzetébe."
+              class="oe_highlight" attrs="{'invisible':  [('count_korzet_elter','=',0)]}"/>
+            <button type="object" name="szett_eszkoz_hasznal" string="Szett eszközök személyes használatra" confirm="A szettben lévő eszközök személyes használatba vétele."
+              class="oe_highlight" attrs="{'invisible':  [('count_hasznalo_elter','=',0)]}"/>
+          </div>
+          <group col="4">
+            <field name="name"/>
+            <field name="leltarkorzet_id"       options="{'no_create': True, 'no_open': True}"/>
+            <field name="hasznalo_id"           options="{'no_create': True, 'no_open': True}"/>
+            <field  name="megjegyzes"/>
+            <field name="count_korzet_elter"    invisible="1"/>
+            <field name="count_hasznalo_elter"  invisible="1"/>
+          </group>
+          <div>
+            <field name="eszkozok_ids"/>
+          </div>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_tree_leltar_szett"    model="ir.ui.view">
+      <field  name="name">Leltár szett Tree</field>
+      <field  name="model">leltar.szett</field>
+      <field  name="arch" type="xml">
+        <tree>
+          <field  name="name"/>
+          <field  name="leltarkorzet_id"/>
+          <field  name="hasznalo_id"/>
+          <field  name="megjegyzes"/>
+          <field  name="count_korzet_elter"/>
+          <field  name="count_hasznalo_elter"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_leltar_szett"    model="ir.ui.view">
+      <field  name="name">Leltár szett Filter</field>
+      <field  name="model">leltar.szett</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field  name="name"/>
+          <field  name="leltarkorzet_id"/>
+          <filter string="Leltárkörzet eltér" domain="[('count_korzet_elter','>',0)]"/>
+          <filter string="Felhasználó eltér" domain="[('count_hasznalo_elter','>',0)]"/>
+        </search>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Tárgyi eszköz  -->
+    <record id="view_form_leltar_eszkoz"    model="ir.ui.view">
+      <field  name="name">Tárgyi eszköz Form</field>
+      <field  name="model">leltar.eszkoz</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <form create="false" edit="true">
+          <group col="4">
+            <field name="leltari_szam"          readonly="1"/>
+            <field name="megnevezes"            readonly="1"/>
+            <field name="name"                  readonly="1"/>
+            <field name="leltarcsoport_id"      readonly="1"/>
+            <field name="akt_leltarkorzet_id"   readonly="1"/>
+            <field name="akt_hasznalo_id"       readonly="1"/>
+            <field name="tulajdonsag_ids"       widget="many2many_tags"/>
+            <field name="csoportkod"            readonly="1"/>
+            <field name="szett_id"              options="{'no_create': True}"/>
+            <field name="netto_ertek"           readonly="1"/>
+            <field name="megjegyzes"/>
+            <field name="leltari_szam_vonalkod" readonly="1"/>
+            <field name="leltarkorzet_kod"      readonly="1"/>
+            <field name="hivszam"               readonly="1"/>
+            <field name="ds_leltarkorzet"       readonly="1"/>
+            <field name="ds_leltarfelelos"      readonly="1"/>
+            <field name="selejtezni"            readonly="1"    string=""/>
+            <field name="selejt_ok"             readonly="1"/>
+            <field name="active"/>
+          </group>
+          <div>
+            <field name="mozgas_ids"/>
+          </div>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_tree_leltar_eszkoz"    model="ir.ui.view">
+      <field  name="name">Tárgyi eszköz Tree</field>
+      <field  name="model">leltar.eszkoz</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <tree create="false">
+          <field name="leltari_szam"/>
+          <field name="megnevezes"/>
+          <field name="leltarcsoport_id"/>
+          <field name="akt_leltarkorzet_id"/>
+          <field name="akt_hasznalo_id"/>
+          <field name="megjegyzes"/>
+          <field name="tulajdonsag_ids"       widget="many2many_tags"/>
+          <field name="selejtezni"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_tree_leltar_eszkoz_szett"    model="ir.ui.view">
+      <field  name="name">Tárgyi eszköz szett Tree</field>
+      <field  name="model">leltar.eszkoz</field>
+      <field  name="arch" type="xml">
+        <tree editable="top">
+          <field name="leltari_szam"          readonly="1"/>
+          <field name="megnevezes"            readonly="1"/>
+          <field name="leltarcsoport_id"      readonly="1"/>
+          <field name="akt_leltarkorzet_id"   readonly="1"/>
+          <field name="megjegyzes"            readonly="1"/>
+          <field name="tulajdonsag_ids"       readonly="1"    widget="many2many_tags"/>
+          <field name="szett_id"              options="{'no_create': True}"/>
+        </tree>
+      </field>
+    </record>
+<!--
+          <button name="selejtezni_valt" type="object" string="Selejtezni" class="oe_highlight" />
+-->
+
+    <record id="view_tree_leltar_eszkoz_selejt_jelol"    model="ir.ui.view">
+      <field  name="name">Tárgyi eszköz selejt jelöl Tree</field>
+      <field  name="model">leltar.eszkoz</field>
+      <field  name="arch" type="xml">
+        <tree editable="top">
+          <field name="leltari_szam"          readonly="1"/>
+          <field name="megnevezes"            readonly="1"/>
+          <field name="leltarcsoport_id"      readonly="1"/>
+          <field name="akt_leltarkorzet_id"   readonly="1"/>
+          <field name="megjegyzes"            readonly="1"/>
+          <field name="tulajdonsag_ids"       readonly="1"    widget="many2many_tags"/>
+          <field name="netto_ertek"           readonly="1"/>
+          <field name="selejt_ok"/>
+          <field name="selejtezni"            readonly="1"/>
+          <field name="active"                invisible="1"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_tree_leltar_eszkoz_selejtez"    model="ir.ui.view">
+      <field  name="name">Tárgyi eszköz selejtez Tree</field>
+      <field  name="model">leltar.eszkoz</field>
+      <field  name="arch" type="xml">
+        <tree create="false">
+          <field  name="leltari_szam"/>
+          <field  name="megnevezes"/>
+          <field  name="leltarcsoport_id"/>
+          <field  name="akt_leltarkorzet_id"/>
+          <field  name="megjegyzes"/>
+          <field  name="tulajdonsag_ids"      widget="many2many_tags"/>
+          <field  name="netto_ertek"/>
+          <field  name="selejt_ok"/>
+          <field  name="not_active"           string=""/>
+          <button name="do_toggle_active"     type="object" string="Selejtez" class="oe_highlight" />
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_leltar_eszkoz"    model="ir.ui.view">
+      <field  name="name">Tárgyi eszköz Filter</field>
+      <field  name="model">leltar.eszkoz</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field  name="name"/>
+          <field  name="akt_leltarkorzet_id"/>
+          <field  name="tulajdonsag_ids"/>
+          <filter string="Számítástechnika" domain="[('csoportkod','=','005')]"/>
+        </search>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Tárgyi eszköz mozgás  -->
+    <record id="view_tree_leltar_eszkozmozgas"    model="ir.ui.view">
+      <field  name="name">Eszközmozgás Tree</field>
+      <field  name="model">leltar.eszkozmozgas</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <tree>
+          <field  name="id"/>
+          <field  name="eszkoz_id"/>
+          <field  name="hova_leltarkorzet_id"/>
+          <field  name="megjegyzes"/>
+          <field  name="megerkezett"/>
+          <field  name="create_uid" string="Felvette"/>
+          <field  name="create_date" string="Felvétel ideje"/>
+          <field  name="write_uid" string="Módosította"/>
+          <field  name="write_date" string="Módosítás ideje"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_tree_leltar_eszkoz_ujmozgas"    model="ir.ui.view">
+      <field  name="name">Eszköz újmozgás Tree</field>
+      <field  name="model">leltar.eszkozmozgas</field>
+      <field  name="arch" type="xml">
+        <tree edit="false" editable="top">
+          <field  name="id"/>
+          <field  name="eszkoz_id"/>
+          <field  name="hova_leltarkorzet_id"/>
+          <field  name="megjegyzes"/>
+          <field  name="megerkezett" readonly="1"/>
+          <field  name="create_uid" readonly="1" string="Felvette"/>
+          <field  name="create_date" readonly="1" string="Felvétel ideje"/>
+          <field  name="write_uid" readonly="1" string="Módosította"/>
+          <field  name="write_date" readonly="1" string="Módosítás ideje"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_tree_leltar_eszkozerkezes"    model="ir.ui.view">
+      <field  name="name">Eszközérkezés Tree</field>
+      <field  name="model">leltar.eszkozmozgas</field>
+      <field  name="arch" type="xml">
+        <tree create="false">
+          <field  name="eszkoz_id"/>
+          <field  name="hova_leltarkorzet_id"/>
+          <field  name="megjegyzes"/>
+          <field  name="megerkezett" string=""/>
+          <button name="megerkezett_valt" type="object" string="Megérkezett" class="oe_highlight" />
+          <field  name="write_uid" string="Módosította"/>
+          <field  name="write_date" string="Módosítás ideje"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_tree_leltar_eszkozmozgas_sztorno"    model="ir.ui.view">
+      <field  name="name">Eszközmozgás Sztornó Tree</field>
+      <field  name="model">leltar.eszkozmozgas</field>
+      <field  name="arch" type="xml">
+        <tree create="false">
+          <field  name="eszkoz_id"/>
+          <field  name="hova_leltarkorzet_id"/>
+          <field  name="megjegyzes"/>
+          <field  name="megerkezett" string=""/>
+          <button name="sztorno" type="object" string="Sztornó" class="oe_highlight" />
+          <field  name="write_uid" string="Módosította"/>
+          <field  name="write_date" string="Módosítás ideje"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_leltar_eszkozmozgas"    model="ir.ui.view">
+      <field  name="name">Eszközmozgás Filter</field>
+      <field  name="model">leltar.eszkozmozgas</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field  name="eszkoz_id"/>
+          <field  name="hova_leltarkorzet_id"/>
+          <field  name="megjegyzes"/>
+        </search>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Leltárkörzet mozgás  -->
+    <record id="view_tree_leltar_korzetmozgas"    model="ir.ui.view">
+      <field  name="name">Körzet újmozgás Tree</field>
+      <field  name="model">leltar.korzetmozgas</field>
+      <field  name="arch" type="xml">
+        <tree edit="false" editable="top">
+          <field  name="id"/>
+          <field  name="honnan_leltarkorzet_id"/>
+          <field  name="hova_leltarkorzet_id"/>
+          <field  name="megjegyzes"/>
+        </tree>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Tárgyi eszköz átvétel  -->
+    <record id="view_tree_leltar_eszkozatvetel"    model="ir.ui.view">
+      <field  name="name">Eszközátvétel Tree</field>
+      <field  name="model">leltar.eszkozatvetel</field>
+      <field  name="arch" type="xml">
+        <tree edit="false" editable="top">
+          <field  name="eszkoz_id"/>
+          <field  name="uj_hasznalo_id"/>
+          <field  name="megjegyzes"/>
+          <field  name="create_uid" readonly="1"/>
+          <field  name="create_date" readonly="1"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_leltar_eszkozatvetel"    model="ir.ui.view">
+      <field  name="name">Eszközátvétel Filter</field>
+      <field  name="model">leltar.eszkozatvetel</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field  name="eszkoz_id"/>
+          <field  name="uj_hasznalo_id"/>
+          <field  name="megjegyzes"/>
+        </search>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Tárgyi eszköz felmérés  -->
+    <record id="view_tree_leltar_leltar"    model="ir.ui.view">
+      <field  name="name">Tárgyi eszköz felmérés Tree</field>
+      <field  name="model">leltar.leltar</field>
+      <field  name="arch" type="xml">
+        <tree create="false">
+          <field  name="eszkoz_id"/>
+          <field  name="leltarkorzet_id"/>
+          <field  name="hivszam"/>
+          <field  name="targyev"/>
+          <field  name="targyho"/>
+          <field  name="leltari_szam"/>
+          <field  name="leltari_szam_vonalkod"/>
+          <field  name="leltarkorzet_vonalkod"/>
+          <field  name="szobaszam"/>
+          <field  name="ervenyesseg_kezdete"/>
+        </tree>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Vonalkód olvasás  -->
+    <record id="view_form_leltar_vonalkodolvas"    model="ir.ui.view">
+      <field  name="name">Vonalkód olvasás Form</field>
+      <field  name="model">leltar.vonalkodolvas</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <form create="false" edit="false">
+          <group col="4">
+            <field name="id"/>
+            <field name="create_uid" string="Felvette"/>
+            <field name="leltarkorzet_id"/>
+            <field name="create_date" string="Felvétel ideje"/>
+          </group>
+          <b>Új eszközök</b>
+          <field name="uj_eszkoz_ids"/>
+          <b>Ellenőrzésre váró eszközök</b>
+          <field name="ell_eszkoz_ids"/>
+          <b>Adatfelvételkor leltárkörzetbe tartozó eszközök</b>
+          <field name="akt_eszkoz_ids"/>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_form_leltar_vonalkodolvas_felvesz"    model="ir.ui.view">
+      <field  name="name">Vonalkód olvasás Form adatfelvétel</field>
+      <field  name="model">leltar.vonalkodolvas</field>
+      <field  name="arch" type="xml">
+        <form edit="false">
+          <div>
+            <button type="object" name="do_mass_insert_mozgas" string="Eszközmozgás(ok) rögzítése" class="oe_highlight" attrs="{'invisible':  [('leltar','=',True)]}"/>
+            <button special="cancel"  string="Elvetés" attrs="{'invisible':  [('leltar','=',True)]}"/>
+          </div>
+          <group col="4">
+            <field name="vonalkod"/>
+            <field name="leltarkorzet_id" readonly="1"/>
+            <field name="vonalkod_save" readonly="1"/>
+            <field name="eszkoz_id" readonly="1"/>
+            <field name="uzenet" readonly="1"/>
+            <field name="akt_leltarkorzet_id" readonly="1"/>
+            <field name="leltar" invisible="1"/>
+          </group>
+          <b>Új eszközök</b>
+          <field name="uj_eszkoz_ids"  options="{'no_create': True}"/>
+          <b attrs="{'invisible':  [('leltar','!=',True)]}">Ellenőrzésre váró eszközök</b>
+          <field name="ell_eszkoz_ids" options="{'no_create': True}" attrs="{'invisible':  [('leltar','!=',True)]}"/>
+          <field name="akt_eszkoz_ids" invisible="1"/>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_tree_leltar_vonalkodolvas"    model="ir.ui.view">
+      <field  name="name">Vonalkód olvasás Tree</field>
+      <field  name="model">leltar.vonalkodolvas</field>
+      <field  name="arch" type="xml">
+        <tree>
+          <field name="id"/>
+          <field name="leltarkorzet_id"/>
+          <field name="create_uid" string="Felvette"/>
+          <field name="create_date" string="Felvétel ideje"/>
+        </tree>
+      </field>
+    </record>
+
+    <!--  Actions  -->
+    <act_window id="leltar_eszkozmozgas"          name="Tárgyi eszköz mozgás"         res_model="leltar.eszkozmozgas"   view_mode="tree"      view_id="view_tree_leltar_eszkoz_ujmozgas"/>
+    <act_window id="leltar_eszkozmozgas_vonalkod" name="Eszköz vonalkódos mozgás"     res_model="leltar.vonalkodolvas"  view_mode="form"      view_id="view_form_leltar_vonalkodolvas_felvesz"  target="new"
+                context="{'readonly_by_pass': ['leltarkorzet_id'], 'leltar': False}"/>
+    <act_window id="leltar_eszkozerkezes"         name="Tárgyi eszköz érkezés"        res_model="leltar.eszkozmozgas"   view_mode="tree"      view_id="view_tree_leltar_eszkozerkezes"
+                domain="[('megerkezett','=',False)]"/>
+    <act_window id="leltar_eszkozmozgas_sztorno"  name="Eszköz mozgás sztornó"        res_model="leltar.eszkozmozgas"   view_mode="tree"      view_id="view_tree_leltar_eszkozmozgas_sztorno"
+                domain="[('megerkezett','=',False)]"/>
+    <act_window id="leltar_eszkozatvetel"         name="Személyes használatba vétel"  res_model="leltar.eszkozatvetel"  view_mode="tree"      view_id="view_tree_leltar_eszkozatvetel" />
+
+    <act_window id="leltar_eszkoz"                name="Tárgyi eszköz"                res_model="leltar.eszkoz"         view_mode="tree,form" view_id="view_tree_leltar_eszkoz" />
+    <act_window id="leltar_eszkoz_selejt_jelol"   name="Tárgyi eszköz"                res_model="leltar.eszkoz"         view_mode="tree"      view_id="view_tree_leltar_eszkoz_selejt_jelol"
+                context="{'readonly_by_pass': ['selejtezni']}"/>
+    <act_window id="leltar_eszkoz_selejtez"       name="Tárgyi eszköz"                res_model="leltar.eszkoz"         view_mode="tree"      view_id="view_tree_leltar_eszkoz_selejtez"
+                domain="[('selejtezni','=',True)]"/>
+    <act_window id="leltar_leltar"                name="Tárgyi eszköz felmérés"       res_model="leltar.leltar"         view_mode="tree" />
+
+    <act_window id="leltar_szett"                 name="Tárgyi eszköz szett"          res_model="leltar.szett"          view_mode="tree,form" view_id="view_tree_leltar_szett" />
+    <act_window id="leltar_szett_ossze"           name="Szett összeállítása"          res_model="leltar.eszkoz"         view_mode="tree"      view_id="view_tree_leltar_eszkoz_szett" />
+
+    <act_window id="leltar_vonalkodolvas"         name="Vonalkód olvasás"             res_model="leltar.vonalkodolvas"  view_mode="form"      view_id="view_form_leltar_vonalkodolvas_felvesz"
+                context="{'readonly_by_pass': ['leltarkorzet_id'], 'leltar': True}"/>
+    <act_window id="leltar_gordulo_leltar"        name="Gördülő leltár"               res_model="leltar.vonalkodolvas"  view_mode="tree,form" view_id="view_tree_leltar_vonalkodolvas"
+                domain="[('leltar','=',True)]" />
+
+    <act_window id="leltar_korzet"                name="Leltár körzet"                res_model="leltar.korzet"         view_mode="tree,form" />
+    <act_window id="leltar_csoport"               name="Leltár csoport"               res_model="leltar.csoport"        view_mode="tree,form" />
+
+    <act_window id="leltar_import"                name="Import"                       res_model="szefo.parameter"       view_mode="tree"      view_id="view_tree_leltar_import"/>
+
+    <act_window id="leltar_korzetmozgas"          name="Körzetmozgás"                 res_model="leltar.korzetmozgas"   view_mode="tree,form" />
+<!--
+    <act_window id="leltar_ds_felelos" name="Import" res_model="leltar.ds_felelos" view_mode="tree,form" />
+    <act_window id="only_once" name="Only once" res_model="szefo.parameter" view_mode="tree" view_id="view_tree_leltar_once"/>
+    <act_window id="leltar_eszkoz_admin" name="Tárgyi eszköz" res_model="leltar.eszkoz" view_id="view_tree_leltar_eszkoz" view_mode="tree,form" />
+-->
+    <!--  Menu  items  -->
+    <menuitem id="menu_root" name="Tárgyi eszközök" sequence="201" groups="group_leltar_viewer" />
+
+    <menuitem id="menu_mozgas"                          name="Tevékenységek"            parent="menu_root"            sequence="10" />
+      <menuitem id="menu_leltar_eszkozmozgas"           name="Tárgyi eszköz mozgás"     parent="menu_mozgas"          sequence="10" action="leltar_eszkozmozgas" />
+      <menuitem id="menu_leltar_eszkozmozgas_vonalkod"  name="Eszköz vonalkódos mozgás" parent="menu_mozgas"          sequence="15" action="leltar_eszkozmozgas_vonalkod" />
+      <menuitem id="menu_leltar_eszkozerkezes"          name="Tárgyi eszköz érkezés"    parent="menu_mozgas"          sequence="20" action="leltar_eszkozerkezes" />
+      <menuitem id="menu_leltar_eszkozmozgas_sztorno"   name="Eszköz mozgás sztornó"    parent="menu_mozgas"          sequence="30" action="leltar_eszkozmozgas_sztorno"  groups="group_leltar_user" />
+      <menuitem id="menu_leltar_eszkozatvetel"          name="Személyes használatra"    parent="menu_mozgas"          sequence="40" action="leltar_eszkozatvetel" />
+
+    <menuitem id="menu_leltar"                          name="Tárgyi eszközök"          parent="menu_root"            sequence="20" />
+      <menuitem id="menu_leltar_eszkoz"                 name="Tárgyi eszközök"          parent="menu_leltar"          sequence="10" action="leltar_eszkoz" />
+      <menuitem id="menu_leltar_eszkoz_selejt_jelol"    name="Selejtezésre jelöl"       parent="menu_leltar"          sequence="20" action="leltar_eszkoz_selejt_jelol"   groups="group_leltar_user" />
+      <menuitem id="menu_leltar_eszkoz_selejtez"        name="Selejtez"                 parent="menu_leltar"          sequence="30" action="leltar_eszkoz_selejtez"       groups="group_leltar_manager" />
+      <menuitem id="menu_leltar_leltar"                 name="Felmérés"                 parent="menu_leltar"          sequence="50" action="leltar_leltar" />
+
+    <menuitem id="menu_szett"                           name="Tárgyi eszköz szettek"    parent="menu_root"            sequence="30" />
+      <menuitem id="menu_leltar_szett"                  name="Tárgyi eszköz szettek"    parent="menu_szett"           sequence="10" action="leltar_szett" />
+      <menuitem id="menu_leltar_szett_ossze"            name="Szettek összeállítása"    parent="menu_szett"           sequence="20" action="leltar_szett_ossze" />
+
+    <menuitem id="menu_leltar_gordulo"                  name="Gördülő leltár"           parent="menu_root"            sequence="40" />
+      <menuitem id="menu_leltar_vonalkodolvas"          name="Vonalkód olvasás"         parent="menu_leltar_gordulo"  sequence="10" action="leltar_vonalkodolvas"         groups="group_leltar_manager"/>
+      <menuitem id="menu_leltar_gordulo_leltar"         name="Gördülő leltár"           parent="menu_leltar_gordulo"  sequence="20" action="leltar_gordulo_leltar" />
+
+    <menuitem id="menu_torzs"                           name="Törzsadatok"              parent="menu_root"            sequence="50" />
+      <menuitem id="menu_leltar_korzet"                 name="Leltárkörzetek"           parent="menu_torzs"           sequence="30" action="leltar_korzet" />
+      <menuitem id="menu_leltar_csoport"                name="Leltárcsoportok"          parent="menu_torzs"           sequence="40" action="leltar_csoport" />
+
+    <menuitem id="menu_karbantartas"                    name="Karbantartás"             parent="menu_root"            sequence="60" groups="group_leltar_manager" />
+      <menuitem id="menu_leltar_import"                 name="Adat import"              parent="menu_karbantartas"    sequence="20" action="leltar_import" />
+
+    <menuitem id="menu_administrator"                   name="Administrator"            parent="menu_root"            sequence="90" groups="base.group_system" />
+      <menuitem id="menu_leltar_korzetmozgas"           name="Körzetmozgás (költözés)"  parent="menu_administrator"   sequence="10" action="leltar_korzetmozgas" />
+<!--
+      <menuitem id="menu_leltar_ds_felelos" name="Adat ds_felelos" parent="menu_administrator" sequence="20" action="leltar_ds_felelos" />
+      <menuitem id="menu_only_once" name="Only once after install" parent="menu_administrator" sequence="30" action="only_once" />
+      <menuitem id="menu_leltar_eszkoz_admin" name="Tárgyi eszközök (admin)" parent="menu_torzs" sequence="50" action="leltar_eszkoz_admin" groups="base.group_system" />
+-->
+  </data>
+</openerp>

@@ -1,0 +1,39 @@
+<?xml version="1.0"?>
+<openerp>
+    <data>
+        <record id="res_partner_kanban_view_szefo" model="ir.ui.view">
+            <field name="name">res.partner.kanban.szefo</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id"   ref="base.res_partner_kanban_view"/>
+            <field name="arch" type="xml">
+                <ul position="replace">
+                    <li t-if="record.parent_id.raw_value and !record.function.raw_value"><field name="parent_id"/></li>
+                    <li t-if="!record.parent_id.raw_value and record.function.raw_value"><field name="function"/></li>
+                    <li t-if="record.parent_id.raw_value and record.function.raw_value"><field name="function"/> at <field name="parent_id"/></li>
+                    <li t-if="record.city.raw_value and !record.country_id.raw_value"><field name="city"/></li>
+                    <li t-if="!record.city.raw_value and record.country_id.raw_value"><field name="country_id"/></li>
+                    <li t-if="record.city.raw_value and record.country_id.raw_value"><field name="city"/>, <field name="country_id"/></li>
+                    <li t-if="record.phone.raw_value"><field name="phone"/></li>
+<!--
+                    <li t-if="record.mobile.raw_value"><field name="mobile"/></li>
+-->
+                </ul>
+            </field>
+        </record>
+
+        <record id="view_partner_tree_szefo"  model="ir.ui.view">
+            <field name="name">res.partner.tree.szefo</field>
+            <field name="model">res.partner</field>
+            <field name="inherit_id"   ref="base.view_partner_tree"/>
+            <field name="arch" type="xml">
+                <field name="display_name" position="after">
+                    <field name="city"/>
+                </field>
+                <field name="phone" position="after">
+                    <field name="mobile"/>
+                </field>
+            </field>
+        </record>
+
+    </data>
+</openerp>

@@ -1,0 +1,217 @@
+<?xml version="1.0"?>
+<!--
+  Paper Format
+    Internal A4
+      Szállítólevél
+      Gyártási lap
+-->
+<openerp>
+  <data>
+    <template id="report_szallitolevel">
+      <t t-call="report.html_container">
+        <t t-foreach="docs"  t-as="o">
+
+          <!-- Multicompany -->
+          <t t-if="o and 'company_id' in o">
+            <t t-set="company" t-value="o.company_id"></t>
+          </t>
+          <t t-if="not o or not 'company_id' in o">
+            <t t-set="company" t-value="res_company"></t>
+          </t>
+          <div class="header">
+            <div class="row">
+              <div class="col-xs-3">
+                <img t-if="company.logo" t-att-src="'data:image/png;base64,%s' % company.logo" style="max-height: 45px;"/>
+              </div>
+              <div class="col-xs-9 text-right" style="margin-top:20px;" t-field="company.rml_header1"/>
+            </div>
+            <div class="row zero_min_height">
+              <div class="col-xs-12">
+                <div style="border-bottom: 1px solid black;"></div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-xs-3">
+                <div t-field="company.partner_id"
+                    t-field-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": true}'
+                    style="border-bottom: 1px solid black;"/>
+              </div>
+              <div class="col-xs-9">
+                <h4 style="text-align: right;">Szállítólevél - #LR<span t-field="o.id"/> - <span t-field="o.state"/></h4>
+              </div>
+            </div>
+          </div>
+
+          <t t-call="report.external_layout">
+            <div class="page" style="font-size: 10pt;">
+              <table  class="table  table-bordered">
+                <tr>
+                  <th>Szállító</th>
+                  <th>Átvevő</th>
+                </tr>
+                <tr>
+                  <td> <span t-field="o.forrashely_id.nev"/> </td>
+                  <td> <span t-field="o.celallomas_id.nev"/> </td>
+                </tr>
+                <tr>
+                  <td>
+                    <span t-field="o.forrashely_id.telepules"/>,
+                    <span t-field="o.forrashely_id.cim"/>
+                  </td>
+                  <td>
+                    <span t-field="o.celallomas_id.telepules"/>
+                    <span t-field="o.celallomas_id.cim"/>
+                  </td>
+                </tr>
+              </table>
+              <br></br>
+              <table class="table table-condensed">
+                <tr>
+                  <th>Sorszám</th>
+                  <th>Rendelés</th>
+                  <th>Cikkszám</th>
+                  <th>Cikknév</th>
+                  <th class="text-right">Mennyiség</th>
+                  <th>Kód</th>
+                  <th>Megj.</th>
+                </tr>
+                <tr t-foreach="o.mozgassor_ids" t-as="oo">
+                    <td> <span t-field="oo.gyartasi_lap_id.id"/> </td>
+                    <td> <span t-field="oo.gyartasi_lap_id.rendelesszam"/> </td>
+                    <td>
+                      <span t-field="oo.cikk_id"/>
+                      <span t-field="oo.bom_id"/>
+                    </td>
+                    <td> <span t-field="oo.cikknev"/> </td>
+                    <td class="text-right"> <span t-field="oo.mennyiseg"/> </td>
+                    <td> <span t-field="oo.hibakod_id"/> </td>
+                    <td> <span t-field="oo.megjegyzes"/> </td>
+                </tr>
+              </table>
+              <br></br>
+              <p>
+                <b>Megjegyzés:</b> <span t-field="o.megjegyzes"/>
+                <br></br>
+                <br></br>
+                <b>Kelt:</b> <span t-field="o.forrashely_id.telepules"/>, <span t-field="o.create_date"/>
+              </p>
+              <br></br>
+              <br></br>
+
+              <div class="row">
+                <div  class="col-xs-1"> </div>
+                <div  class="col-xs-4">
+                  ............................................................
+                </div>
+                <div  class="col-xs-6">
+                  ........................................................................................
+                </div>
+                <div  class="col-xs-1"> </div>
+              </div>
+              <div class="row">
+                <div  class="col-xs-2"> </div>
+                <div  class="col-xs-4">
+                  Átadó
+                </div>
+                <div  class="col-xs-6">
+                  Átvevő olvasható neve, aláírása
+                </div>
+              </div>
+            </div>
+<!--
+-->
+          </t>
+        </t>
+      </t>
+    </template>
+
+    <template id="report_gyartasi_lap">
+      <t t-call="report.html_container">
+        <t t-foreach="docs"  t-as="o">
+          <t t-call="report.internal_layout">
+<!--
+-->
+            <div class="page" style="font-size: 10pt;">
+              <h4 style="text-align: right;">Gyártási lap #<b><span t-field="o.id"/></b></h4>
+              <table class="table table-condensed table-bordered">
+                <tr>
+                  <td>Gyártási rend:</td>               <td><b><span t-field="o.rendelesszam"/></b></td>
+                  <td align="right">Kiadás:</td>        <td><span t-field="o.kiadas_ideje"/></td>
+                  <td align="right">Rendelt db:</td>    <td><b><span t-field="o.rendelt_db"/></b></td>
+                  <td align="right">Határidő:</td>      <td><span t-field="o.hatarido"/></td>
+                </tr>
+                <tr>
+                  <td>Referencia:</td>                  <td colspan="3"><span t-field="o.cikk_id"/> <span t-field="o.cikk_id.cikknev"/> </td>
+                  <td align="right">Jegyzet:</td>       <td colspan="3"><span t-field="o.jegyzet"/></td>
+                </tr>
+<!--
+-->
+              </table>
+              <table class="table table-condensed table-bordered" style="font-size: 9pt;">
+                <tr>
+                  <th>Műveleti utasítás</th>
+                  <th>Darabjegyzék</th>
+                </tr>
+                <tr>
+                  <td>
+                    <table class="table table-condensed">
+                      <tr>
+                        <th>msz.</th>
+                        <th>hom.</th>
+                        <th>megnevezés</th>
+                        <th>össz.</th>
+                        <th>beáll.</th>
+                      </tr>
+                      <tr t-foreach="o.gylap_muvelet_ids" t-as="oo">
+                        <td align="right"> <span t-field="oo.muveleti_szam"/> </td>
+                        <td> <span t-field="oo.homogen_id"/> </td>
+                        <td> <span t-field="oo.megnevezes"/> </td>
+                        <td align="right"> <span t-esc="round(oo.ossz_ido,3)"/> </td>
+                        <td align="right"> <span t-esc="round(oo.beall_ido,3)"/> </td>
+                      </tr>
+                    </table>
+
+                  </td>
+                  <td>
+                    <table class="table table-condensed">
+                      <tr>
+                        <th>referencia</th>
+                        <th>beépül</th>
+                        <th>PRICE</th>
+                      </tr>
+                      <tr t-foreach="o.gylap_dbjegyzek_ids" t-as="oo">
+                        <td> <span t-field="oo.cikk_id"/> <span t-field="oo.cikk_id.cikknev"/> </td>
+                        <td align="right"> <span t-esc="round(oo.ossz_beepules,5)"/> </td>
+                        <td align="right"> <span t-field="oo.bekerulesi_ar"/> </td>
+                      </tr>
+                    </table>
+
+                  </td>
+                </tr>
+              </table>
+            </div>
+<!--
+-->
+          </t>
+        </t>
+      </t>
+    </template>
+
+    <report
+      id="report_legrand_szallitolevel"
+      model="legrand.mozgasfej"
+      string="Szállítólevél"
+      report_type="qweb-pdf"
+      name="legrand.report_szallitolevel"
+    />
+
+    <report
+      id="report_legrand_gyartasi_lap"
+      model="legrand.gyartasi_lap"
+      string="Gyártási lap"
+      report_type="qweb-pdf"
+      name="legrand.report_gyartasi_lap"
+    />
+
+  </data>
+</openerp>

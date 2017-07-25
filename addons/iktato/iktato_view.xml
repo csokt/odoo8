@@ -1,0 +1,335 @@
+<?xml version="1.0"?>
+<openerp>
+  <data>
+    <!--####################################################################################################################  Iktatókönyv  -->
+    <record id="view_form_iktato_konyv"    model="ir.ui.view">
+      <field  name="name">Iktató Könyv Form</field>
+      <field  name="model">iktato.konyv</field>
+      <field  name="arch" type="xml">
+        <form string="iktato.konyv">
+          <group col="4">
+            <field name="iratszam_be"             attrs="{'invisible':  [('irany','!=','be')], 'required':  [('irany','=','be')]}"/>
+            <field name="iratszam_ki"             attrs="{'invisible':  [('irany','!=','ki')]}"/>
+            <field name="tipus"/>
+            <field name="irany"                   readonly="1"/>
+            <field name="elozmeny_id"/>
+            <field name="id"                      string="Sorszám"/>
+            <field name="targy"/>
+            <field name="megjegyzes"/>
+            <field name="partner_id"/>
+            <field name="melleklet"/>
+            <field name="osztaly_id"/>
+            <field name="kezeles_mod"/>
+            <field name="osztaly_ids"             widget="many2many_tags"/>
+            <field name="regi_sorszam"/>
+            <field name="eloado_id"/>
+            <field name="megtekintes"/>
+            <field name="irat_kelte"/>
+            <field name="create_date"             readonly="1" string="Iktatás ideje"/>
+            <field name="ugy_id"/>
+            <field name="name"/>
+            <field name="szerzodes_id"            groups="iktato.group_iktato_manager"/>
+            <field name="iratszam"                invisible="True"/>
+            <field name="megtekintes_novelheto"   invisible="True"/>
+          </group>
+          <button name="megtekintesi_szint_csokkentes" type="object" string="Megtekintési szint csökkentés" class="oe_highlight oe_read_only"
+            attrs="{'invisible':  ['|', ('megtekintes','=',0), ('ugy_id','!=',False)]}"
+            />
+          <button name="megtekintesi_szint_noveles" type="object" string="Megtekintési szint növelés" class="oe_highlight oe_read_only"
+            attrs="{'invisible':  ['|', ('megtekintes_novelheto','=',False), ('ugy_id','!=',False)]}"
+            />
+          <button name="ugygeneralas" type="object" string="Ügygenerálás" class="oe_highlight oe_read_only"
+            attrs="{'invisible':  ['|', ('irany','!=','ki'), ('ugy_id','!=',False)]}"
+            />
+          <div class="oe_chatter">
+
+<!--
+            <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+-->
+            <field name="message_ids" widget="mail_thread"/>
+          </div>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_tree_iktato_konyv"    model="ir.ui.view">
+      <field  name="name">Iktató Könyv Tree</field>
+      <field  name="model">iktato.konyv</field>
+      <field  name="arch" type="xml">
+        <tree>
+          <field name="id" string="Sorszám"/>
+          <field name="irany"/>
+          <field name="tipus"/>
+          <field name="iratszam"/>
+          <field name="targy"/>
+          <field name="osztaly_id"/>
+          <field name="partner_id"/>
+          <field name="elozmeny_id"/>
+          <field name="irat_kelte"/>
+          <field name="regi_sorszam"/>
+          <field name="ugysorszam"/>
+          <field name="create_date" readonly="1" string="Iktatás ideje"/>
+        </tree>
+      </field>
+    </record>
+<!--
+          <field name="osztaly_ids" widget="many2many_tags"/>
+-->
+    <record id="view_filter_iktato_konyv"    model="ir.ui.view">
+      <field  name="name">Iktató Könyv Filter</field>
+      <field  name="model">iktato.konyv</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field name="name"/>
+          <field name="osztaly_id"/>
+          <field name="megjegyzes"/>
+          <filter domain="[('create_date','&lt;=', datetime.datetime.combine(context_today(), datetime.time(23,59,59))),
+                           ('create_date','&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0)))]"
+                  string="Ma" help="A mai napon rögzített iratok"/>
+          <separator/>
+          <filter domain="[('create_date','&gt;=', ((context_today()-datetime.timedelta(days=1)).strftime('%Y-%m-%d 00:00:00'))),
+                           ('create_date','&lt;=', ((context_today()+datetime.timedelta(days=0)).strftime('%Y-%m-%d 00:00:00')))]"
+                  string="Tegnap" help="Tegnap rögzített iratok"/>
+
+        </search>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Ügy  -->
+    <record id="view_form_iktato_ugy"    model="ir.ui.view">
+      <field  name="name">Iktató Ügy Form</field>
+      <field  name="model">iktato.ugy</field>
+      <field  name="arch" type="xml">
+        <form string="iktato.ugy" create="false">
+          <group col="4">
+            <field name="targy"/>
+            <field name="megjegyzes"/>
+            <field name="partner_id"/>
+            <field name="name"/>
+            <field name="osztaly_id"/>
+            <field name="ugysorszam" readonly="1"/>
+            <field name="eloado_id"/>
+            <field name="megtekintes" readonly="1"/>
+            <field name="megtekintes_novelheto" invisible="True"/>
+          </group>
+          <button name="megtekintesi_szint_csokkentes" type="object" string="Megtekintési szint csökkentés" class="oe_highlight oe_read_only"
+            attrs="{'invisible':  [('megtekintes','=',0)]}"
+            />
+          <button name="megtekintesi_szint_noveles" type="object" string="Megtekintési szint növelés" class="oe_highlight oe_read_only"
+            attrs="{'invisible':  [('megtekintes_novelheto','=',False)]}"
+            />
+          <div>
+            <field name="konyv_ids"/>
+          </div>
+          <div class="oe_chatter">
+            <field name="message_follower_ids" widget="mail_followers" groups="base.group_user"/>
+            <field name="message_ids" widget="mail_thread"/>
+          </div>
+        </form>
+      </field>
+    </record>
+<!--
+-->
+
+    <record id="view_tree_iktato_ugy"    model="ir.ui.view">
+      <field  name="name">Iktató Ügy Tree</field>
+      <field  name="model">iktato.ugy</field>
+      <field  name="arch" type="xml">
+        <tree create="false">
+          <field name="ugysorszam"/>
+          <field name="targy"/>
+          <field name="eloado_id"/>
+          <field name="osztaly_id"/>
+          <field name="partner_id"/>
+          <field name="megjegyzes"/>
+        </tree>
+      </field>
+    </record>
+
+<!--
+    <record id="view_filter_iktato_ugy"    model="ir.ui.view">
+      <field  name="name">Iktató Ügy Filter</field>
+      <field  name="model">iktato.ugy</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field name="name"/>
+          <field name="targy"/>
+          <field name="osztaly_id"/>
+          <field name="eloado_id"/>
+          <field name="partner_id"/>
+          <field name="megjegyzes"/>
+        </search>
+      </field>
+    </record>
+-->
+    <!--####################################################################################################################  Szerződés  -->
+    <record id="view_form_iktato_szerzodes"    model="ir.ui.view">
+      <field  name="name">Szerződés Form</field>
+      <field  name="model">iktato.szerzodes</field>
+      <field  name="arch" type="xml">
+        <form string="iktato.szerzodes">
+          <group col="4">
+            <field name="szerz_tipus_id"/>
+            <field name="szerzodesszam"/>
+            <field name="targy"/>
+            <field name="kelte"/>
+            <field name="partner_id"/>
+            <field name="kezdete"/>
+            <field name="penznem"/>
+            <field name="vege"/>
+            <field name="osszeg"/>
+            <field name="hatarido"/>
+            <field name="utem_osszeg"/>
+            <field name="szerz_utem_id"/>
+            <field name="megjegyzes"/>
+            <field name="megtekintes"/>
+            <field name="name"/>
+            <field name="megtekintes_novelheto" invisible="True"/>
+          </group>
+          <button name="megtekintesi_szint_csokkentes" type="object" string="Megtekintési szint csökkentés" class="oe_highlight oe_read_only"
+            attrs="{'invisible':  [('megtekintes','=',0)]}"
+            />
+          <button name="megtekintesi_szint_noveles" type="object" string="Megtekintési szint növelés" class="oe_highlight oe_read_only"
+            attrs="{'invisible':  [('megtekintes_novelheto','=',False)]}"
+            />
+          <field name="iktatokonyv_ids"/>
+          <field name="szerzodes_log_ids"/>
+          <div class="oe_chatter">
+            <field name="message_ids" widget="mail_thread"/>
+          </div>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_tree_iktato_szerzodes"    model="ir.ui.view">
+      <field  name="name">Szerződés Tree</field>
+      <field  name="model">iktato.szerzodes</field>
+      <field  name="arch" type="xml">
+        <tree>
+          <field name="id"                string="Sorszám"/>
+          <field name="szerz_tipus_id"/>
+          <field name="szerzodesszam"/>
+          <field name="targy"/>
+          <field name="partner_id"/>
+          <field name="penznem"/>
+          <field name="osszeg"/>
+          <field name="utem_osszeg"/>
+          <field name="kelte"/>
+          <field name="kezdete"/>
+          <field name="vege"/>
+          <field name="hatarido"/>
+          <field name="szerz_utem_id"/>
+          <field name="write_date"        string="Rögzítés ideje"/>
+        </tree>
+      </field>
+    </record>
+<!--
+          <field name="osztaly_ids" widget="many2many_tags"/>
+-->
+    <record id="view_filter_iktato_szerzodes"    model="ir.ui.view">
+      <field  name="name">Szerződés Filter</field>
+      <field  name="model">iktato.szerzodes</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field name="name"/>
+          <field name="szerzodesszam"/>
+          <field name="targy"/>
+          <field name="partner_id"/>
+          <field name="megjegyzes"/>
+        </search>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Szerződés log -->
+    <record id="view_form_iktato_szerzodes_log"    model="ir.ui.view">
+      <field  name="name">Szerződés Form</field>
+      <field  name="model">iktato.szerzodes_log</field>
+      <field  name="arch" type="xml">
+        <form string="iktato.szerzodes">
+          <group col="4">
+            <field name="szerz_tipus_id"/>
+            <field name="szerzodesszam"/>
+            <field name="targy"/>
+            <field name="kelte"/>
+            <field name="partner_id"/>
+            <field name="kezdete"/>
+            <field name="penznem"/>
+            <field name="vege"/>
+            <field name="osszeg"/>
+            <field name="hatarido"/>
+            <field name="utem_osszeg"/>
+            <field name="szerz_utem_id"/>
+            <field name="megjegyzes"/>
+            <field name="megtekintes"/>
+            <field name="name"/>
+          </group>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_tree_iktato_szerzodes_log"    model="ir.ui.view">
+      <field  name="name">Szerződés log Tree</field>
+      <field  name="model">iktato.szerzodes_log</field>
+      <field  name="arch" type="xml">
+        <tree>
+          <field name="szerz_tipus_id"/>
+          <field name="szerzodesszam"/>
+          <field name="targy"/>
+          <field name="partner_id"/>
+          <field name="penznem"/>
+          <field name="osszeg"/>
+          <field name="utem_osszeg"/>
+          <field name="kelte"/>
+          <field name="kezdete"/>
+          <field name="vege"/>
+          <field name="hatarido"/>
+          <field name="szerz_utem_id"/>
+          <field name="rogzites"          string="Rögzítés ideje"/>
+        </tree>
+      </field>
+    </record>
+
+    <!--  Actions  -->
+    <record id="iktato_bejovo_level" model="ir.actions.act_window">
+      <field name="name">Bejövő levél</field>
+      <field name="type">ir.actions.act_window</field>
+      <field name="res_model">iktato.konyv</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">tree,form</field>
+      <field name="domain">[('irany','=','be'), ('tipus','=','level')]</field>
+      <field name="context">{'irany':'be', 'tipus': 'level'}</field>
+      <field name="view_ids" eval="[(5, 0, 0),
+          (0, 0, {'view_mode': 'tree', 'view_id': ref('view_tree_iktato_konyv')}),
+          (0, 0, {'view_mode': 'form', 'view_id': ref('view_form_iktato_konyv')})]"/>
+    </record>
+    <act_window id="iktato_bejovo_szamla"     name="Bejövő számla"    res_model="iktato.konyv"        view_id="view_tree_iktato_konyv"  view_mode="tree,form"
+                domain="[('irany','=','be'), ('tipus','=','szamla')]" context="{'irany':'be', 'tipus': 'szamla'}"/>
+    <act_window id="iktato_bejovo_szerzodes"  name="Bejövő szerződés" res_model="iktato.konyv"        view_id="view_tree_iktato_konyv"  view_mode="tree,form"
+                domain="[('irany','=','be'), ('tipus','=','szerz')]"  context="{'irany':'be', 'tipus': 'szerz'}"/>
+    <act_window id="iktato_bejovo_irat"       name="Bejövő irat"      res_model="iktato.konyv"        view_id="view_tree_iktato_konyv"  view_mode="tree,form"
+                domain="[('irany','=','be')]" context="{'irany':'be'}"/>
+    <act_window id="iktato_kimeno_irat"       name="Kimenő irat"      res_model="iktato.konyv"        view_id="view_tree_iktato_konyv"  view_mode="tree,form"
+                domain="[('irany','=','ki')]" context="{'irany':'ki', 'tipus': 'level'}"/>
+    <act_window id="iktato_konyv"             name="Iktatókönyv"      res_model="iktato.konyv"        view_id="view_tree_iktato_konyv"  view_mode="tree,form"/>
+    <act_window id="iktato_ugy"               name="Ügy"              res_model="iktato.ugy"                                            view_mode="tree,form" />
+
+    <act_window id="iktato_szerzodes"         name="Szerződés"        res_model="iktato.szerzodes"                                      view_mode="tree,form" />
+
+    <!--  Menu  items  -->
+    <menuitem id="menu_root" name="Iktatás" sequence="202" groups="group_iktato_viewer" />
+    <menuitem id="menu_iktatas"                   name="Iktatás"            parent="menu_root"      sequence="10" />
+      <menuitem id="menu_iktato_bejovo_level"     name="Bejövő levelek"     parent="menu_iktatas"   sequence="10" action="iktato_bejovo_level" />
+      <menuitem id="menu_iktato_bejovo_szamla"    name="Bejövő számlák"     parent="menu_iktatas"   sequence="20" action="iktato_bejovo_szamla" />
+      <menuitem id="menu_iktato_bejovo_szerzodes" name="Bejövő szerződések" parent="menu_iktatas"   sequence="30" action="iktato_bejovo_szerzodes" />
+      <menuitem id="menu_iktato_bejovo_irat"      name="Bejövő iratok"      parent="menu_iktatas"   sequence="40" action="iktato_bejovo_irat" />
+      <menuitem id="menu_iktato_kimeno_irat"      name="Kimenő iratok"      parent="menu_iktatas"   sequence="50" action="iktato_kimeno_irat" />
+      <menuitem id="menu_iktato_iktato_konyv"     name="Iktatókönyv"        parent="menu_iktatas"   sequence="60" action="iktato_konyv" />
+      <menuitem id="menu_iktato_ugy"              name="Ügyek"              parent="menu_iktatas"   sequence="70" action="iktato_ugy" />
+
+    <menuitem id="menu_szerzodes"                 name="Szerződés"          parent="menu_root"      sequence="10"                       groups="group_iktato_manager" />
+      <menuitem id="menu_iktato_szerzodes"        name="Szerződések"        parent="menu_szerzodes" sequence="10" action="iktato_szerzodes" />
+<!--
+    <act_window id="iktato_ugy" name="Ügyek" res_model="iktato.ugy" view_id="view_tree_iktato_ugy" view_mode="tree,form" />
+-->
+  </data>
+</openerp>

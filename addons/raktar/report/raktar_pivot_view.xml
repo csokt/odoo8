@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="utf-8"?>
+<openerp>
+  <data>
+
+    <!--####################################################################################################################  Készlet  -->
+    <record id="view_graph_raktar_keszlet_ertekel" model="ir.ui.view">
+     <field name="name">raktar.keszlet_ertekel.graph</field>
+     <field name="model">raktar.keszlet_ertekel</field>
+     <field name="arch" type="xml">
+       <graph string="Készlet értékelés"  type="pivot" stacked="True">
+         <field name="product_id"         type="row"/>
+         <field name="location_id"        type="col"/>
+         <field name="qty"                type="measure"/>
+       </graph>
+     </field>
+    </record>
+
+    <record id="view_filter_raktar_keszlet_ertekel" model="ir.ui.view">
+      <field name="name">raktar.keszlet_ertekel.search</field>
+      <field name="model">raktar.keszlet_ertekel</field>
+      <field name="arch" type="xml">
+        <search string="Készlet értékelés">
+          <field name="product_id"/>
+          <field name="location_id"/>
+          <filter name="internal_location" string="Belső termékhelyek" domain="[('location_id.usage', '=', 'internal')]"/>
+          <separator/>
+          <filter name="anyag"  string="Anyag"  domain="[('product_id.anyag',  '=', True)]"/>
+          <filter name="termek" string="Termék" domain="[('product_id.termek', '=', True)]"/>
+          <separator/>
+          <separator/>
+          <filter name="sale_ok_true"   string="Értékesíthető"      domain="[('sale_ok', '=', True)]"/>
+          <filter name="sale_ok_false"  string="Nem értékesíthető"  domain="[('sale_ok', '=', False)]"/>
+          <separator/>
+          <filter string="Ebben az évben" name="year" domain="[('in_date','&lt;=', time.strftime('%%Y-12-31')),('in_date','&gt;=',time.strftime('%%Y-01-01'))]"/>
+          <group expand="1" string="Csoportosítás">
+            <filter name="product" string="Termék" context="{'group_by':'product_id'}"/>
+          </group>
+        </search>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Gyártási lap  -->
+    <record id="view_graph_raktar_gylap_ertekel" model="ir.ui.view">
+     <field name="name">raktar.gylap_ertekel.graph</field>
+     <field name="model">raktar.gyartasi_lap</field>
+     <field name="arch" type="xml">
+       <graph string="Gyártási lap értékelés"  type="pivot" stacked="True">
+         <field name="rendelesszam"       type="row"/>
+         <field name="rendelt_db"         type="measure"/>
+         <field name="teljesitett_db"     type="measure"/>
+         <field name="hatralek_db"        type="measure"/>
+         <field name="szamlazott_db"      type="measure"/>
+         <field name="szamlazhato_db"     type="measure"/>
+       </graph>
+     </field>
+    </record>
+
+    <!--####################################################################################################################  Gyártás  -->
+    <record id="view_graph_raktar_gyartas_ertekel" model="ir.ui.view">
+     <field name="name">raktar.gyartas_ertekel.graph</field>
+     <field name="model">raktar.gyartas</field>
+     <field name="arch" type="xml">
+       <graph string="Gyártás értékelés"  type="pivot" stacked="True">
+         <field name="gyartasi_hely_id"   type="row"/>
+         <field name="gyartando_ora"      type="measure"/>
+       </graph>
+     </field>
+    </record>
+
+    <!--####################################################################################################################  Homogén  -->
+    <record id="view_graph_raktar_homogen_ertekel" model="ir.ui.view">
+     <field name="name">raktar.homogen_ertekel.graph</field>
+     <field name="model">raktar.homogen</field>
+     <field name="arch" type="xml">
+       <graph string="Homogén értékelés"  type="pivot" stacked="True">
+         <field name="gyartasi_lap_id"    type="row"/>
+         <field name="homogen_id"         type="col"/>
+         <field name="szamlazhato_ora"    type="measure"/>
+       </graph>
+     </field>
+    </record>
+
+    <!--####################################################################################################################  Selejt szétszerelés, pótlás  -->
+    <record id="view_graph_raktar_selejtkovet_ert" model="ir.ui.view">
+     <field name="name">raktar.selejtkovet_ertekel.graph</field>
+     <field name="model">raktar.selejtkovet</field>
+     <field name="arch" type="xml">
+       <graph string="Selejtkövetés ért"  type="pivot" stacked="True">
+         <field name="product_id"         type="row"/>
+         <field name="hely_id"            type="col"/>
+         <field name="szamolt"            type="measure"/>
+       </graph>
+     </field>
+    </record>
+
+    <!--####################################################################################################################  Üzem készlet  -->
+    <record id="view_graph_raktar_uzem_keszl_ert" model="ir.ui.view">
+     <field name="name">raktar.uzem_keszlet.graph</field>
+     <field name="model">raktar.uzem_keszlet</field>
+     <field name="arch" type="xml">
+       <graph string="Üzem készlet"       type="pivot" stacked="True">
+         <field name="uzem_id"            type="row"/>
+         <field name="product_id"         type="row"/>
+         <field name="hely_id"            type="col"/>
+         <field name="raktaron"           type="measure"/>
+         <field name="tervezett"          type="measure"/>
+       </graph>
+     </field>
+    </record>
+<!--
+         <field name="sorszam"            type="row"/>
+-->
+
+    <!--####################################################################################################################  Actions  -->
+    <record id="raktar_keszlet_ertekel" model="ir.actions.act_window">
+      <field name="name">Készlet értékelés</field>
+      <field name="res_model">raktar.keszlet_ertekel</field>
+      <field name="view_type">form</field>
+      <field name="view_mode">graph</field>
+      <field name="view_id"               ref="view_graph_raktar_keszlet_ertekel"/>
+      <field name="search_view_id"        ref="view_filter_raktar_keszlet_ertekel"/>
+      <field name="context">{'search_default_internal_location':1}</field>
+    </record>
+
+    <act_window id="raktar_gylap_ertekel"     name="Gyártási lap értékelés"   res_model="raktar.gyartasi_lap"     view_id="view_graph_raktar_gylap_ertekel"     view_mode="graph"
+                context="{'search_default_szamlazhato':1}"/>
+
+    <act_window id="raktar_gyartas_ertekel"   name="Gyártás értékelés"        res_model="raktar.gyartas"          view_id="view_graph_raktar_gyartas_ertekel"   view_mode="graph"
+                context="{'search_default_filter_nem_kesz':1}"/>
+
+    <act_window id="raktar_homogen_ertekel"   name="Homogén értékelés"        res_model="raktar.homogen"          view_id="view_graph_raktar_homogen_ertekel"   view_mode="graph"
+                domain="[('sajat','=',True)]" context="{'search_default_szamlazhato':1}"/>
+
+    <act_window id="raktar_selejtkovet_ert"   name="Selejtkövetés értékelés"  res_model="raktar.selejtkovet"      view_id="view_graph_raktar_selejtkovet_ert"   view_mode="graph"/>
+
+    <act_window id="raktar_uzem_keszl_ert"    name="Üzem készlet"             res_model="raktar.uzem_keszlet"     view_id="view_graph_raktar_uzem_keszl_ert"    view_mode="graph"
+                context="{'search_default_filter_helyi': 1}"/>
+
+    <!--####################################################################################################################  Menu  items  -->
+    <menuitem id="menu_raktar_report"             name="Raktár"                 parent="base.menu_reporting"  sequence="14"   groups="group_raktar_viewer" />
+      <menuitem id="menu_raktar_keszlet_ertekel"  name="Készlet értékelés"      parent="menu_raktar_report"   sequence="10"   action="raktar_keszlet_ertekel" />
+      <menuitem id="menu_raktar_gylap_ertekel"    name="Gyártási lap értékelés" parent="menu_raktar_report"   sequence="20"   action="raktar_gylap_ertekel" />
+      <menuitem id="menu_raktar_gyartas_ertekel"  name="Gyártás értékelés"      parent="menu_raktar_report"   sequence="30"   action="raktar_gyartas_ertekel" />
+      <menuitem id="menu_raktar_homogen_ertekel"  name="Homogén értékelés"      parent="menu_raktar_report"   sequence="40"   action="raktar_homogen_ertekel" />
+      <menuitem id="menu_raktar_selejtkovet_ert"  name="Selejtkövetés"          parent="menu_raktar_report"   sequence="50"   action="raktar_selejtkovet_ert" />
+      <menuitem id="menu_raktar_uzem_keszl_ert"   name="Üzem készlet"           parent="menu_raktar_report"   sequence="60"   action="raktar_uzem_keszl_ert" />
+
+  </data>
+</openerp>

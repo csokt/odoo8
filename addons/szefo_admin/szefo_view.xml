@@ -1,0 +1,198 @@
+<?xml version="1.0"?>
+<openerp>
+  <data>
+
+    <!--  Log  -->
+    <record id="view_tree_szefo_log"    model="ir.ui.view">
+      <field  name="name">Log Tree</field>
+      <field  name="model">szefo.log</field>
+      <field  name="arch" type="xml">
+        <tree>
+          <field  name="loglevel"/>
+          <field  name="module"/>
+          <field  name="table"/>
+          <field  name="name"/>
+          <field  name="value"/>
+          <field  name="rowid"/>
+          <field  name="create_uid"/>
+          <field  name="create_date"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_szefo_log"    model="ir.ui.view">
+      <field  name="name">Log Filter</field>
+      <field  name="model">szefo.log</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field  name="module"/>
+          <field  name="table"/>
+          <field  name="name"/>
+          <field  name="value"/>
+          <field  name="rowid"/>
+          <filter string="Notice"  domain="[('loglevel','=','notice')]"/>
+          <filter string="Info"    domain="[('loglevel','=','info')]"/>
+          <filter string="Warning" domain="[('loglevel','=','warning')]"/>
+          <filter string="Error"   domain="[('loglevel','=','error')]"/>
+        </search>
+      </field>
+    </record>
+
+    <!--  Szefo admin import -->
+    <record id="view_tree_szefo_admin_import"    model="ir.ui.view">
+      <field  name="name">Szefo Admin Import Tree</field>
+      <field  name="model">szefo.parameter</field>
+      <field  name="arch" type="xml">
+        <tree create="false" >
+          <button name="import_nexon" type="object" string="Nexon személy import" class="oe_highlight" confirm="Importálod a személy adatokat a Nexonból?" />
+        </tree>
+      </field>
+    </record>
+
+    <!--  Személy  -->
+    <record id="view_tree_nexon_szemely"    model="ir.ui.view">
+      <field  name="name">Nexon Szemely Tree</field>
+      <field  name="model">nexon.szemely</field>
+      <field  name="arch" type="xml">
+        <tree>
+          <field  name="name"/>
+          <field  name="SzulIdo"/>
+          <button name="copy_szemely" type="object" string="Átvétel a VIR alkalmazottak közé" class="oe_highlight" />
+          <field  name="employee_id"/>
+        </tree>
+      </field>
+    </record>
+
+    <!--  Odoo users  -->
+    <record id="view_tree_szefo_user"    model="ir.ui.view">
+      <field  name="name">Odoo User Tree</field>
+      <field  name="model">res.users</field>
+      <field  name="arch" type="xml">
+        <tree create="false" editable="top">
+          <field  name="name" readonly="1"/>
+          <field  name="login" readonly="1"/>
+          <field  name="sajat_raktar_id"/>
+          <field  name="security_clearance"/>
+        </tree>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Jogosultság  -->
+    <record id="view_form_szefo_jogosultsag"    model="ir.ui.view">
+      <field name="name">Jogosultság Form</field>
+      <field name="model">szefo.jogosultsag</field>
+      <field name="arch" type="xml">
+        <form>
+          <group col="4">
+            <field name="felhasznalo_id"    options="{'no_create': True, 'no_open': True}"/>
+            <field name="id"                invisible="1"/>
+            <field name="jogosultsag_csoport"/>
+            <field name="jogosultsagnev_id"/>
+            <field name="allapot"/>
+            <field name="engedelyezo_id"    options="{'no_create': True, 'no_open': True}"/>
+            <field name="write_uid"         readonly="1"  string="Módosította"  options="{'no_open': True}"/>
+            <field name="write_date"        readonly="1"  string="Módosítás ideje"/>
+          </group>
+          <field name="jogosultsag_log_ids"/>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_form_szefo_jogosultsag_masol"    model="ir.ui.view">
+      <field name="name">Jogosultság másol Form</field>
+      <field name="model">szefo.jogosultsag_masol</field>
+      <field name="arch" type="xml">
+        <form>
+          <button name="jogosultsag_masol_update" type="object" string="Jogosultságok frissítése az kijelölt adatokkal" class="oe_highlight" />
+          <button name="jogosultsag_import"       type="object" string="Jogosultságok végleges importálása" class="oe_highlight" confirm="Az összes jogosultság felvétele."/>
+          <group col="4">
+            <field name="felhasznalo_id"    options="{'no_create': True, 'no_open': True}"/>
+            <field name="engedelyezo_id"    options="{'no_create': True, 'no_open': True}"/>
+          </group>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_tree_szefo_jogosultsag"   model="ir.ui.view">
+      <field  name="name">Jogosultság Tree</field>
+      <field  name="model">szefo.jogosultsag</field>
+      <field  name="arch" type="xml">
+        <tree editable="top">
+          <field name="felhasznalo_id"    options="{'no_create': True, 'no_open': True}"/>
+          <field name="jogosultsag_csoport"/>
+          <field name="jogosultsagnev_id"/>
+          <field name="allapot"/>
+          <field name="engedelyezo_id"    options="{'no_create': True, 'no_open': True}"/>
+          <field name="write_uid"         readonly="1"  string="Módosította"  options="{'no_open': True}"/>
+          <field name="write_date"        readonly="1"  string="Módosítás ideje"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_tree_szefo_jogosultsag_masol"   model="ir.ui.view">
+      <field  name="name">Jogosultság másol Tree</field>
+      <field  name="model">szefo.jogosultsag_masol</field>
+      <field  name="arch" type="xml">
+        <tree editable="top">
+          <field name="felhasznalo_id"    options="{'no_create': True, 'no_open': True}"/>
+          <field name="jogosultsag_csoport"/>
+          <field name="jogosultsagnev_id"/>
+          <field name="allapot"/>
+          <field name="engedelyezo_id"    options="{'no_create': True, 'no_open': True}"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_tree_szefo_jogosultsag_log"   model="ir.ui.view">
+      <field  name="name">Jogosultság log Tree</field>
+      <field  name="model">szefo.jogosultsag_log</field>
+      <field  name="arch" type="xml">
+        <tree>
+          <field name="felhasznalo_id"/>
+          <field name="jogosultsag_csoport"/>
+          <field name="jogosultsagnev_id"/>
+          <field name="allapot"/>
+          <field name="engedelyezo_id"/>
+          <field name="rogzito_uid"/>
+          <field name="rogzitesi_ido"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_szefo_jogosultsag"    model="ir.ui.view">
+      <field  name="name">Jogosultság Filter</field>
+      <field  name="model">szefo.jogosultsag</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field name="felhasznalo_id"/>
+          <field name="jogosultsag_csoport"/>
+          <field name="jogosultsagnev_id"/>
+        </search>
+      </field>
+    </record>
+
+    <!--  Actions  -->
+    <act_window id="szefo_telephely" name="Telephely" res_model="szefo.telephely" view_mode="tree,form" />
+    <act_window id="nexon_szemely" name="Nexon személy" res_model="nexon.szemely" view_mode="tree,form" />
+    <act_window id="szefo_jogosultsag" name="Jogosultság" res_model="szefo.jogosultsag" view_mode="tree,form" />
+    <act_window id="szefo_jogosultsag_masol" name="Jogosultság másol" res_model="szefo.jogosultsag_masol" view_mode="tree,form" />
+    <act_window id="szefo_log" name="Log" res_model="szefo.log" view_mode="tree" />
+    <act_window id="szefo_admin_import" name="Import" res_model="szefo.parameter" view_mode="tree" view_id="view_tree_szefo_admin_import"/>
+    <act_window id="szefo_user" name="Felhasználó" res_model="res.users" view_mode="tree" view_id="view_tree_szefo_user"/>
+
+
+    <!--  Menu  items  -->
+    <menuitem id="menu_root" name="SZEFO admin" sequence="400" groups="group_szefoadmin_manager" />
+    <menuitem id="menu_adat" name="Adattáblák" parent="menu_root" sequence="10" />
+      <menuitem id="menu_szefo_telephely" name="Telephelyek" parent="menu_adat" sequence="10" action="szefo_telephely" />
+      <menuitem id="menu_nexon_szemely" name="Nexon személyek" parent="menu_adat" sequence="20" action="nexon_szemely" />
+      <menuitem id="menu_szefo_jogosultsag" name="Jogosultságok" parent="menu_adat" sequence="30" action="szefo_jogosultsag" />
+      <menuitem id="menu_szefo_jogosultsag_masol" name="Jogosultság másol" parent="menu_adat" sequence="40" action="szefo_jogosultsag_masol" />
+      <menuitem id="menu_szefo_log" name="Log" parent="menu_adat" sequence="90" action="szefo_log" />
+    <menuitem id="menu_akcio" name="Akciók" parent="menu_root" sequence="20" />
+      <menuitem id="menu_szefo_parameter" name="Import" parent="menu_akcio" sequence="10" action="szefo_admin_import" />
+    <menuitem id="menu_administrator" name="Administrator" parent="menu_root" sequence="90" groups="base.group_system" />
+      <menuitem id="menu_szefo_user" name="Felhasználók" parent="menu_administrator" sequence="10" action="szefo_user" />
+
+  </data>
+</openerp>

@@ -1,0 +1,193 @@
+<?xml version="1.0"?>
+<!--
+  Paper Format
+    Internal A4
+      Leltár
+-->
+<openerp>
+  <data>
+    <template id="report_szallitolevel">
+      <t t-call="report.html_container">
+        <t t-call="report.external_layout">
+          <div class="page" style="font-size: 12pt;">
+            <h3 style="text-align: center;">Szállítólevél - #TE<span t-field="docs[0].id"/></h3>
+            <br></br>
+            <table  class="table  table-bordered">
+              <tr>
+                <th>Szállító</th>
+                <th>Átvevő</th>
+              </tr>
+                <tr>
+                <td> <span t-field="docs[0].honnan_leltarkorzet_id.telephely_id"/> </td>
+                <td> <span t-field="docs[0].hova_leltarkorzet_id.telephely_id"/> </td>
+              </tr>
+            </table>
+<!--
+-->
+            <br></br>
+            <table  class="table  table-bordered">
+              <tr>
+                <th>Eszköz megnevezése</th>
+                <th>Leltári száma</th>
+                <th>m.e.</th>
+                <th>Mennyiség</th>
+              </tr>
+              <t t-foreach="docs" t-as="o">
+                <t t-if="docs[0].honnan_leltarkorzet_id.telephely_id.id == o.honnan_leltarkorzet_id.telephely_id.id and docs[0].hova_leltarkorzet_id.telephely_id.id == o.hova_leltarkorzet_id.telephely_id.id">
+                  <tr>
+                    <td> <span t-field="o.eszkoz_id.megnevezes"/> </td>
+                    <td> <span t-field="o.eszkoz_id.leltari_szam"/> </td>
+                    <td> db </td>
+                    <td> 1 </td>
+                  </tr>
+                </t>
+              </t>
+                <tr> <td colspan="4"></td> </tr>
+                <tr>
+                  <th colspan="2"> Egyéb, leltári számmal nem rendelkező szállított cikkek megnevezése </th> <th>m.e.</th> <th>Mennyiség</th>
+                </tr>
+                <tr> <td colspan="2">&#160;</td> <td></td> <td></td> </tr>
+                <tr> <td colspan="2">&#160;</td> <td></td> <td></td> </tr>
+                <tr> <td colspan="2">&#160;</td> <td></td> <td></td> </tr>
+                <tr> <td colspan="2">&#160;</td> <td></td> <td></td> </tr>
+                <tr> <td colspan="2">&#160;</td> <td></td> <td></td> </tr>
+            </table>
+            <br></br>
+            <p>Kelt: <span t-field="docs[0].honnan_leltarkorzet_id.telephely_id"/>, <span t-field="docs[0].create_date"/></p>
+            <br></br>
+            <br></br>
+
+            <div class="row">
+              <div  class="col-xs-1"> </div>
+              <div  class="col-xs-4">
+                ............................................................
+              </div>
+              <div  class="col-xs-6">
+                ........................................................................................
+              </div>
+              <div  class="col-xs-1"> </div>
+            </div>
+            <div class="row">
+              <div  class="col-xs-2"> </div>
+              <div  class="col-xs-4">
+                <span t-field="docs[0].create_uid"/> (átadó)
+              </div>
+              <div  class="col-xs-6">
+                Átvevő olvasható neve, aláírása
+              </div>
+            </div>
+          </div>
+        </t>
+      </t>
+    </template>
+
+    <template id="report_eszkozatvetel">
+      <t t-call="report.html_container">
+        <t t-call="report.external_layout">
+          <div class="page" style="font-size: 12pt;">
+            <h3 style="text-align: center;">ÁTVÉTELI ELISMERVÉNY</h3>
+            <br></br>
+            <p style="text-align: justify;">Alulírott <span t-field="docs[0].uj_hasznalo_id"/> (született: <span t-field="docs[0].uj_hasznalo_id.birthday"/>), mint a Szegedi SZEFO zrt munkavállalója ezennel elismerem, hogy a Szegedi SZEFO zrt (6724 Szeged, Tavasz u. 2., Adószám: 11090036-2-06) tulajdonát képezõ alábbi számítástechnikai eszközök átvételét, mint az eszközök felelős őrzője, igazolom:</p>
+            <br></br>
+            <table  class="table  table-bordered">
+              <tr>
+                <th>Eszköz megnevezése</th>
+                <th>Leltári száma</th>
+                <th>Leltárkörzet</th>
+              </tr>
+              <t t-foreach="docs" t-as="o">
+                <t t-if="docs[0].uj_hasznalo_id.id == o.uj_hasznalo_id.id">
+                  <tr>
+                    <td> <span t-field="o.eszkoz_id.megnevezes"/> </td>
+                    <td> <span t-field="o.eszkoz_id.leltari_szam"/> </td>
+                    <td> <span t-field="o.eszkoz_id.akt_leltarkorzet_id"/> </td>
+                  </tr>
+                </t>
+              </t>
+            </table>
+            <br></br>
+            <p>Kelt: Szeged, <span t-field="docs[0].create_date"/></p>
+            <br></br>
+            <br></br>
+
+            <div class="row">
+              <div  class="col-xs-3"> </div>
+              <div  class="col-xs-4">
+                .....................................................
+              </div>
+              <div  class="col-xs-4">
+                .....................................................
+              </div>
+              <div  class="col-xs-1"> </div>
+            </div>
+            <div class="row">
+              <div  class="col-xs-4"> </div>
+              <div  class="col-xs-4">
+                Átadó
+              </div>
+              <div  class="col-xs-4">
+                Átvevő
+              </div>
+            </div>
+          </div>
+        </t>
+      </t>
+    </template>
+
+<!--
+-->
+    <template id="report_leltar">
+      <t t-call="report.html_container">
+        <t t-foreach="docs"  t-as="o">
+          <t t-call="report.internal_layout">
+<!--
+-->
+            <div class="page" style="font-size: 12pt;">
+              <h4 style="text-align: center;"> Tárgyi eszköz nyilvántartás - <span t-field="o.name"/> </h4>
+              <br></br>
+              <table class="table table-condensed">
+                <tr>
+                  <th>Leltári szám</th>
+                  <th>Eszköz megnevezése</th>
+                </tr>
+<!--
+-->
+                <tr t-foreach="o.eszkozok_ids.sorted(key=lambda b: b.leltari_szam)" t-as="oo">
+                    <td> <span t-field="oo.leltari_szam"/> </td>
+                    <td> <span t-field="oo.megnevezes"/> </td>
+                </tr>
+              </table>
+            </div>
+<!--
+-->
+          </t>
+        </t>
+      </t>
+    </template>
+
+    <report
+        id="report_leltar_szallitolevel"
+        model="leltar.eszkozmozgas"
+        string="Szállítólevél"
+        report_type="qweb-pdf"
+        name="leltar.report_szallitolevel"
+    />
+
+    <report
+        id="report_leltar_eszkozatvetel"
+        model="leltar.eszkozatvetel"
+        string="Személyes használatba vétel"
+        report_type="qweb-pdf"
+        name="leltar.report_eszkozatvetel"
+    />
+
+    <report
+        id="report_leltar_leltar"
+        model="leltar.korzet"
+        string="Leltár"
+        report_type="qweb-pdf"
+        name="leltar.report_leltar"
+    />
+
+  </data>
+</openerp>

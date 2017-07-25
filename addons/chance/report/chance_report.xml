@@ -1,0 +1,134 @@
+<?xml version="1.0"?>
+<!--
+  Paper Format
+    Internal A4
+      Szállítólevél
+-->
+<openerp>
+  <data>
+    <template id="report_szallitolevel">
+      <t t-call="report.html_container">
+        <t t-foreach="docs"  t-as="o">
+
+          <!-- Multicompany -->
+          <t t-if="o and 'company_id' in o">
+            <t t-set="company" t-value="o.company_id"></t>
+          </t>
+          <t t-if="not o or not 'company_id' in o">
+            <t t-set="company" t-value="res_company"></t>
+          </t>
+          <div class="header">
+            <div class="row">
+              <div class="col-xs-3">
+                <img t-if="company.logo" t-att-src="'data:image/png;base64,%s' % company.logo" style="max-height: 45px;"/>
+              </div>
+              <div class="col-xs-9 text-right" style="margin-top:20px;" t-field="company.rml_header1"/>
+            </div>
+            <div class="row zero_min_height">
+              <div class="col-xs-12">
+                <div style="border-bottom: 1px solid black;"></div>
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-xs-3">
+                <div t-field="company.partner_id"
+                    t-field-options='{"widget": "contact", "fields": ["address", "name"], "no_marker": true}'
+                    style="border-bottom: 1px solid black;"/>
+              </div>
+              <div class="col-xs-9">
+                <h4 style="text-align: right;">Szállítólevél - #CH<span t-field="o.id"/> - <span t-field="o.state"/></h4>
+              </div>
+            </div>
+          </div>
+
+          <t t-call="report.external_layout">
+            <div class="page" style="font-size: 10pt;">
+              <table  class="table  table-bordered">
+                <tr>
+                  <th>Szállító</th>
+                  <th>Átvevő</th>
+                </tr>
+                <tr>
+                  <td> <span t-field="o.forrashely_id.nev"/> </td>
+                  <td>
+                    <span t-field="o.celallomas_id.nev"/>
+                    <span t-field="o.vevo_id.nev"/>
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <span t-field="o.forrashely_id.telepules"/>,
+                    <span t-field="o.forrashely_id.cim"/>
+                  </td>
+                  <td>
+                    <span t-field="o.celallomas_id.telepules"/>
+                    <span t-field="o.vevo_id.telepules"/>,
+                    <span t-field="o.celallomas_id.cim"/>
+                    <span t-field="o.vevo_id.cim"/>
+                  </td>
+                </tr>
+              </table>
+              <br></br>
+              <table class="table table-condensed">
+                <tr>
+                  <th>Cikk</th>
+                  <th class="text-right">Mennyiség</th>
+                  <th class="text-right">Egységár</th>
+                  <th class="text-right">Érték</th>
+                  <th>Megj.</th>
+                </tr>
+                <tr t-foreach="o.mozgassor_ids" t-as="oo">
+                    <td> <span t-field="oo.cikk_id"/> </td>
+                    <td class="text-right"> <span t-field="oo.mennyiseg"/> </td>
+                    <td class="text-right"> <span t-field="oo.egysegar"/> </td>
+                    <td class="text-right"> <span t-field="oo.ertek"/> </td>
+                    <td> <span t-field="oo.megjegyzes"/> </td>
+                </tr>
+              </table>
+              <br></br>
+              <p>
+                <b>Megjegyzés:</b> <span t-field="o.megjegyzes"/>
+                <br></br>
+                <br></br>
+                <b>Kelt:</b> <span t-field="o.forrashely_id.telepules"/>, <span t-field="o.create_date"/>
+              </p>
+              <br></br>
+              <br></br>
+
+              <div class="row">
+                <div  class="col-xs-1"> </div>
+                <div  class="col-xs-4">
+                  ............................................................
+                </div>
+                <div  class="col-xs-6">
+                  ........................................................................................
+                </div>
+                <div  class="col-xs-1"> </div>
+              </div>
+              <div class="row">
+                <div  class="col-xs-2"> </div>
+                <div  class="col-xs-4">
+                  Átadó
+                </div>
+                <div  class="col-xs-6">
+                  Átvevő olvasható neve, aláírása
+                </div>
+              </div>
+            </div>
+<!--
+-->
+          </t>
+        </t>
+      </t>
+    </template>
+
+    <report
+      id="report_chance_szallitolevel"
+      model="chance.mozgasfej"
+      string="Szállítólevél"
+      report_type="qweb-pdf"
+      name="chance.report_szallitolevel"
+    />
+
+  </data>
+</openerp>

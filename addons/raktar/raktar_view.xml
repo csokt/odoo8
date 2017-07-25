@@ -1,0 +1,1216 @@
+<?xml version="1.0"?>
+<openerp>
+  <data>
+    <!--####################################################################################################################  Parameter  -->
+    <record id="view_tree_raktar_gylap_import"    model="ir.ui.view">
+      <field  name="name">Raktár Import Tree</field>
+      <field  name="model">szefo.parameter</field>
+      <field  name="arch" type="xml">
+        <tree create="false" >
+          <button name="import_gyartasi_lap" type="object" string="Gyártási lap import" confirm="Gyártási lapok importja a gyártás programból" />
+        </tree>
+      </field>
+    </record>
+
+<!--
+          <button name="mozgas_veglegesites_depo" type="object" string="Mozgásterv végrehajtás (Forráshely=Depó)"
+                  confirm="A mozgástervben a depóból induló anyag és termékmozgások véglegesítése."/>
+          <button name="mozgas_veglegesites_1"    type="object" string="Mozgásterv végrehajtás (mai napra tervezett)"
+                  confirm="A mozgástervben a mai napra kijelölt anyag és termékmozgások véglegesítése."/>
+          <button name="mozgas_veglegesites_2"    type="object" string="Mozgásterv végrehajtás (ma és holnap)"
+                  confirm="A mozgástervben a mai és holnapi napra kijelölt anyag és termékmozgások véglegesítése."/>
+          <button name="mozgas_veglegesites_kiv"  type="object" string="Mozgásterv végrehajtás (Kiválasztott)"
+                  confirm="A mozgástervben a kiválasztott anyag és termékmozgások véglegesítése."/>
+
+    <record id="view_tree_raktar_mozgasvegleg"    model="ir.ui.view">
+      <field  name="name">Mozgás véglegesítés Tree</field>
+      <field  name="model">szefo.parameter</field>
+      <field  name="arch" type="xml">
+        <tree create="false" >
+          <button name="mozgas_veglegesites_ossz" type="object" string="Mozgásterv végrehajtás (Összes)"
+                  confirm="A mozgástervben szereplő anyag és termékmozgások véglegesítése."/>
+          <button name="alkatresz_foglalas" type="object" string="Alkatrészek lefoglalása"
+                  confirm="Alkatrészek lefoglalása gyártáshoz és szállításhoz."/>
+        </tree>
+      </field>
+    </record>
+-->
+
+    <record id="view_tree_raktar_mozgas_gen"    model="ir.ui.view">
+      <field  name="name">Mozgás létrehozás Tree</field>
+      <field  name="model">szefo.parameter</field>
+      <field  name="arch" type="xml">
+        <tree create="false" >
+          <button name="mozgas_gen_ki" type="object" string="Termék kiszállítás mozgások létrehozása"
+                  confirm="A depóban kiszállításra váró termékek mozgásának létrehozása."/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_tree_raktar_szlamellnulla"    model="ir.ui.view">
+      <field  name="name">Szla mell. nulla Tree</field>
+      <field  name="model">szefo.parameter</field>
+      <field  name="arch" type="xml">
+        <tree create="false" >
+          <button name="szla_mell_nulla" type="object" string="Számlamelléklet alaphelyzetbe állítás"
+                  confirm="Számlamelléklet lista alaphelyzetbe hozás. E funkció végrehajtása előtt feltétlen exportáld ki excelbe a számlamellékletet!"/>
+        </tree>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Gyártási lap  -->
+<!--
+            <button name="set_state2javit"      type="object"   string="Javításra beküldött termék" class="oe_highlight"
+                                                attrs="{'invisible': ['|',('state','!=','uj'),('muveletterv_id','!=',False)]}"
+                                                confirm="Nem halad végig a gyártási folyamaton, külön kezeljük."/>
+-->
+    <record id="view_form_raktar_gyartasi_lap"    model="ir.ui.view">
+      <field name="name">Gyártási lap Form</field>
+      <field name="model">raktar.gyartasi_lap</field>
+      <field name="priority" eval="15"/>
+      <field name="arch" type="xml">
+        <form create="false">
+          <header>
+            <button name="set_state2mterv"      type="object"   string="Műveletterv véglegesítése" class="oe_highlight"
+                                                attrs="{'invisible': ['|',('state','!=','uj'),('muveletterv_id','=',False)]}"/>
+            <button name="copy_muvelet"         type="object"   string="Gyártási terv készítés" class="oe_highlight"
+                                                attrs="{'invisible': [('state','!=','mterv')]}"/>
+            <button name="gyartas_inditas"      type="object" string="Gyártási előírások végrehajtása" class="oe_highlight"
+                                                attrs="{'invisible': ['|',('state','!=','gyterv'),('count_gyartas_ids','=',0)]}"
+                                                confirm="Az összes előrt gyártási művelet végrehajtása."/>
+            <button name="set_state2mterv"      type="object"   string="Vissza a gyártási terv készítéshez" class="oe_highlight"
+                                                attrs="{'invisible': ['|',('state','!=','gyterv'),('count_gyartas_ids','>',0)]}"/>
+            <button name="set_state2gyartas"    type="object"   string="Alkatrész kimérés megtörtént" class="oe_highlight"
+                                                attrs="{'invisible': [('state','!=','kimer')]}"/>
+            <button name="set_state2kesz"       type="object"   string="Rendelés teljesítve" class="oe_highlight"
+                                                attrs="{'invisible': [('state','!=','gykesz')]}"
+                                                confirm="Csak csökkentett megrendelés esetén, számlamellékletet készítés után használd!"
+                                                groups="raktar.group_raktar_manager" />
+            <button name="export_impex"         type="object"   string="Impexbe export"
+                                                confirm="Adatok exportálása az impex adattáblába." groups="raktar.group_raktar_user" />
+            <field name="state" widget="statusbar"/>
+          </header>
+          <group col="4">
+            <field name="product_id"/>
+            <field name="gyartasi_hely_ids"   attrs="{'readonly': [('state','=','kesz')]}"  widget="many2many_tags"   options="{'no_create': True}"/>
+          </group>
+          <group col="8">
+            <field name="rendelesszam"/>
+            <field name="termekcsalad"/>
+            <field name="termekkod"/>
+            <field name="kiadas_ideje"/>
+            <field name="rendelt_db"          readonly="1"/>
+            <field name="modositott_db"       attrs="{'readonly': [('state','=','kesz')]}"/>
+            <field name="hatarido"            attrs="{'readonly': [('state','=','kesz')]}"/>
+            <field name="hatarido_str"/>
+            <field name="jegyzet"/>
+            <field name="id"                  string="Sorszám"/>
+            <field name="muveletterv_id"      attrs="{'readonly':  [('state','not in',('uj','mterv'))]}" options="{'no_create': True}"/>
+            <field name="check_cikkek_uid"    attrs="{'invisible': [('state','!=','mterv')]}"/>
+            <field name="teljesitett_db"      attrs="{'invisible': [('state','not in',('javit','gyartas','gykesz','kesz'))], 'readonly':  [('state','=','kesz')]}"/>
+            <field name="szamlazott_db"       attrs="{'invisible': [('state','not in',('javit','gyartas','gykesz','kesz'))]}" readonly="1"/>
+            <field name="szamlazhato_db"      attrs="{'invisible': [('state','not in',('javit','gyartas','gykesz','kesz'))]}"/>
+            <field name="vir_teljesitett_db"  attrs="{'invisible': [('state','not in',('javit','gyartas','gykesz','kesz'))], 'readonly':  [('state','=','kesz')]}"/>
+            <field name="eltol"               attrs="{'invisible': [('state','!=','mterv')]}"/>
+            <field name="count_cikkhiany"     attrs="{'invisible': [('state','!=','mterv')]}"/>
+          </group>
+          <div>
+            <field name="gyartas_ids"         attrs="{'invisible': [('state','in',('uj','javit','mterv'))]}"/>
+          <sheet>
+            <button name="calc_gyartas_anyag" type="object" string="Beépülő anyagmennyiség számítás" class="oe_highlight"
+                                              attrs="{'invisible': ['|',('state','not in',('uj','mterv')),('muveletterv_id','=',False)]}"/>
+            <field name="gyartas_cikk_ids"    attrs="{'invisible': ['|',('state','not in',('uj','mterv')),('muveletterv_id','=',False)]}"/>
+            <field name="darabjegyzek_ids"/>
+            <field name="gylap_muvelet_ids"/>
+            <field name="homogen_ids"/>
+            <field name="count_gyartas_ids"   invisible="1"/>
+          </sheet>
+          </div>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_form_raktar_gyartasi_lap_admin"    model="ir.ui.view">
+      <field name="name">Gyártási lap Form</field>
+      <field name="model">raktar.gyartasi_lap</field>
+      <field name="arch" type="xml">
+        <form create="false">
+          <header>
+            <button name="set_state2gykesz"     type="object"   string="Állapot -> Gyártás kész" class="oe_highlight"/>
+            <field name="state" widget="statusbar"/>
+          </header>
+          <group col="4">
+            <field name="product_id"/>
+            <field name="gyartasi_hely_ids"   widget="many2many_tags"/>
+          </group>
+          <group col="8">
+            <field name="rendelesszam"/>
+            <field name="termekcsalad"/>
+            <field name="termekkod"/>
+            <field name="kiadas_ideje"/>
+            <field name="rendelt_db"          />
+            <field name="modositott_db"       />
+            <field name="hatarido"            />
+            <field name="hatarido_str"/>
+            <field name="jegyzet"/>
+            <field name="id"                  />
+            <field name="muveletterv_id"      />
+            <field name="check_cikkek_uid"    />
+            <field name="teljesitett_db"      />
+            <field name="szamlazott_db"       />
+            <field name="szamlazhato_db"      />
+            <field name="eltol"               />
+            <field name="count_cikkhiany"     />
+            <field name="active"              />
+          </group>
+          <div>
+            <field name="gyartas_ids"         />
+          <sheet>
+            <field name="gyartas_cikk_ids"    />
+            <field name="darabjegyzek_ids"/>
+            <field name="gylap_muvelet_ids"/>
+            <field name="homogen_ids"/>
+            <field name="count_gyartas_ids"   invisible="1"/>
+          </sheet>
+          </div>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_tree_raktar_gyartasi_lap"    model="ir.ui.view">
+      <field  name="name">Gyártási lap Tree</field>
+      <field  name="model">raktar.gyartasi_lap</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <tree create="false">
+          <field name="id" string="Sorszám"/>
+          <field name="name"/>
+          <field name="hatarido"/>
+          <field name="gyartasi_hely_ids"/>
+          <field name="rendelt_db"/>
+          <field name="teljesitett_db"/>
+          <field name="rendelt_ora"         sum="rendelt óra összesen"/>
+          <field name="teljesitett_ora"     sum="teljesített óra összesen"/>
+          <field name="state"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_tree_raktar_gylap_mterv_valaszt"       model="ir.ui.view">
+      <field  name="name">Gyártási lap Tree</field>
+      <field  name="model">raktar.gyartasi_lap</field>
+      <field  name="arch" type="xml">
+        <tree editable="top">
+          <field name="id"                string="Sorszám"/>
+          <field name="name"/>
+          <field name="rendelt_db"        readonly="1"/>
+          <field name="kiadas_ideje"      readonly="1"/>
+          <field name="hatarido"          readonly="1"/>
+          <field name="muveletterv_id"    options="{'no_create': True}"/>
+          <field name="check_cikkek_uid"/>
+          <field name="state"             invisible="1"/>
+          <field name="product_id"        invisible="1"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_tree_raktar_gylap_generalas"       model="ir.ui.view">
+      <field  name="name">Gyártási lap Tree</field>
+      <field  name="model">raktar.gyartasi_lap</field>
+      <field  name="arch" type="xml">
+        <tree colors="green:count_cikkhiany==0.0">
+          <field name="id"                string="Sorszám"/>
+          <field name="name"/>
+          <field name="hatarido"/>
+          <field name="jegyzet"/>
+          <field name="gyartasi_hely_ids"/>
+          <field name="rendelt_db"/>
+          <field name="rendelt_ora"/>
+          <field name="count_cikkhiany"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_tree_raktar_gylap_mterv_keszit"    model="ir.ui.view">
+      <field  name="name">Gyártási lap Tree</field>
+      <field  name="model">raktar.gyartasi_lap</field>
+      <field  name="arch" type="xml">
+        <tree>
+          <field name="id"                string="Sorszám"/>
+          <field name="name"/>
+          <field name="rendelt_db"/>
+          <field name="hatarido"/>
+          <field name="muveletterv_id"    options="{'no_create': True}"/>
+          <button name="create_muveletterv" type="object" string="Műveletterv készítés" attrs="{'invisible': [('muveletterv_id','!=',False)]}"/>
+        </tree>
+      </field>
+    </record>
+<!--
+-->
+
+    <record id="view_filter_raktar_gyartasi_lap"    model="ir.ui.view">
+      <field  name="name">Gyártási lap Filter</field>
+      <field  name="model">raktar.gyartasi_lap</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field  name="id"               string="Sorszám"/>
+          <field  name="name"/>
+          <filter name="filter_szentes"   string="Szentes"              domain="[('gyartasi_hely_ids.azon','=','szentes')]"/>
+          <filter name="filter_hmvhely"   string="Hódmezővásárhely"     domain="[('gyartasi_hely_ids.azon','=','hmvhely')]"/>
+          <filter name="filter_berkert"   string="Bérkert"              domain="[('gyartasi_hely_ids.azon','=','berkert')]"/>
+          <filter name="filter_mako"      string="Makó"                 domain="[('gyartasi_hely_ids.azon','=','mako')]"/>
+          <filter name="filter_oroshaza"  string="Orosháza"             domain="[('gyartasi_hely_ids.azon','=','oroshaza')]"/>
+          <filter name="filter_apatfalva" string="Apátfalva"            domain="[('gyartasi_hely_ids.azon','=','apatfalva')]"/>
+          <separator/>
+          <filter name="filter_uj"        string="Új"                   domain="[('state','=','uj')]"/>
+          <filter name="filter_javit"     string="Javítás"              domain="[('state','=','javit')]"/>
+          <filter name="filter_mterv"     string="Műveletterv"          domain="[('state','=','mterv')]"/>
+          <filter name="filter_gyterv"    string="Gyártási terv"        domain="[('state','=','gyterv')]"/>
+          <filter name="filter_kimer"     string="Kimérés"              domain="[('state','=','kimer')]"/>
+          <filter name="filter_gyartas"   string="Gyártás"              domain="[('state','=','gyartas')]"/>
+          <filter name="filter_gykesz"    string="Gyártás kész"         domain="[('state','=','gykesz')]"/>
+          <filter name="filter_kesz"      string="Rendelés teljesítve"  domain="[('state','=','kesz')]"/>
+          <filter name="szamlazhato"      string="Számlázható"          domain="[('szamlazhato_db','>',0)]"/>
+          <group expand="0" string="Csoportosítás">
+            <filter name="group_termek"   string="Termék"               context="{'group_by': 'termekkod'}"/>
+          </group>
+        </search>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Darabjegyzék  -->
+    <record id="view_form_raktar_darabjegyzek"    model="ir.ui.view">
+      <field name="name">Darabjegyzék Form</field>
+      <field name="model">raktar.darabjegyzek</field>
+      <field name="priority" eval="15"/>
+      <field name="arch" type="xml">
+        <form create="false" edit="false">
+          <group col="4">
+            <field name="gyartasi_lap_id"/>
+            <field name="product_id"/>
+            <field name="rendelt_db"/>
+            <field name="cikkszam"/>
+            <field name="beepules"/>
+            <field name="bekerulesi_ar"/>
+            <field name="ossz_beepules"/>
+            <field name="ossz_bekerules"/>
+            <field name="active"/>
+          </group>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_tree_raktar_darabjegyzek"    model="ir.ui.view">
+      <field  name="name">Darabjegyzék Tree</field>
+      <field  name="model">raktar.darabjegyzek</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <tree editable="bottom">
+          <field name="product_id" string="Alkatrészek a gyártási lapon"/>
+          <field name="beepules"/>
+          <field name="ossz_beepules"/>
+        </tree>
+      </field>
+    </record>
+
+<!--
+        <tree editable="bottom" create="false" edit="false">
+-->
+
+    <!--####################################################################################################################  Gylap művelet  -->
+    <record id="view_tree_raktar_gylap_muvelet"    model="ir.ui.view">
+      <field  name="name">Gylap művelet Tree</field>
+      <field  name="model">raktar.gylap_muvelet</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <tree editable="bottom">
+          <field name="name"/>
+          <field name="homogen"/>
+          <field name="megnevezes"/>
+          <field name="ossz_ido"/>
+          <field name="beall_ido"/>
+          <field name="state"                invisible="1"/>
+        </tree>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Homogén  -->
+    <record id="view_tree_raktar_homogen"    model="ir.ui.view">
+      <field  name="name">Homogén Tree</field>
+      <field  name="model">raktar.homogen</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <tree editable="top" create="false">
+          <field name="homogen"/>
+          <button name="toggle_sajat"         type="object" string="Saját/nem saját homogén váltás" attrs="{'invisible': [('state','=','kesz')]}"/>
+          <field name="sajat"/>
+          <field name="ossz_ido"/>
+          <field name="beall_ido"/>
+          <field name="korrekcios_ido"/>
+          <field name="potido"/>
+          <field name="state"                 invisible="1"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_tree_raktar_szlamelleklet"    model="ir.ui.view">
+      <field  name="name">Számlamelléklet Tree</field>
+      <field  name="model">raktar.homogen</field>
+      <field  name="arch" type="xml">
+        <tree create="false" edit="false">
+          <field name="name"/>
+          <field name="rendelesszam"/>
+          <field name="termekkod"/>
+          <field name="szamlazhato_db"/>
+          <field name="szamlazhato_ora"       string="Óra"  sum="munkaóra + beáll.idő összesen"/>
+          <field name="potido"                              sum="pótidő összesen"/>
+          <field name="homogen"/>
+          <field name="termekcsalad"/>
+          <field name="hatarido"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_raktar_homogen"    model="ir.ui.view">
+      <field  name="name">Homogén Filter</field>
+      <field  name="model">raktar.homogen</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field name="name"/>
+          <field name="rendelesszam"/>
+          <field name="termekkod"/>
+          <field name="homogen"/>
+          <filter name="szamlazhato" string="Számlázható" domain="[('szamlazhato_db','>',0)]"/>
+        </search>
+      </field>
+    </record>
+<!--
+          <group expand="0" string="Csoportosítás">
+            <filter name="group_rendelesszam" string="Rendelésszám" context="{'group_by': 'rendelesszam'}"/>
+            <filter name="group_termekkod"    string="Tételkód"     context="{'group_by': 'termekkod'}"/>
+          </group>
+-->
+
+    <!--####################################################################################################################  Mozgásnem  -->
+    <record id="view_form_raktar_mozgasnem"    model="ir.ui.view">
+      <field name="name">Mozgásnem Form</field>
+      <field name="model">raktar.mozgasnem</field>
+      <field name="arch" type="xml">
+        <form>
+          <group col="4">
+            <field name="name"/>
+            <field name="azon"/>
+            <field name="partner_id"/>
+            <field name="picking_type_id"/>
+            <field name="location_src_id"/>
+            <field name="location_dest_id"/>
+            <field name="belso_szallitas"/>
+            <field name="gyartas"/>
+            <field name="beszallitas"/>
+            <field name="kiszallitas"/>
+            <field name="selejt"/>
+            <field name="veszteseg"/>
+            <field name="location_id"/>
+            <field name="id"                    readonly="1"/>
+            <field name="mozgas_be_forr"/>
+            <field name="mozgas_be_cel"/>
+            <field name="mozgas_ki_forr"/>
+            <field name="mozgas_ki_cel"/>
+            <field name="mozgas_belso_forr"/>
+            <field name="mozgas_belso_cel"/>
+            <field name="mozgas_vissza_forr"/>
+            <field name="mozgas_vissza_cel"/>
+            <field name="mozgas_selejt_forr"/>
+            <field name="mozgas_selejt_cel"/>
+            <field name="mozgas_szall_forr"/>
+            <field name="mozgas_szall_cel"/>
+            <field name="uzem_raktar_valaszt"/>
+            <field name="uzem_helyi_raktar"/>
+            <field name="sorrend"/>
+            <field name="active"/>
+          </group>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_tree_raktar_mozgasnem"    model="ir.ui.view">
+      <field  name="name">Mozgásnem Tree</field>
+      <field  name="model">raktar.mozgasnem</field>
+      <field  name="arch" type="xml">
+        <tree>
+          <field name="name"/>
+          <field name="azon"/>
+          <field name="partner_id"/>
+          <field name="picking_type_id"/>
+        </tree>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Műveletterv  -->
+    <record id="view_form_raktar_muveletterv"    model="ir.ui.view">
+      <field name="name">Műveletterv Form</field>
+      <field name="model">raktar.muveletterv</field>
+      <field name="priority" eval="15"/>
+      <field name="arch" type="xml">
+        <form>
+          <group col="4">
+            <field name="name"/>
+            <field name="active"/>
+            <field name="product_id"                options="{'no_create': True}"/>
+            <field name="valtozat"/>
+            <field name="gyartasi_lap_id"           options="{'no_create': True}"/>
+            <field name="rendelt_db"/>
+            <button name="toggle_muvelet_cikkek"    type="object" string="Alkatrészlista elrejtése/felfedése"   class="oe_highlight" />
+          </group>
+          <field name="muvelet_ids"/>
+          <div>
+          <sheet>
+            <button name="calc_muvelet_cikkek_uid"  type="object" string="Alkatrészlista"                       class="oe_highlight"
+                                                    attrs="{'invisible': [('rejt_muvelet_cikkek','=',True)]}"/>
+            <field name="muvelet_cikk_ids"          readonly="1"  attrs="{'invisible': [('rejt_muvelet_cikkek','=',True)]}"/>
+            <button name="calc_muvelet_homogen"     type="object" string="Homogénszámítás"                      class="oe_highlight" />
+            <field name="muvelet_homogen_ids"       readonly="1"/>
+          </sheet>
+          </div>
+          <field name="rejt_muvelet_cikkek"         invisible="1"/>
+          <field name="mod_gyartasi_lap_id"         invisible="1"/>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_tree_raktar_muveletterv"    model="ir.ui.view">
+      <field  name="name">Műveletterv Tree</field>
+      <field  name="model">raktar.muveletterv</field>
+      <field  name="arch" type="xml">
+        <tree>
+          <field name="name"/>
+          <field name="product_id"/>
+          <field name="valtozat"/>
+        </tree>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Művelet  -->
+    <record id="view_tree_raktar_muvelet"    model="ir.ui.view">
+      <field  name="name">Művelet Tree</field>
+      <field  name="model">raktar.muvelet</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <tree editable="bottom">
+          <field name="szint"/>
+          <field name="name"/>
+          <field name="product_id"              options="{'no_create': True}"/>
+          <field name="beepules"/>
+          <field name="bom_id"                  options="{'no_create': True}"/>
+          <field name="homogen_id"              options="{'no_create': True}"/>
+          <field name="edit_muv_szam_ids"/>
+          <field name="muv_szam_ids"            widget="many2many_tags"   options="{'no_create': True}"
+                                                attrs="{'readonly': [('edit_muv_szam_ids','=',False)]}"/>
+          <field name="db_per_ora"/>
+          <field name="ossz_ido"                readonly="1"/>
+          <field name="beall_ido"               readonly="1"/>
+          <field name="gyartasi_hely_id"        options="{'no_create': True}"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_raktar_muvelet"    model="ir.ui.view">
+      <field  name="name">Művelet Filter</field>
+      <field  name="model">raktar.muvelet</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field name="name"/>
+          <field name="product_id"/>
+          <field name="bom_id"/>
+          <field name="gyartasi_hely_id"/>
+          <group expand="0" string="Csoportosítás">
+            <filter name="group_name"     string="Megnevezés"     context="{'group_by': 'name'}"/>
+            <filter name="group_product"  string="Termék"         context="{'group_by': 'product_id'}"/>
+            <filter name="group_bom"      string="Anyagjegyzék"   context="{'group_by': 'bom_id'}"/>
+            <filter name="group_homogen"  string="Homogén"        context="{'group_by': 'homogen_id'}"/>
+            <filter name="group_gyhely"   string="Gyártási hely"  context="{'group_by': 'gyartasi_hely_id'}"/>
+          </group>
+        </search>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Műveletterv alkatrész  -->
+    <record id="view_tree_raktar_muvelet_cikk"    model="ir.ui.view">
+      <field  name="name">Művelet cikk Tree</field>
+      <field  name="model">raktar.muvelet_cikk</field>
+      <field  name="arch" type="xml">
+        <tree editable="bottom">
+          <field name="product_id"/>
+          <field name="termek_menny"/>
+        </tree>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Műveletterv homogén  -->
+    <record id="view_tree_raktar_muvelet_homogen"    model="ir.ui.view">
+      <field  name="name">Művelet homogén Tree</field>
+      <field  name="model">raktar.muvelet_homogen</field>
+      <field  name="arch" type="xml">
+        <tree editable="bottom" colors="red:ossz_ido_elter!=0.0;red:beall_ido_elter!=0.0">
+          <field name="homogen_id"/>
+          <field name="ossz_ido"/>
+          <field name="ossz_ido_legr"/>
+          <field name="ossz_ido_elter"/>
+          <field name="beall_ido"/>
+          <field name="beall_ido_legr"/>
+          <field name="beall_ido_elter"/>
+        </tree>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Gyártás  -->
+    <record id="view_form_raktar_gyartas"    model="ir.ui.view">
+      <field  name="name">Gyártás Form</field>
+      <field  name="model">raktar.gyartas</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <form create="false" edit="false">
+          <header>
+            <button name="export_impex"   type="object" string="Impexbe export"
+                                          confirm="Adatok exportálása az impex adattáblába." groups="raktar.group_raktar_user" />
+          </header>
+          <sheet>
+          <group col="4">
+            <field  name="production_id"/>
+            <field  name="name"/>
+            <field  name="gyartasi_lap_id"/>
+            <field  name="gyartasi_lap_sorsz"/>
+            <field  name="product_id"/>
+            <field  name="teljesitett_ora"/>
+            <field  name="gyartasi_hely_id"     options="{'no_open': True}"/>
+            <field  name="tervezett_datum"/>
+            <field  name="bom_id"/>
+            <field  name="hatarido"/>
+            <field  name="production_state"/>
+            <field  name="szint"/>
+            <field  name="ossz_ido"/>
+            <field  name="beall_ido"/>
+            <field  name="rendelt_db"/>
+            <field  name="rendelt_ora"/>
+            <field  name="gyartando_db"/>
+            <field  name="gyartando_ora"/>
+            <field  name="gyartott_db"/>
+            <field  name="gyartott_ora"/>
+            <field  name="teljesitett_ora"/>
+            <field  name="szamlazhato_ora"/>
+          </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_form_raktar_gyartas_admin"    model="ir.ui.view">
+      <field  name="name">Gyártás Form</field>
+      <field  name="model">raktar.gyartas</field>
+      <field  name="arch" type="xml">
+        <form>
+          <sheet>
+          <group col="4">
+            <field  name="production_id"/>
+            <field  name="name"/>
+            <field  name="gyartasi_lap_id"/>
+            <field  name="gyartasi_lap_sorsz"/>
+            <field  name="product_id"/>
+            <field  name="rendelt_db"/>
+            <field  name="gyartasi_hely_id"/>
+            <field  name="tervezett_datum"/>
+            <field  name="bom_id"/>
+            <field  name="beepules"/>
+            <field  name="production_state"/>
+            <field  name="szint"/>
+            <field  name="ossz_ido"/>
+            <field  name="beall_ido"/>
+          </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_tree_raktar_gyartas"    model="ir.ui.view">
+      <field  name="name">Gyártás Tree</field>
+      <field  name="model">raktar.gyartas</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <tree editable="top" create="false">
+          <field  name="szint"                readonly="1"/>
+          <field  name="beepules"             readonly="1"/>
+          <field  name="bom_id"               readonly="1"/>
+          <field  name="db_per_ora"           readonly="1"/>
+          <field  name="rendelt_db"           attrs="{'readonly': [('production_id','!=',False)]}"/>
+          <field  name="gyartasi_hely_id"     attrs="{'readonly': [('production_id','!=',False)]}" options="{'no_create': True}"/>
+          <field  name="homogen_id"           readonly="1"/>
+          <field  name="potido"               attrs="{'readonly': [('state','not in',('gyartas','gykesz'))]}"/>
+          <button name="dec_tervezett_datum"  type="object" string="-" attrs="{'invisible': [('production_id','!=',False)]}"/>
+          <field  name="tervezett_datum"      attrs="{'readonly':  [('production_id','!=',False)]}"/>
+          <button name="inc_tervezett_datum"  type="object" string="+" attrs="{'invisible':  [('production_id','!=',False)]}"/>
+          <button name="felosztas"            type="object" string="Felosztás" attrs="{'invisible': [('production_id','!=',False)]}"/>
+          <field  name="production_id"        readonly="1"/>
+          <field  name="production_state"     readonly="1"/>
+          <field  name="feloszt"              invisible="1"/>
+          <field  name="state"                invisible="1"/>
+        </tree>
+      </field>
+    </record>
+<!--
+          <field  name="beall_ido"/>
+-->
+
+    <record id="view_tree_raktar_gyartas_datum"    model="ir.ui.view">
+      <field  name="name">Gyártás Tree</field>
+      <field  name="model">raktar.gyartas</field>
+      <field  name="arch" type="xml">
+        <tree create="false">
+          <field  name="hatarido"/>
+          <field  name="gyartasi_hely_id"/>
+          <field  name="name"/>
+          <field  name="gyartasi_lap_sorsz"/>
+          <field  name="gyartasi_lap_id"/>
+          <field  name="rendelt_db"/>
+          <field  name="production_id"/>
+          <field  name="production_state"/>
+          <field  name="gyartando_db"/>
+          <field  name="gyartando_ora"        sum="gyártandó óra"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_raktar_gyartas"    model="ir.ui.view">
+      <field  name="name">Gyártás Filter</field>
+      <field  name="model">raktar.gyartas</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field  name="gyartasi_hely_id"/>
+          <field  name="name"/>
+          <field  name="gyartasi_lap_id"/>
+          <field  name="production_id"/>
+          <field  name="homogen_id"/>
+          <filter name="filter_szentes"   string="Szentes"              domain="[('gyartasi_hely_id.azon','=','szentes')]"/>
+          <filter name="filter_hmvhely"   string="Hódmezővásárhely"     domain="[('gyartasi_hely_id.azon','=','hmvhely')]"/>
+          <filter name="filter_berkert"   string="Bérkert"              domain="[('gyartasi_hely_id.azon','=','berkert')]"/>
+          <filter name="filter_mako"      string="Makó"                 domain="[('gyartasi_hely_id.azon','=','mako')]"/>
+          <filter name="filter_oroshaza"  string="Orosháza"             domain="[('gyartasi_hely_id.azon','=','oroshaza')]"/>
+          <filter name="filter_apatfalva" string="Apátfalva"            domain="[('gyartasi_hely_id.azon','=','apatfalva')]"/>
+          <separator/>
+          <filter name="filter_kimer"     string="Kimérés"              domain="[('gyartasi_lap_id.state','=','kimer')]"/>
+          <filter name="filter_gyartas"   string="Gyártás"              domain="[('gyartasi_lap_id.state','=','gyartas')]"/>
+          <filter name="filter_gykesz"    string="Gyártás kész"         domain="[('gyartasi_lap_id.state','=','gykesz')]"/>
+          <filter name="filter_kesz"      string="Rendelés teljesítve"  domain="[('gyartasi_lap_id.state','=','kesz')]"/>
+          <separator/>
+          <filter name="filter_nem_kesz"  string="Gyártás alatt"        domain="['|', ('production_id','=',False), ('production_state','not in',('done', 'cancel'))]"/>
+          <separator/>
+          <filter name="szamlazhato"      string="Számlázható"          domain="[('gyartasi_lap_id.szamlazhato_db','>',0)]"/>
+          <group expand="0" string="Csoportosítás">
+            <filter name="group_gyhely"   string="Gyártási hely"        context="{'group_by': 'gyartasi_hely_id'}"/>
+            <filter name="group_name"     string="Megnevezés"           context="{'group_by': 'name'}"/>
+          </group>
+        </search>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Gyártás alkatrész  -->
+    <record id="view_tree_raktar_gyartas_cikk"    model="ir.ui.view">
+      <field  name="name">Gyártás cikk Tree</field>
+      <field  name="model">raktar.gyartas_cikk</field>
+      <field  name="arch" type="xml">
+        <tree editable="bottom" colors="red:elteres!=0.0;blue:ossz_beepules>elerheto">
+          <field name="product_id"/>
+          <field name="elerheto"/>
+          <field name="ossz_beepules"/>
+          <field name="legr_ossz_beepules"/>
+          <field name="elteres"/>
+        </tree>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Mozgásterv -->
+    <record id="view_form_raktar_mozgasterv"    model="ir.ui.view">
+      <field  name="name">Mozgásterv Form</field>
+      <field  name="model">raktar.mozgasterv</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <form create="false">
+          <sheet>
+          <group col="4">
+            <field name="origin"            attrs="{'readonly': [('picking_id','!=',False)]}"/>
+            <field name="gyartasi_lap_id"   attrs="{'readonly': [('picking_id','!=',False)]}"   options="{'no_create': True}"/>
+            <field name="product_id"        attrs="{'readonly': [('picking_id','!=',False)]}"   options="{'no_create': True}"/>
+            <field name="product_uom_qty"   attrs="{'readonly': [('picking_id','!=',False)]}"/>
+            <field name="date_planned"      attrs="{'readonly': [('picking_id','!=',False)]}"/>
+            <field name="forrashely_id"     attrs="{'readonly': [('picking_id','!=',False)]}"   options="{'no_create': True, 'no_open': True}"/>
+            <field name="celallomas_id"     attrs="{'readonly': [('picking_id','!=',False)]}"   options="{'no_create': True, 'no_open': True}"/>
+            <field name="picking_id"        readonly="1"/>
+          </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_tree_raktar_mozgasterv"    model="ir.ui.view">
+      <field  name="name">Mozgásterv Tree</field>
+      <field  name="model">raktar.mozgasterv</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <tree editable="top" edit="false">
+          <field name="forrashely_id"/>
+          <field name="celallomas_id"/>
+          <field name="gyartasi_lap_sorsz"/>
+          <field name="origin"/>
+          <field name="product_id"/>
+          <field name="product_uom_qty"/>
+          <field name="date_planned"/>
+          <field name="kivalaszt"       string=""/>
+          <button name="kivalaszt_valt" type="object" string="Kiválaszt" attrs="{'invisible': [('picking_id','!=',False)]}"/>
+          <field name="picking_id"      invisible="1"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_raktar_mozgasterv"    model="ir.ui.view">
+      <field  name="name">Mozgásterv Filter</field>
+      <field  name="model">raktar.mozgasterv</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <search>
+          <field name="forrashely_id"/>
+          <field name="celallomas_id"/>
+          <field name="origin"/>
+          <field name="product_id"/>
+          <filter name="filter_szallithato" string="Szállítható"  domain="[('picking_id','=',False)]"/>
+          <separator/>
+          <filter name="filter_kivalaszt"   string="Kiválasztott" domain="[('kivalaszt','=',True)]"/>
+          <group expand="0" string="Csoportosítás">
+            <filter name="group_origin"   string="Rendelésszám" context="{'group_by': 'origin'}"/>
+            <filter name="group_termek"   string="Termék"       context="{'group_by': 'product_id'}"/>
+            <filter name="group_forras"   string="Forráshely"   context="{'group_by': 'forrashely_id'}"/>
+            <filter name="group_cel"      string="Célállomás"   context="{'group_by': 'celallomas_id'}"/>
+          </group>
+        </search>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Picking  -->
+<!--
+            <button name="selejt_kiszallitas"   type="object" string="Selejt szállítás létrehozás a Legrand felé"
+                    attrs="{'invisible': ['|','|',('picking_id','=',False),('picking2_id','!=',False),('celallomas_azon','!=','selejt')]}"
+                    class="oe_highlight"  confirm="A rögzített mozgásokat ismét végrehajtja Selejt raktár -> Legrand irányba." />
+-->
+    <record id="view_form_raktar_picking"    model="ir.ui.view">
+      <field  name="name">Szállítás Form</field>
+      <field  name="model">raktar.picking</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <form>
+          <header>
+            <button name="veglegesites"   type="object" string="Véglegesítés" attrs="{'invisible': [('state','!=','terv')]}"
+                    class="oe_highlight"  confirm="A rögzített mozgásokat végrehajtja. Ezután itt már nem lehet módosítani." />
+            <button name="state2kesz"     type="object" string="Átszállítva" attrs="{'invisible': [('state','!=','szallit')]}"
+                    class="oe_highlight"  confirm="Az alkatrészek hiánytalanul megérkeztek." />
+            <button name="state2elter"    type="object" string="Átszállítva eltérésekkel" attrs="{'invisible': [('state','!=','szallit')]}"
+                                          confirm="A leszállított alkatrészek mennyisége a szállítólevélhez képest eltér." />
+            <button name="state2konyvelt" type="object" string="Könyvelve" attrs="{'invisible': [('state','not in',('elter', 'kesz'))]}"
+                    class="oe_highlight"  groups="raktar.group_raktar_manager" />
+            <button name="import_impex"   type="object" string="Impexből import" attrs="{'invisible': [('state','!=','terv')]}"
+                                          confirm="Adatok importálása az impex adattáblából." groups="raktar.group_raktar_user" />
+            <button name="export_impex"   type="object" string="Impexbe export"
+                                          confirm="Adatok exportálása az impex adattáblába."  groups="raktar.group_raktar_user" />
+            <field  name="state"          widget="statusbar"/>
+          </header>
+          <sheet>
+            <group col="4">
+              <field name="forrashely_id"       attrs="{'readonly': ['|',('state','!=','terv'),('mozgas', 'not in', ('belso','szall'))], 'required': [('mozgas', 'in', ('belso','szall'))]}"
+                                                options="{'no_create': True, 'no_open': True}"
+                                                domain="[('picking_type_id.code', '=', 'internal')]"/>
+              <field name="celallomas_id"       attrs="{'readonly': ['|',('state','!=','terv'),('mozgas', 'not in', ('belso','szall'))], 'required': [('mozgas', 'in', ('belso','szall'))],
+                                                        'invisible': [('mozgas', 'not in', ('belso','szall'))]}"
+                                                options="{'no_create': True, 'no_open': True}"
+                                                domain="[('picking_type_id.code', '=', 'internal')]"/>
+              <field name="create_uid"          readonly="1"    string="Felvette"/>
+              <field name="create_date"         readonly="1"    string="Létrehozás ideje"/>
+              <field name="picking_id"          attrs="{'invisible': [('mozgas', 'in', ('szall',))]}"/>
+              <field name="picking_state"       attrs="{'invisible': [('mozgas', 'in', ('szall',))]}"/>
+              <field name="picking2_id"         attrs="{'invisible': [('picking2_id','=',False)]}"/>
+              <field name="id"                  attrs="{'invisible': [('mozgas', 'in', ('be',))]}"   string="Szállítólevél száma"/>
+            </group>
+            <group col="2">
+              <field name="forrasdokumentum"    attrs="{'readonly': [('state','!=','terv')]}"/>
+              <field name="megjegyzes"          attrs="{'readonly': [('state','in',('elter','kesz'))]}"/>
+            </group>
+            <field name="raktar_move_ids"       attrs="{'readonly': [('state','!=','terv')]}"/>
+            <field name="mozgas"                invisible="1"/>
+            <field name="celallomas_azon"       invisible="1"/>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_tree_raktar_picking"    model="ir.ui.view">
+      <field  name="name">Szállítás Tree</field>
+      <field  name="model">raktar.picking</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <tree>
+          <field name="id"                      invisible="context.get('mozgas') == 'be'"    string="Szállítólevél"/>
+          <field name="forrashely_id"/>
+          <field name="celallomas_id"           invisible="context.get('mozgas') not in ('belso', 'szall')"/>
+          <field name="picking_id"              invisible="context.get('mozgas') == 'szall'"/>
+          <field name="megjegyzes"/>
+          <field name="state"/>
+          <field name="create_uid"              string="Felvette"/>
+          <field name="create_date"             string="Létrehozás ideje"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_raktar_picking"    model="ir.ui.view">
+      <field  name="name">Szállítás Filter</field>
+      <field  name="model">raktar.picking</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field name="id"                    string="Szállítólevél"/>
+          <field name="forrashely_id"/>
+          <field name="celallomas_id"/>
+          <field name="picking_id"/>
+          <field name="raktar_move_ids"/>
+          <filter name="filter_terv"          string="Tervezet"                 domain="[('state','=','terv')]"/>
+          <filter name="filter_szallit"       string="Szállítás"                domain="[('state','=','szallit')]"/>
+          <filter name="filter_elter"         string="Átszállítva eltérésekkel" domain="[('state','=','elter')]"/>
+          <filter name="filter_kesz"          string="Átszállítva"              domain="[('state','=','kesz')]"/>
+          <filter name="filter_konyvelt"      string="Könyvelve"                domain="[('state','=','konyvelt')]"/>
+          <filter name="filter_kiszed_folyt"  string="Kiszedés folytatás"       domain="[('picking_state','not in',('cancel', ('done')))]"/>
+          <group expand="0" string="Csoportosítás">
+            <filter name="group_forras"       string="Forráshely"               context="{'group_by': 'forrashely_id'}"/>
+            <filter name="group_cel"          string="Célállomás"               context="{'group_by': 'celallomas_id'}"/>
+          </group>
+        </search>
+      </field>
+    </record>
+<!--
+  ([('terv',u'Tervezet'),('szallit',u'Szállítás'),('elter',u'Átszállítva eltérésekkel'),('kesz',u'Átszállítva')], 'Állapot',
+-->
+    <!--####################################################################################################################  Move  -->
+    <record id="view_tree_raktar_move_default"    model="ir.ui.view">
+      <field  name="name">Mozgás Tree</field>
+      <field  name="model">raktar.move</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <tree editable="bottom">
+          <field name="gyartasi_lap_sorsz"  attrs="{'required': [('mozgas', '=', '#ki')]}" />
+          <field name="gyartasi_lap_id"     attrs="{'required': [('mozgas', '=', '#ki')]}" options="{'no_create': True}"/>
+          <field name="product_id"          options="{'no_create': True}"/>
+          <field name="forrashelyen"        attrs="{'invisible': [('picking_id', '!=', 0)]}"/>
+          <field name="product_uom_qty"/>
+          <field name="hibakod_id"          attrs="{'readonly': [('mozgas', 'not in', ('belso', 'selejt', 'szall'))]}" />
+          <field name="megjegyzes"/>
+          <field name="raktar_picking_id"   invisible="1"/>
+          <field name="mozgas"              invisible="1"/>
+          <field name="picking_id"          invisible="1"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_tree_raktar_move_ki"    model="ir.ui.view">
+      <field  name="name">Mozgás Tree</field>
+      <field  name="model">raktar.move</field>
+      <field  name="arch" type="xml">
+        <tree default_order="gyartasi_lap_sorsz desc, create_date">
+          <field name="gyartasi_lap_sorsz"/>
+          <field name="gyartasi_lap_id"/>
+          <field name="modositott_db"/>
+          <field name="product_uom_qty"   string="Kiszállítva"/>
+          <field name="megjegyzes"/>
+          <field name="create_date"       string="Létrehozás ideje"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_raktar_move"    model="ir.ui.view">
+      <field  name="name">Mozgás Filter</field>
+      <field  name="model">raktar.move</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field name="gyartasi_lap_sorsz"/>
+          <field name="product_id"/>
+        </search>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Bont  -->
+    <record id="view_form_raktar_bont"    model="ir.ui.view">
+      <field  name="name">Szétszerelés Form</field>
+      <field  name="model">raktar.bont</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <form>
+          <header>
+            <button name="szetszerel"       type="object"         string="Szétszerelés"         class="oe_highlight"
+                                            attrs="{'invisible': [('picking_id','!=',False)]}"  confirm="Szétszerelés véglegesítése"/>
+          </header>
+          <sheet>
+          <group col="2">
+            <field name="sorszam"/>
+            <field name="gyartasi_lap_id"/>
+          </group>
+          <group col="4">
+            <field name="gyartas_id"/>
+            <field name="product"/>
+            <field name="mennyiseg"/>
+            <field name="hely"/>
+            <field name="picking_id"/>
+            <field name="picking2_id"/>
+          </group>
+          <group col="4">
+            <field name="megjegyzes"/>
+          </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_tree_raktar_bont"    model="ir.ui.view">
+      <field  name="name">Szétszerelés Tree</field>
+      <field  name="model">raktar.bont</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <tree>
+          <field name="sorszam"/>
+          <field name="gyartasi_lap_id"/>
+          <field name="product"/>
+          <field name="hely"/>
+          <field name="mennyiseg"/>
+          <field name="picking_id"/>
+          <field name="megjegyzes"/>
+        </tree>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Impex  -->
+    <record id="view_tree_raktar_impex"    model="ir.ui.view">
+      <field  name="name">Impex Tree</field>
+      <field  name="model">raktar.impex</field>
+      <field  name="arch" type="xml">
+        <tree editable="bottom">
+          <field name="sorszam"/>
+          <field name="rendelesszam"/>
+          <field name="termekkod"/>
+          <field name="homogen"/>
+          <field name="hely"/>
+          <field name="db"/>
+          <field name="mennyiseg"/>
+          <field name="ertek"/>
+          <field name="ora"                 sum="db összesen"/>
+          <field name="datum"/>
+          <field name="gyartasi_lap_id"/>
+          <field name="gylap_state"/>
+          <field name="gyartasi_hely_ids"   widget="many2many_tags"/>
+          <field name="product_id"/>
+          <field name="price"/>
+          <field name="raktaron"/>
+          <field name="homogen_id"/>
+          <field name="hely_id"/>
+          <field name="production_id"/>
+          <field name="production_state"/>
+          <field name="hibakod_id"/>
+          <field name="megjegyzes"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_form_raktar_impex_beepul"    model="ir.ui.view">
+      <field name="name">Impex beépülés Form</field>
+      <field name="model">raktar.impex_beepul</field>
+      <field name="arch" type="xml">
+        <form>
+          <h3>Az Impex táblába legenerálja a megadott alkatrész beépülési láncolatát.</h3>
+          <br></br>
+          <group col="2">
+            <field name="product_id"        options="{'no_create': True}"/>
+          </group>
+          <footer>
+            <button type="object" name="impex_beepul" string="Beépülés számítás" class="oe_highlight" />
+            <button special="cancel"  string="Elvet"/>
+          </footer>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_form_raktar_impex_menny"    model="ir.ui.view">
+      <field name="name">Impex mennyiség Form</field>
+      <field name="model">raktar.impex_input</field>
+      <field name="arch" type="xml">
+        <form>
+          <h3>Az Impex tábla mennyiségeit megszorozza az Arány mezőben kiszámolt vagy megadott értékkel.</h3>
+          <br></br>
+          <group col="2">
+            <field name="szamlalo"/>
+            <field name="nevezo"/>
+            <field name="arany"/>
+          </group>
+          <footer>
+            <button type="object" name="impex_aranyit" string="Arányít" class="oe_highlight" />
+            <button special="cancel"  string="Elvet"/>
+          </footer>
+        </form>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Manager akciók -->
+    <record id="view_tree_raktar_manager_impex"    model="ir.ui.view">
+      <field  name="name">Raktar Manager Tree</field>
+      <field  name="model">szefo.parameter</field>
+      <field  name="arch" type="xml">
+        <tree create="false" >
+          <button name="calc_impex"         type="object" string="Impex id keres"                     confirm="Az impex adattáblában kikeresi és beírja a hivatkozásokat." />
+          <button name="legrand_keszlet"    type="object" string="Raktárkészlet"                      confirm="Aktuális raktárkészlet Legrand számítás szerint." />
+          <button name="anyagjegyzek_keres" type="object" string="Anyagjegyzék keres"                 confirm="A beimportált gyártási lapokhoz megkeresi a lehetséges anyagjegyzékeket." />
+          <button name="gylap_ellenorzes"   type="object" string="Gyártási lapok ellenőrzése"         confirm="Végigmegy a lezáratlan gyártási lapokon, a hibákak beírja az impex adattáblába." />
+          <button name="homogen_ellenorzes" type="object" string="Homogének ellenőrzése"              confirm="Végigmegy a homogéneken, az időadatokat összeveti a gyártási műveletekkel, az eltéréseket beírja az impex adattáblába." />
+        </tree>
+      </field>
+    </record>
+<!--
+          <button name="telj_db_napijelent" type="object" string="Teljesített db napijelentésből"     confirm="A napijelentés db értékével megnöveli a gyártási lap Teljesített db mezőjét." />
+          <button name="telj_db_szlamell"   type="object" string="Teljesített db számlamellékletből"  confirm="A számlamelléklet db értékét beírja a gyártási lap Teljesített db mezőjébe." />
+-->
+
+    <!--####################################################################################################################  Szefo admin import -->
+    <record id="view_tree_szefo_admin_akcio"    model="ir.ui.view">
+      <field  name="name">Szefo Admin Tree</field>
+      <field  name="model">szefo.parameter</field>
+      <field  name="arch" type="xml">
+        <tree create="false" >
+          <button name="gen_cikkszam" type="object" string="Cikknévből cikkszám"  confirm="A cikk/termék nevéből kinyeri a cikkszámot, és beírja az adatbázisba." />
+        </tree>
+      </field>
+    </record>
+<!--
+          <button name="upgrade_v6"   type="object" string="Upgrade v6"           confirm="Mozgásnemek átmásolása a Raktár adattáblába." />
+          <button name="upgrade_v5"   type="object" string="Upgrade v5"           confirm="Gyártási műveletek homogén és idők beírása a műveletekből." />
+          <button name="upgrade_v4"   type="object" string="Upgrade v4"           confirm="Gyártási lap műveleti utasítás import" />
+          <button name="upgrade_v3"   type="object" string="Upgrade v3"           confirm="Gyártási lap státusz beállítás." />
+          <button name="upgrade_v2"   type="object" string="Upgrade v2"           confirm="Mozgásterv rendelésszámból gyartasi_lap_id." />
+          <button name="upgrade_v1"   type="object" string="Upgrade v1"           confirm="Adatkonverzió az adattáblák módosítása miatt." />
+          <button name="import_cikk"  type="object" string="Szentes alkatrész import" confirm="Importálod az alkatrészeket Szentes készletből?" />
+          <button name="init_db"      type="object" string="Init db" confirm="Veszélyes! Csak először!" />
+-->
+
+    <!--  Actions  -->
+    <act_window id="raktar_gylap_import"      name="Import"         res_model="szefo.parameter"     view_id="view_tree_raktar_gylap_import"         view_mode="tree"/>
+    <act_window id="raktar_gylap_mterv_val"   name="Műveletterv"    res_model="raktar.gyartasi_lap" view_id="view_tree_raktar_gylap_mterv_valaszt"  view_mode="tree,form"
+                domain="[('state','=','uj')]"/>
+    <act_window id="raktar_gylap_generalas"   name="Gyártás gen."   res_model="raktar.gyartasi_lap" view_id="view_tree_raktar_gylap_generalas"      view_mode="tree,form"
+                context="{'search_default_filter_mterv': 1}"/>
+    <act_window id="raktar_gylap_szerk"       name="Gyártás"        res_model="raktar.gyartasi_lap" view_id="view_tree_raktar_gyartasi_lap"         view_mode="tree,form"
+                context="{'search_default_filter_gyterv': 1}"/>
+    <act_window id="raktar_gylap_kimer"       name="Kimér"          res_model="raktar.gyartasi_lap" view_id="view_tree_raktar_gyartasi_lap"         view_mode="tree,form"
+                context="{'search_default_filter_kimer': 1}"/>
+
+    <act_window id="raktar_mozgasterv"        name="Mozgásterv"     res_model="raktar.mozgasterv"   view_id="view_tree_raktar_mozgasterv"           view_mode="tree,form"
+                context="{'search_default_filter_szallithato': 1}"/>
+    <act_window id="raktar_picking_bevet"     name="Bevételezés"    res_model="raktar.picking"      view_id="view_tree_raktar_picking"              view_mode="tree,form"
+                context="{'mozgas':'be'}"     domain="[('mozgas','=','be')]"/>
+    <act_window id="raktar_picking_belso"     name="Szállítás"      res_model="raktar.picking"      view_id="view_tree_raktar_picking"              view_mode="tree,form"
+                context="{'mozgas':'belso'}"  domain="[('mozgas','=','belso')]"/>
+    <act_window id="raktar_picking_vissza"    name="Visszaszállítás" res_model="raktar.picking"     view_id="view_tree_raktar_picking"              view_mode="tree,form"
+                context="{'mozgas':'vissza'}" domain="[('mozgas','=','vissza')]"/>
+    <act_window id="raktar_picking_selejt"    name="Selejt vissza"  res_model="raktar.picking"      view_id="view_tree_raktar_picking"              view_mode="tree,form"
+                context="{'mozgas':'selejt'}" domain="[('mozgas','=','selejt')]"/>
+
+    <act_window id="raktar_gylap_gyartas"     name="Gyártási lap"   res_model="raktar.gyartasi_lap" view_id="view_tree_raktar_gyartasi_lap"         view_mode="tree,form"
+                context="{'search_default_filter_gyartas': 1}"/>
+    <act_window id="raktar_gyartas_datum"     name="Gyártás"        res_model="raktar.gyartas"      view_id="view_tree_raktar_gyartas_datum"        view_mode="tree,form"
+                context="{'search_default_filter_nem_kesz': 1}"/>
+
+    <act_window id="raktar_picking_ki"        name="Kiszállítás"    res_model="raktar.picking"      view_id="view_tree_raktar_picking"              view_mode="tree,form"
+                context="{'mozgas':'ki'}"     domain="[('mozgas','=','ki')]"/>
+    <act_window id="raktar_szlamelleklet"     name="Számlamelléklet" res_model="raktar.homogen"     view_id="view_tree_raktar_szlamelleklet"        view_mode="tree,form"
+                domain="[('sajat','=',True), ('szamlazhato_db','>',0)]"/>
+    <act_window id="raktar_szlamellnulla"     name="Számlamelléklet" res_model="szefo.parameter"    view_id="view_tree_raktar_szlamellnulla"        view_mode="tree"/>
+
+    <act_window id="raktar_muveletterv"       name="Műveletterv"    res_model="raktar.muveletterv"  view_id="view_tree_raktar_muveletterv"          view_mode="tree,form"/>
+    <act_window id="raktar_muvelet"           name="Művelet"        res_model="raktar.muvelet"      view_id="view_tree_raktar_muvelet"              view_mode="tree,form"/>
+    <act_window id="raktar_gylap_mterv_kesz"  name="Gyártási lap"   res_model="raktar.gyartasi_lap" view_id="view_tree_raktar_gylap_mterv_keszit"   view_mode="tree"
+                domain="[('state','=','uj')]"/>
+
+    <act_window id="raktar_impex"             name="Impex"          res_model="raktar.impex"                                                        view_mode="tree,form"/>
+    <act_window id="raktar_manager_impex"     name="Impex akciók"   res_model="szefo.parameter"     view_id="view_tree_raktar_manager_impex"        view_mode="tree"/>
+    <act_window id="raktar_impex_beepul"      name="Beépülés"       res_model="raktar.impex_beepul" view_id="view_form_raktar_impex_beepul"         view_mode="form"  target="new"/>
+    <act_window id="raktar_impex_menny"       name="Arányítás"      res_model="raktar.impex_input"  view_id="view_form_raktar_impex_menny"          view_mode="form"  target="new"/>
+
+    <act_window id="raktar_gylap_admin"       name="Gyártási lap"   res_model="raktar.gyartasi_lap" view_id="view_form_raktar_gyartasi_lap_admin"   view_mode="tree,form"/>
+    <act_window id="raktar_gyartas_admin"     name="Gyártási műv."  res_model="raktar.gyartas"      view_id="view_form_raktar_gyartas_admin"        view_mode="tree,form"/>
+    <act_window id="raktar_mozgasnem"         name="Mozgásnem"      res_model="raktar.mozgasnem"    view_id="view_tree_raktar_mozgasnem"            view_mode="tree,form"/>
+    <act_window id="raktar_bont"              name="Szétszerelés"   res_model="raktar.bont"                                                         view_mode="tree,form"/>
+    <act_window id="raktar_sajathomogen"      name="Homogén"        res_model="raktar.sajathomogen"                                                 view_mode="tree,form"/>
+    <act_window id="raktar_hibakod"           name="Hibakód"        res_model="raktar.hibakod"                                                      view_mode="tree,form"/>
+    <act_window id="szefo_admin_akcio"        name="Import"         res_model="szefo.parameter"     view_id="view_tree_szefo_admin_akcio"           view_mode="tree"/>
+
+<!--
+    <act_window id="raktar_mozgasvegleg"      name="Véglegesítés"   res_model="szefo.parameter"     view_id="view_tree_raktar_mozgasvegleg"         view_mode="tree"/>
+    <act_window id="raktar_mozgas_gen"        name="Új mozgás"      res_model="szefo.parameter"     view_id="view_tree_raktar_mozgas_gen"           view_mode="tree"/>
+
+      <menuitem id="menu_raktar_mozgasterv"     name="Mozgásterv"                   parent="menu_raktar_szallitas"      sequence="10" action="raktar_mozgasterv"      />
+      <menuitem id="menu_raktar_mozgasvegleg"   name="Mozgásterv véglegesítés"      parent="menu_raktar_szallitas"      sequence="20" action="raktar_mozgasvegleg"    />
+      <menuitem id="menu_raktar_mozgas_gen"     name="Mozgás létrehozás"            parent="menu_raktar_szamla"         sequence="10" action="raktar_mozgas_gen"    />
+-->
+    <!--  Menu  items  -->
+    <menuitem id="menu_root" name="Raktár" sequence="65" groups="group_raktar_viewer" />
+
+    <menuitem id="menu_raktar_raktar"           name="Raktár"                       parent="menu_root"                  sequence="10" />
+      <menuitem id="menu_mrp_product_action"    name="Termékek"                     parent="menu_raktar_raktar"         sequence="10" action="mrp.product_template_action" />
+      <menuitem id="menu_stock_quantsact"       name="Mennyiségek"                  parent="menu_raktar_raktar"         sequence="20" action="stock.quantsact" />
+      <menuitem id="menu_action_move_form2"     name="Készletmozgások"              parent="menu_raktar_raktar"         sequence="30" action="stock.action_move_form2" groups="group_raktar_manager"/>
+
+    <menuitem id="menu_raktar_gyartas_elok"     name="Gyártás előkészítés"          parent="menu_root"                  sequence="20"                                 groups="group_raktar_manager" />
+      <menuitem id="menu_raktar_gylap_import"   name="Gyártási lap import"          parent="menu_raktar_gyartas_elok"   sequence="10" action="raktar_gylap_import"    />
+      <menuitem id="menu_raktar_gyartasi_lap2"  name="Műveletterv választás"        parent="menu_raktar_gyartas_elok"   sequence="20" action="raktar_gylap_mterv_val" />
+      <menuitem id="menu_raktar_gyartasi_lap3"  name="Gyártási terv készítés"       parent="menu_raktar_gyartas_elok"   sequence="30" action="raktar_gylap_generalas" />
+      <menuitem id="menu_raktar_gyartasi_lap4"  name="Gyártási terv szerkesztés"    parent="menu_raktar_gyartas_elok"   sequence="40" action="raktar_gylap_szerk"     />
+      <menuitem id="menu_raktar_gyartasi_lap5"  name="Alkatrész kimérés"            parent="menu_raktar_gyartas_elok"   sequence="50" action="raktar_gylap_kimer"     />
+
+    <menuitem id="menu_raktar_szallitas"        name="Szállítás"                    parent="menu_root"                  sequence="30"                                 groups="group_raktar_manager" />
+      <menuitem id="menu_stock_action_picking"  name="Raktárműveletek"              parent="menu_raktar_szallitas"      sequence="30" action="stock.action_picking_type_form" />
+      <menuitem id="menu_raktar_picking_bevet"  name="Alkatrész bevételezés"        parent="menu_raktar_szallitas"      sequence="40" action="raktar_picking_bevet"   />
+      <menuitem id="menu_raktar_picking_belso"  name="Belső szállítás"              parent="menu_raktar_szallitas"      sequence="50" action="raktar_picking_belso"   />
+      <menuitem id="menu_raktar_picking_vissza" name="Alkatrész visszaszállítás"    parent="menu_raktar_szallitas"      sequence="60" action="raktar_picking_vissza"  />
+      <menuitem id="menu_raktar_picking_selejt" name="Selejt visszaszállítás"       parent="menu_raktar_szallitas"      sequence="70" action="raktar_picking_selejt"  />
+
+    <menuitem id="menu_raktar_gyartas"          name="Gyártás"                      parent="menu_root"                  sequence="40" />
+      <menuitem id="menu_raktar_gyartasi_lap6"  name="Gyártási lapok"               parent="menu_raktar_gyartas"        sequence="10" action="raktar_gylap_gyartas" />
+      <menuitem id="menu_raktar_gyartas_datum"  name="Gyártási műveletek"           parent="menu_raktar_gyartas"        sequence="20" action="raktar_gyartas_datum" />
+      <menuitem id="menu_mrp_production_action" name="Gyártási rendelések"          parent="menu_raktar_gyartas"        sequence="30" action="mrp.mrp_production_action" />
+
+    <menuitem id="menu_raktar_szamla"           name="Kiszállítás, számlázás"       parent="menu_root"                  sequence="50"                                 groups="group_raktar_manager"/>
+      <menuitem id="menu_raktar_picking_ki"     name="Termék kiszállítás"           parent="menu_raktar_szamla"         sequence="20" action="raktar_picking_ki"    />
+      <menuitem id="menu_raktar_szlamelleklet"  name="Számlamelléklet"              parent="menu_raktar_szamla"         sequence="30" action="raktar_szlamelleklet" />
+      <menuitem id="menu_raktar_szlamellnulla"  name="Számlamelléklet nullázás"     parent="menu_raktar_szamla"         sequence="30" action="raktar_szlamellnulla" />
+
+    <menuitem id="menu_technologia"             name="Technológia"                  parent="menu_root"                  sequence="60"                                 groups="group_raktar_manager" />
+      <menuitem id="menu_mrp_bom_form_action"   name="Anyagjegyzék"                 parent="menu_technologia"           sequence="10" action="mrp.mrp_bom_form_action" />
+      <menuitem id="menu_raktar_muveletterv"    name="Műveletterv"                  parent="menu_technologia"           sequence="20" action="raktar_muveletterv" />
+      <menuitem id="menu_raktar_muvelet"        name="Műveletek"                    parent="menu_technologia"           sequence="30" action="raktar_muvelet" />
+      <menuitem id="menu_raktar_gylap_mterv"    name="Gyártási lapból műveletterv"  parent="menu_technologia"           sequence="40" action="raktar_gylap_mterv_kesz" />
+
+    <menuitem id="menu_segedlet"                name="Segédeszközök"                parent="menu_root"                  sequence="70"                                 groups="group_raktar_user" />
+      <menuitem id="menu_raktar_impex"          name="Impex"                        parent="menu_segedlet"              sequence="10" action="raktar_impex"           groups="group_raktar_user" />
+      <menuitem id="menu_raktar_manager"        name="Impex műveletek"              parent="menu_segedlet"              sequence="20" action="raktar_manager_impex"   groups="group_raktar_user" />
+      <menuitem id="menu_raktar_impex_beepul"   name="Beépülés generálás"           parent="menu_segedlet"              sequence="30" action="raktar_impex_beepul" />
+      <menuitem id="menu_raktar_impex_menny"    name="Impex mennyiség arányít"      parent="menu_segedlet"              sequence="40" action="raktar_impex_menny" />
+
+    <menuitem id="menu_administrator"           name="Administrator"                parent="menu_root"                  sequence="90"                                 groups="group_raktar_admin" />
+      <menuitem id="menu_raktar_gylap_admin"    name="Gyártási lapok"               parent="menu_administrator"         sequence="10" action="raktar_gylap_admin" />
+      <menuitem id="menu_raktar_gyartas_admin"  name="Gyártási műveletek"           parent="menu_administrator"         sequence="20" action="raktar_gyartas_admin" />
+      <menuitem id="menu_raktar_mozgasnem"      name="Mozgásnem"                    parent="menu_administrator"         sequence="30" action="raktar_mozgasnem"       groups="base.group_system"/>
+      <menuitem id="menu_raktar_bont"           name="Szétszerelés"                 parent="menu_administrator"         sequence="40" action="raktar_bont" />
+      <menuitem id="menu_raktar_homogen"        name="Homogén"                      parent="menu_administrator"         sequence="50" action="raktar_sajathomogen" />
+      <menuitem id="menu_raktar_hibakod"        name="Hibakód"                      parent="menu_administrator"         sequence="60" action="raktar_hibakod" />
+      <menuitem id="menu_szefo_parameter"       name="Akció"                        parent="menu_administrator"         sequence="90" action="szefo_admin_akcio" />
+
+<!--
+-->
+  </data>
+</openerp>

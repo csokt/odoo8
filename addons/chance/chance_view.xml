@@ -1,0 +1,451 @@
+<?xml version="1.0"?>
+<openerp>
+  <data>
+    <!--####################################################################################################################  Parameter  -->
+
+    <!--####################################################################################################################  Hely  -->
+    <record id="view_form_hely"    model="ir.ui.view">
+      <field name="name">Hely Form</field>
+      <field name="model">chance.hely</field>
+      <field name="arch" type="xml">
+        <form>
+          <group col="4">
+            <field name="azonosito"/>
+            <field name="name"/>
+            <field name="nev"/>
+            <field name="telepules"/>
+            <field name="cim"/>
+            <field name="sorrend"/>
+            <field name="id"                    readonly="1"/>
+            <field name="szefo_e"/>
+            <field name="active"/>
+          </group>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_tree_hely"    model="ir.ui.view">
+      <field  name="name">Hely Tree</field>
+      <field  name="model">chance.hely</field>
+      <field  name="arch" type="xml">
+        <tree editable="top">
+          <field name="id"/>
+          <field name="azonosito"/>
+          <field name="name"/>
+          <field name="nev"/>
+          <field name="telepules"/>
+          <field name="cim"/>
+          <field name="sorrend"/>
+          <field name="szefo_e"/>
+        </tree>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Cikk  -->
+    <record id="view_form_cikk"    model="ir.ui.view">
+      <field name="name">Cikk Form</field>
+      <field name="model">chance.cikk</field>
+      <field name="priority" eval="15"/>
+      <field name="arch" type="xml">
+        <form>
+          <sheet>
+            <group col="4">
+              <field name="cikkszam"/>
+              <field name="osztaly"/>
+              <field name="meret"/>
+              <field name="szin"/>
+              <field name="megnevezes"/>
+              <field name="onkoltseg"/>
+              <field name="name"/>
+              <field name="vonalkod"              readonly="1"/>
+              <field name="active"                groups="chance.group_chance_director"/>
+            </group>
+            <field name="feljegyzes_ids">
+              <tree editable="top">
+                <field name="feljegyzes"/>
+                <field name="create_uid"          readonly="1"    string="Felvette"/>
+                <field name="create_date"         readonly="1"    string="Létrehozás ideje"/>
+              </tree>
+            </field>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_tree_cikk"    model="ir.ui.view">
+      <field name="name">Cikk Tree</field>
+      <field name="model">chance.cikk</field>
+      <field name="priority" eval="15"/>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="cikkszam"/>
+          <field name="osztaly"/>
+          <field name="meret"/>
+          <field name="szin"/>
+          <field name="megnevezes"/>
+          <field name="onkoltseg"/>
+          <field name="name"/>
+          <field name="vonalkod"/>
+        </tree>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Cikkár  -->
+    <record id="view_tree_cikkar"    model="ir.ui.view">
+      <field name="name">Cikkár Tree</field>
+      <field name="model">chance.cikkar</field>
+      <field name="priority" eval="15"/>
+      <field name="arch" type="xml">
+        <tree editable="top">
+          <field name="hely_id"           options="{'no_create': True, 'no_open': True}"/>
+          <field name="cikkszam"/>
+          <field name="osztaly"/>
+          <field name="megnevezes"/>
+          <field name="nyilvantartasi_ar"/>
+        </tree>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Mozgásfej  -->
+    <record id="view_form_mozgasfej"    model="ir.ui.view">
+      <field  name="name">Mozgásfej Form</field>
+      <field  name="model">chance.mozgasfej</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <form>
+          <header>
+            <button name="veglegesites"   type="object"   string="Véglegesítés"             attrs="{'invisible': ['|',('state','!=','terv'),('mozgasnem','=','rendel')]}"   class="oe_highlight"
+                                          confirm="A tervezett mozgásokat véglegesíti"/>
+            <button name="veglegesites"   type="object"   string="Véglegesítés"             attrs="{'invisible': ['|',('state','!=','terv'),('mozgasnem','!=','rendel')]}"  class="oe_highlight"
+                                          confirm="A tervezett mozgásokat véglegesíti"      groups="chance.group_chance_manager" />
+            <button name="state2kesz"     type="object"   string="Átszállítva"              attrs="{'invisible': [('state','not in',('szallit','elter'))]}" class="oe_highlight"
+                                          confirm="A rögzített mozgások egyeznek a leszállított mennyiségekkel."/>
+            <button name="state2elter"    type="object"   string="Átszállítva eltérésekkel" attrs="{'invisible': [('state','!=','szallit')]}"
+                                          confirm="A leszállított alkatrészek mennyisége a szállítólevélhez képest eltér." />
+            <button name="state2konyvelt" type="object"   string="Könyvelve"                attrs="{'invisible': [('state','!=','kesz')]}"                  class="oe_highlight"
+                                          confirm="A szállítólvelet lezárja."               groups="chance.group_chance_manager" />
+            <button name="state2elter"    type="object"   string="Átszállítva eltérésekkel" attrs="{'invisible': [('state','!=','kesz')]}"
+                                          confirm="A rögzített mozgások NEM egyeznek a leszállított mennyiségekkel."  groups="chance.group_chance_manager"/>
+            <field  name="state"          widget="statusbar"/>
+          </header>
+            <group col="6">
+              <field name="id"                  string="Szállítólevél száma"/>
+              <field name="create_uid"          readonly="1"    string="Felvette"/>
+              <field name="create_date"         readonly="1"    string="Létrehozás ideje"/>
+              <field name="forrashely_id"       attrs="{'readonly': ['|',('state','!=','terv'),('mozgasnem', 'not in', ('belso','elad'))], 'required': [('mozgasnem', 'in', ('belso','elad'))]}"
+                                                options="{'no_create': True, 'no_open': True}"
+                                                domain="[('szefo_e', '=', True)]"/>
+              <field name="write_uid"           readonly="1"    string="Módosította"/>
+              <field name="write_date"          readonly="1"    string="Módosítás ideje"/>
+              <field name="celallomas_id"       attrs="{'readonly': ['|',('state','!=','terv'),('mozgasnem', 'not in', ('belso','korrekcio','indulo','rendel'))], 'required': [('mozgasnem', 'in', ('belso','korrekcio','indulo','rendel'))]}"
+                                                options="{'no_create': True, 'no_open': True}"
+                                                domain="[('szefo_e', '=', True)]"/>
+              <field name="mozgastorzs_id"      attrs="{'readonly': [('state','=','konyvelt')]}"
+                                                options="{'no_create': True, 'no_open': True}"/>
+              <field name="vevo_id"             attrs="{'invisible': [('mozgasnem','!=','elad')]}"/>
+            </group>
+            <group col="2">
+              <field name="forrasdokumentum"    attrs="{'readonly': [('state','!=','terv')]}"/>
+              <field name="megjegyzes"          attrs="{'readonly': [('state','=','konyvelt')]}"/>
+            </group>
+            <field name="mozgassor_ids"         attrs="{'readonly': [('state','not in',('terv','elter'))]}"     context="{'mozgasnem': context.get('mozgasnem')}"/>
+            <field name="mozgasnem"             invisible="1"/>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_tree_mozgasfej"    model="ir.ui.view">
+      <field  name="name">Mozgásfej Tree</field>
+      <field  name="model">chance.mozgasfej</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <tree>
+          <field name="id"                      string="Szállítólevél"/>
+          <field name="forrashely_id"/>
+          <field name="celallomas_id"/>
+          <field name="megjegyzes"/>
+          <field name="state"/>
+          <field name="create_uid"              string="Felvette"/>
+          <field name="create_date"             string="Létrehozás ideje"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_mozgasfej"    model="ir.ui.view">
+      <field  name="name">Mozgásfej Filter</field>
+      <field  name="model">chance.mozgasfej</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field name="id"                    string="Szállítólevél"/>
+          <field name="forrashely_id"/>
+          <field name="celallomas_id"/>
+          <field name="mozgassor_ids"/>
+          <filter name="filter_terv"          string="Tervezet"                 domain="[('state','=','terv')]"/>
+          <filter name="filter_szallit"       string="Szállítás"                domain="[('state','=','szallit')]"/>
+          <filter name="filter_elter"         string="Átszállítva eltérésekkel" domain="[('state','=','elter')]"/>
+          <filter name="filter_kesz"          string="Átszállítva"              domain="[('state','=','kesz')]"/>
+          <filter name="filter_konyvelt"      string="Könyvelve"                domain="[('state','=','konyvelt')]"/>
+          <group expand="0" string="Csoportosítás">
+            <filter name="group_forras"       string="Forráshely"               context="{'group_by': 'forrashely_id'}"/>
+            <filter name="group_cel"          string="Célállomás"               context="{'group_by': 'celallomas_id'}"/>
+          </group>
+        </search>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Mozgássor  -->
+    <record id="view_tree_mozgassor_default"    model="ir.ui.view">
+      <field  name="name">Mozgássor default Tree</field>
+      <field  name="model">chance.mozgassor</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <tree editable="bottom">
+          <field name="vonalkod"/>
+          <field name="cikk_id"                 options="{'no_create': True}"/>
+          <field name="raktaron"                invisible="context.get('mozgasnem') not in ('elad','belso','rendel')"  readonly="1"/>
+          <field name="mennyiseg"/>
+          <field name="egysegar"/>
+          <field name="ertek"/>
+          <field name="megjegyzes"/>
+          <field name="create_uid"              string="Felvette"/>
+          <field name="create_date"             string="Létrehozás ideje"/>
+          <field name="write_uid"               string="Módosította"/>
+          <field name="write_date"              string="Módosítás ideje"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_tree_mozgassor"    model="ir.ui.view">
+      <field  name="name">Mozgássor Tree</field>
+      <field  name="model">chance.mozgassor</field>
+      <field  name="arch" type="xml">
+        <tree>
+          <field name="mozgaskod"/>
+          <field name="mozgasfej_sorszam"/>
+          <field name="state"/>
+          <field name="forrashely_id"/>
+          <field name="celallomas_id"/>
+          <field name="cikkszam"/>
+          <field name="osztaly"/>
+          <field name="meret"/>
+          <field name="szin"/>
+          <field name="megnevezes"/>
+          <field name="mennyiseg"/>
+          <field name="egysegar"/>
+          <field name="ertek"/>
+          <field name="megjegyzes"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_mozgassor"    model="ir.ui.view">
+      <field  name="name">Mozgássor Filter</field>
+      <field  name="model">chance.mozgassor</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field name="mozgasfej_sorszam"     string="Szállítólevél"/>
+          <field name="forrashely_id"/>
+          <field name="celallomas_id"/>
+          <field name="cikk_id"/>
+          <field name="cikkszam"/>
+          <field name="osztaly"/>
+          <field name="meret"/>
+          <field name="szin"/>
+          <field name="megnevezes"/>
+          <filter name="filter_terv"          string="Tervezet"                 domain="[('state','=','terv')]"/>
+          <filter name="filter_szallit"       string="Szállítás"                domain="[('state','=','szallit')]"/>
+          <filter name="filter_elter"         string="Átszállítva eltérésekkel" domain="[('state','=','elter')]"/>
+          <filter name="filter_kesz"          string="Átszállítva"              domain="[('state','=','kesz')]"/>
+          <filter name="filter_konyvelt"      string="Könyvelve"                domain="[('state','=','konyvelt')]"/>
+        </search>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Készlet  -->
+    <record id="view_tree_keszlet"    model="ir.ui.view">
+      <field  name="name">Készlet Tree</field>
+      <field  name="model">chance.keszlet</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <tree>
+          <field name="cikkszam"/>
+          <field name="megnevezes"/>
+          <field name="szin"/>
+          <field name="meret"/>
+          <field name="raktaron"/>
+          <field name="hely_id"/>
+          <field name="osztaly"/>
+          <field name="onkoltseg"/>
+          <field name="ertek"/>
+          <field name="varhato"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_graph_keszlet" model="ir.ui.view">
+     <field name="name">raktar.keszlet.graph</field>
+     <field name="model">chance.keszlet</field>
+     <field name="arch" type="xml">
+       <graph string="Készlet értékelés"  type="pivot"      stacked="True">
+         <field name="hely_id"            type="row"/>
+         <field name="cikkszam"           type="row"/>
+         <field name="osztaly"            type="row"/>
+         <field name="szin"               type="row"/>
+         <field name="meret"              type="col"/>
+         <field name="raktaron"           type="measure"/>
+       </graph>
+     </field>
+    </record>
+
+    <record id="view_filter_keszlet"    model="ir.ui.view">
+      <field  name="name">Készlet Filter</field>
+      <field  name="model">chance.keszlet</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field name="cikk_id"/>
+          <field name="cikkszam"/>
+          <field name="osztaly"/>
+          <field name="meret"/>
+          <field name="szin"/>
+          <field name="megnevezes"/>
+          <filter name="filter_keszaru"     string="Készáru raktár"       domain="[('hely_id.azonosito','=','keszaru')]"/>
+          <filter name="filter_biatorbagy"  string="Biatorbágy üzlet"     domain="[('hely_id.azonosito','=','biatorbagy')]"/>
+          <filter name="filter_szeged"      string="Szeged Márkabolt"     domain="[('hely_id.azonosito','=','szeged')]"/>
+          <filter name="filter_heviz"       string="Hévíz Márkabolt"      domain="[('hely_id.azonosito','=','heviz')]"/>
+          <separator/>
+          <filter name="filter_szefo_e"     string="Szefo készlet"        domain="[('szefo_e','=',True)]"/>
+          <group expand="0" string="Csoportosítás">
+            <filter name="group_hely"       string="Hely"                 context="{'group_by': 'hely_id'}"/>
+            <filter name="group_cikk"       string="Cikkazonosito"        context="{'group_by': 'cikk_id'}"/>
+            <filter name="group_cikkszam"   string="Cikkszám"             context="{'group_by': 'cikkszam'}"/>
+            <filter name="group_osztaly"    string="Osztály"              context="{'group_by': 'osztaly'}"/>
+            <filter name="group_meret"      string="Méret"                context="{'group_by': 'meret'}"/>
+            <filter name="group_szin"       string="Szín"                 context="{'group_by': 'szin'}"/>
+          </group>
+        </search>
+      </field>
+    </record>
+
+    <record id="view_tree_keszlet_cikk"    model="ir.ui.view">
+      <field  name="name">Vállalati készlet Tree</field>
+      <field  name="model">chance.keszlet_cikk</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <tree>
+          <field name="cikkszam"/>
+          <field name="megnevezes"/>
+          <field name="szin"/>
+          <field name="meret"/>
+          <field name="szefo_keszlet"/>
+          <field name="osztaly"/>
+          <field name="onkoltseg"/>
+          <field name="ertek"/>
+          <field name="cikk_id"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_keszlet_cikk"    model="ir.ui.view">
+      <field  name="name">Készlet cikk Filter</field>
+      <field  name="model">chance.keszlet_cikk</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field name="cikk_id"/>
+          <field name="cikkszam"/>
+          <field name="osztaly"/>
+          <field name="meret"/>
+          <field name="szin"/>
+          <field name="megnevezes"/>
+        </search>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Feljegyzések  -->
+    <record id="view_tree_feljegyzes"    model="ir.ui.view">
+      <field  name="name">Feljegyzések Tree</field>
+      <field  name="model">chance.feljegyzes</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <tree editable="top">
+          <field name="cikk_id"/>
+          <field name="feljegyzes"/>
+          <field name="create_uid"          readonly="1"    string="Felvette"/>
+          <field name="create_date"         readonly="1"    string="Létrehozás ideje"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_feljegyzes"    model="ir.ui.view">
+      <field  name="name">Feljegyzések Filter</field>
+      <field  name="model">chance.feljegyzes</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field name="cikk_id"/>
+          <field name="feljegyzes"/>
+        </search>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Actions  -->
+    <act_window id="cikk"               name="Cikk"               res_model="chance.cikk"                                                          view_mode="tree,form"/>
+    <act_window id="feljegyzes"         name="Feljegyzés"         res_model="chance.feljegyzes"                                                    view_mode="tree"/>
+    <act_window id="keszlet"            name="Készlet"            res_model="chance.keszlet"                                                       view_mode="tree,form"
+                                                                  context="{'search_default_filter_szefo_e': 1}"/>
+
+    <act_window id="keszlet_ertekel"    name="Készlet értékelés"  res_model="chance.keszlet"                                                       view_mode="graph"
+                                                                  context="{'search_default_filter_szefo_e': 1}"/>
+
+    <act_window id="keszlet_cikk"       name="Vállalati készlet"  res_model="chance.keszlet_cikk"                                                  view_mode="tree,form"/>
+    <act_window id="cikkar"             name="Cikk ár"            res_model="chance.cikkar"                                                        view_mode="tree"/>
+
+    <act_window id="mozgas_bevet"       name="Bevételezés"        res_model="chance.mozgasfej"                                                     view_mode="tree,form"
+                domain="[('mozgasnem','=','bevet')]"              context="{'mozgasnem':'bevet'}"/>
+    <act_window id="mozgas_rendel"      name="Rendelés"           res_model="chance.mozgasfej"                                                     view_mode="tree,form"
+                domain="[('mozgasnem','=','rendel')]"             context="{'mozgasnem':'rendel'}"/>
+    <act_window id="mozgas_belso"       name="Szállítás"          res_model="chance.mozgasfej"                                                     view_mode="tree,form"
+                domain="[('mozgasnem','=','belso')]"              context="{'mozgasnem':'belso'}"/>
+    <act_window id="mozgas_elad"        name="Értékesítés"        res_model="chance.mozgasfej"                                                     view_mode="tree,form"
+                domain="[('mozgasnem','=','elad')]"               context="{'mozgasnem':'elad'}"/>
+    <act_window id="mozgas_leltar"      name="Készlethelyesbítés" res_model="chance.mozgasfej"                                                     view_mode="tree,form"
+                domain="[('mozgasnem','=','korrekcio')]"          context="{'mozgasnem':'korrekcio'}"/>
+    <act_window id="mozgas_selejt"      name="Selejtezés"         res_model="chance.mozgasfej"                                                     view_mode="tree,form"
+                domain="[('mozgasnem','=','selejt')]"             context="{'mozgasnem':'selejt'}"/>
+    <act_window id="mozgas_indulo"      name="Induló készlet"     res_model="chance.mozgasfej"                                                     view_mode="tree,form"
+                domain="[('mozgasnem','=','indulo')]"             context="{'mozgasnem':'indulo'}"/>
+    <act_window id="mozgassor"          name="Tétel"              res_model="chance.mozgassor"            view_id="view_tree_mozgassor"            view_mode="tree"/>
+
+
+    <act_window id="hely"               name="Hely"               res_model="chance.hely"                                                          view_mode="tree,form"/>
+    <act_window id="mozgastorzs"        name="Mozgástörzs"        res_model="chance.mozgastorzs"                                                   view_mode="tree,form"/>
+
+    <!--####################################################################################################################  Menu  items  -->
+    <menuitem id="menu_root" name="Chance" sequence="62" groups="group_chance_viewer" />
+
+    <menuitem id="menu_raktar"            name="Raktár"                       parent="menu_root"                  sequence="10"  />
+      <menuitem id="menu_mozgas_bevet"    name="Késztermék bevételezés"       parent="menu_raktar"                sequence="20" action="mozgas_bevet"           groups="group_chance_manager" />
+      <menuitem id="menu_mozgas_rendel"   name="Rendelés"                     parent="menu_raktar"                sequence="25" action="mozgas_rendel"  />
+      <menuitem id="menu_mozgas_belso"    name="Belső szállítás"              parent="menu_raktar"                sequence="30" action="mozgas_belso" />
+      <menuitem id="menu_mozgas_elad"     name="Értékesítés"                  parent="menu_raktar"                sequence="40" action="mozgas_elad"  />
+      <menuitem id="menu_mozgas_leltar"   name="Készlethelyesbítés"           parent="menu_raktar"                sequence="50" action="mozgas_leltar"          groups="group_chance_manager" />
+      <menuitem id="menu_mozgas_selejt"   name="Selejtezés"                   parent="menu_raktar"                sequence="60" action="mozgas_selejt"          groups="group_chance_manager" />
+      <menuitem id="menu_mozgas_indulo"   name="Induló készlet"               parent="menu_raktar"                sequence="70" action="mozgas_indulo"          groups="group_chance_manager" />
+      <menuitem id="menu_mozgassor"       name="Összes tétel"                 parent="menu_raktar"                sequence="90" action="mozgassor"  />
+
+    <menuitem id="menu_termek"            name="Termékek"                     parent="menu_root"                  sequence="30" />
+      <menuitem id="menu_cikk"            name="Cikkek"                       parent="menu_termek"                sequence="10" action="cikk" />
+      <menuitem id="menu_feljegyzes"      name="Feljegyzések"                 parent="menu_termek"                sequence="20" action="feljegyzes" />
+      <menuitem id="menu_keszlet"         name="Készlet"                      parent="menu_termek"                sequence="30" action="keszlet" />
+      <menuitem id="menu_keszlet_ertekel" name="Készlet értékelés"            parent="menu_termek"                sequence="35" action="keszlet_ertekel" />
+      <menuitem id="menu_keszlet_cikk"    name="Vállalati készlet"            parent="menu_termek"                sequence="40" action="keszlet_cikk" />
+      <menuitem id="menu_cikkar"          name="Cikk árak"                    parent="menu_termek"                sequence="50" action="cikkar" />
+
+    <menuitem id="menu_egyeb"             name="Egyéb"                        parent="menu_root"                  sequence="80"                         />
+
+    <menuitem id="menu_administrator"     name="Administrator"                parent="menu_root"                  sequence="90"                                 groups="group_chance_admin" />
+      <menuitem id="menu_hely"            name="Helyek"                       parent="menu_administrator"         sequence="40" action="hely" />
+      <menuitem id="menu_mozgastorzs"     name="Mozgástörzs"                  parent="menu_administrator"         sequence="60" action="mozgastorzs" />
+
+<!--
+-->
+  </data>
+</openerp>

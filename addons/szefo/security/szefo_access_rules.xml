@@ -1,0 +1,63 @@
+<?xml version="1.0" ?>
+<openerp>
+    <data noupdate="1">
+        <record model="ir.module.category" id="module_anyagigeny_category">
+            <field name="name">Anyagigény</field>
+            <field name="sequence">390</field>
+        </record>
+
+        <record id="group_anyagigeny_viewer" model="res.groups">
+            <field name="name">Viewer</field>
+            <field name="category_id" ref="module_anyagigeny_category"/>
+        </record>
+
+        <record id="group_anyagigeny_user" model="res.groups">
+            <field name="name">User</field>
+            <field name="category_id" ref="module_anyagigeny_category"/>
+            <field name="implied_ids" eval="[(4, ref('group_anyagigeny_viewer'))]"/>
+        </record>
+
+        <record id="group_anyagigeny_manager" model="res.groups">
+            <field name="name">Manager</field>
+            <field name="category_id" ref="module_anyagigeny_category"/>
+            <field name="implied_ids" eval="[(4, ref('group_anyagigeny_user'))]"/>
+        </record>
+
+        <record id="group_anyagigeny_admin" model="res.groups">
+            <field name="name">Admin</field>
+            <field name="category_id" ref="module_anyagigeny_category"/>
+            <field name="implied_ids" eval="[(4, ref('group_anyagigeny_manager'))]"/>
+            <field name="users" eval="[(4, ref('base.user_root'))]"/>
+        </record>
+
+        <record model="ir.module.category" id="module_adattarhaz_category">
+            <field name="name">Adattárház</field>
+            <field name="sequence">390</field>
+        </record>
+
+        <record id="group_adattarhaz_viewer" model="res.groups">
+            <field name="name">Viewer</field>
+            <field name="category_id" ref="module_adattarhaz_category"/>
+        </record>
+
+        <record id="group_adattarhaz_user" model="res.groups">
+            <field name="name">User</field>
+            <field name="category_id" ref="module_adattarhaz_category"/>
+            <field name="implied_ids" eval="[(4, ref('group_adattarhaz_viewer'))]"/>
+        </record>
+
+        <record id="group_adattarhaz_manager" model="res.groups">
+            <field name="name">Manager</field>
+            <field name="category_id" ref="module_adattarhaz_category"/>
+            <field name="implied_ids" eval="[(4, ref('group_adattarhaz_user'))]"/>
+        </record>
+
+        <record id="group_adattarhaz_admin" model="res.groups">
+            <field name="name">Admin</field>
+            <field name="category_id" ref="module_adattarhaz_category"/>
+            <field name="implied_ids" eval="[(4, ref('group_adattarhaz_manager'))]"/>
+            <field name="users" eval="[(4, ref('base.user_root'))]"/>
+        </record>
+    </data>
+
+</openerp>

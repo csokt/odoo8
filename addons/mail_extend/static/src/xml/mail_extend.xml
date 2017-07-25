@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<template>
+
+    <t t-extend="mail.wall">
+        <t t-jquery=".oe_view_title" t-operation="append">
+            <t t-if="widget.action.params.view_inbox">
+	            <span>
+	                <img class='oe_image oe_write_full' title="Write new email" alt="Write new email" src="/mail_extend/static/src/img/new_email.png"/>
+	            </span>
+            </t>
+        </t>
+    </t>
+
+</template>

@@ -1,0 +1,12 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_szefo_anyagigeny_group_viewer,szefo.anyagigeny.viewer,model_szefo_anyagigeny,group_anyagigeny_viewer,1,0,0,0
+access_szefo_anyagigeny_group_user,szefo.anyagigeny.user,model_szefo_anyagigeny,group_anyagigeny_user,1,1,1,0
+access_szefo_anyagigeny_group_manager,szefo.anyagigeny.manager,model_szefo_anyagigeny,group_anyagigeny_manager,1,1,1,0
+access_szefo_anyagigeny_group_admin,szefo.anyagigeny.admin,model_szefo_anyagigeny,group_anyagigeny_admin,1,1,1,1
+
+access_datawh_files_group_viewer,datawh.files.viewer,model_datawh_files,group_adattarhaz_viewer,1,0,0,0
+access_datawh_files_group_user,datawh.files.user,model_datawh_files,group_adattarhaz_user,1,1,0,0
+access_datawh_files_group_admin,datawh.files.admin,model_datawh_files,group_adattarhaz_admin,1,1,0,1
+access_datawh_documents_group_viewer,datawh.documents.viewer,model_datawh_documents,group_adattarhaz_viewer,1,0,0,0
+access_datawh_documents_group_user,datawh.documents.user,model_datawh_documents,group_adattarhaz_user,1,1,0,0
+access_datawh_documents_group_admin,datawh.documents.admin,model_datawh_documents,group_adattarhaz_admin,1,1,0,1

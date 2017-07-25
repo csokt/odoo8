@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!--
+  Paper Format
+    Internal A4 Landscape
+      Iktatókönyv
+-->
+<openerp>
+  <data>
+    <template id="report_iktato_konyv">
+      <t t-call="report.html_container">
+          <t t-call="report.internal_layout">
+            <div class="page" style="font-size: 10pt;">
+              <h4 style="text-align: center;"> Iktatókönyv </h4>
+              <br></br>
+              <table  class="table  table-bordered">
+                <tr>
+                  <th>Sorszám</th>
+                  <th>Osztály</th>
+                  <th>Iktatás ideje</th>
+                  <th>Beküldő/Címzett</th>
+                  <th>Iratszám</th>
+                  <th>Mell.</th>
+                  <th>Tárgy</th>
+                  <th>Kezelési feljegyzések</th>
+                  <th>Másolatot kap</th>
+                  <th>Átvette&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;</th>
+                </tr>
+                <t t-foreach="docs" t-as="o">
+                  <tr>
+                    <td> <span t-field="o.id"/> </td>
+                    <td> <span t-field="o.osztaly_id"/> </td>
+                    <td> <span t-field="o.create_date"/> </td>
+                    <td> <span t-field="o.partner_id"/> </td>
+                    <td> <span t-field="o.iratszam"/> </td>
+                    <td> <span t-field="o.melleklet"/> </td>
+                    <td> <span t-field="o.targy"/> </td>
+                    <td> <span t-field="o.kezeles_mod"/> </td>
+                    <td> <t t-foreach="o.osztaly_ids" t-as="oo"> <span t-field="oo.name"/> </t> </td>
+                    <td>&#160;</td>
+                  </tr>
+                </t>
+              </table>
+            </div>
+          </t>
+      </t>
+    </template>
+
+    <report
+        id="report_iktato_iktatokonyv"
+        model="iktato.konyv"
+        string="Iktatókönyv"
+        report_type="qweb-pdf"
+        name="iktato.report_iktato_konyv"
+    />
+
+  </data>
+</openerp>

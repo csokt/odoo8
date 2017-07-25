@@ -1,0 +1,99 @@
+-- delete from raktar_lezer_tampon ;
+update raktar_lezer_tampon set termek_id    = (select id from product_product where active and cikkszam = termekkod limit 1) ;
+update raktar_lezer_tampon set alkatresz_id = (select id from product_product where active and cikkszam = alkatresz limit 1) ;
+
+# gyártási műveletek nélkül generált
+select t1.id from raktar_gyartasi_lap t1 left join raktar_gyartas t2 on t1.id = t2.gyartasi_lap_id where t1.active and t1.state not in ('uj', 'mterv') and t2.id is null order by id;
+
+UPDATE raktar_impex AS imp SET mennyiseg = keszlet.mennyiseg FROM (
+
+  SELECT product_id, sum(menny) AS mennyiseg FROM (
+--    SELECT impex.product_id, quant.qty AS menny FROM raktar_impex AS impex, stock_quant AS quant, stock_location AS location
+--    WHERE impex.create_uid = 6 AND impex.product_id = quant.product_id AND quant.location_id = location.id AND location.usage = 'internal'
+--    UNION ALL
+--    SELECT impex.product_id, move.product_uom_qty AS menny FROM raktar_impex AS impex, stock_move AS move, mrp_production AS production, raktar_gyartas AS gyartas, raktar_gyartasi_lap AS gylap
+--    WHERE impex.create_uid = 6 AND impex.product_id = move.product_id AND move.state = 'done' AND move.raw_material_production_id = production.id
+--      AND production.id = gyartas.production_id AND gyartas.gyartasi_lap_id = gylap.id AND gylap.state != 'kesz'
+--    UNION ALL
+--    SELECT impex.product_id, -move.product_uom_qty AS menny FROM raktar_impex AS impex, stock_move AS move, mrp_production AS production, raktar_gyartas AS gyartas, raktar_gyartasi_lap AS gylap
+--    WHERE impex.create_uid = 6 AND impex.product_id = move.product_id AND move.state = 'done' AND move.production_id = production.id
+--      AND production.id = gyartas.production_id AND gyartas.gyartasi_lap_id = gylap.id AND gylap.state != 'kesz'
+--    UNION ALL
+--    SELECT impex.product_id, -cikk.ossz_beepules*gylap.teljesitett_db/gylap.rendelt_db AS menny FROM raktar_impex AS impex, raktar_gyartas_cikk AS cikk, raktar_gyartasi_lap AS gylap
+--    WHERE impex.create_uid = 6 AND impex.product_id = cikk.product_id AND cikk.gyartasi_lap_id = gylap.id AND gylap.state != 'kesz' AND gylap.teljesitett_db > 0
+--    UNION ALL
+--    SELECT impex.product_id, gylap.teljesitett_db AS menny FROM raktar_impex AS impex, raktar_gyartasi_lap AS gylap
+--    WHERE impex.create_uid = 6 AND impex.product_id = gylap.product_id AND gylap.state != 'kesz' AND gylap.teljesitett_db > 0
+    ) AS prod_qty
+  GROUP BY product_id
+;
+  ) AS keszlet
+WHERE imp.product_id = keszlet.product_id
+;
+
+-- eltérés a raktárkészlettől
+  SELECT product_id, gylap_id, sum(menny) AS mennyiseg FROM (
+    SELECT gylap.id as gylap_id, impex.product_id, move.product_uom_qty AS menny FROM raktar_impex AS impex, stock_move AS move, mrp_production AS production, raktar_gyartas AS gyartas, raktar_gyartasi_lap AS gylap
+    WHERE impex.create_uid = 6 AND impex.product_id = move.product_id AND move.state = 'done' AND move.raw_material_production_id = production.id
+      AND production.id = gyartas.production_id AND gyartas.gyartasi_lap_id = gylap.id AND gylap.state != 'kesz'
+    UNION ALL
+    SELECT gylap.id as gylap_id, impex.product_id, -move.product_uom_qty AS menny FROM raktar_impex AS impex, stock_move AS move, mrp_production AS production, raktar_gyartas AS gyartas, raktar_gyartasi_lap AS gylap
+    WHERE impex.create_uid = 6 AND impex.product_id = move.product_id AND move.state = 'done' AND move.production_id = production.id
+      AND production.id = gyartas.production_id AND gyartas.gyartasi_lap_id = gylap.id AND gylap.state != 'kesz'
+    UNION ALL
+    SELECT gylap.id as gylap_id, impex.product_id, -cikk.ossz_beepules*gylap.teljesitett_db/gylap.rendelt_db AS menny FROM raktar_impex AS impex, raktar_gyartas_cikk AS cikk, raktar_gyartasi_lap AS gylap
+    WHERE impex.create_uid = 6 AND impex.product_id = cikk.product_id AND cikk.gyartasi_lap_id = gylap.id AND gylap.state != 'kesz' AND gylap.teljesitett_db > 0
+    UNION ALL
+    SELECT gylap.id as gylap_id, impex.product_id, gylap.teljesitett_db AS menny FROM raktar_impex AS impex, raktar_gyartasi_lap AS gylap
+    WHERE impex.create_uid = 6 AND impex.product_id = gylap.product_id AND gylap.state != 'kesz' AND gylap.teljesitett_db > 0
+    ) AS prod_qty
+  GROUP BY product_id, gylap_id
+  HAVING sum(menny) != 0
+  ORDER BY product_id, gylap_id
+;
+
+
+
+  SELECT gylap, sum(menny) AS mennyiseg FROM (
+    SELECT gylap.id as gylap, move.product_uom_qty AS menny FROM raktar_impex AS impex, stock_move AS move, mrp_production AS production, raktar_gyartas AS gyartas, raktar_gyartasi_lap AS gylap
+    WHERE impex.create_uid = 6 AND impex.product_id = move.product_id AND move.state = 'done' AND move.raw_material_production_id = production.id
+      AND production.id = gyartas.production_id AND gyartas.gyartasi_lap_id = gylap.id AND gylap.state != 'kesz'
+    ) AS prod_qty
+  GROUP BY gylap
+  ORDER BY gylap
+;
+
+# 2016 augusztusi leltár korrekció
+UPDATE stock_inventory_line AS inv SET product_qty = impex.mennyiseg FROM raktar_impex AS impex
+WHERE inv.inventory_id = 55 AND inv.product_id = impex.product_id ;
+
+
+
+SELECT uzem_id,hely_id,product_id, sum(mennyiseg) AS mennyiseg FROM (
+  SELECT uzem_id,celallomas_id AS hely_id,product_id, sum(mennyiseg) AS mennyiseg FROM raktar_uzem_move GROUP BY uzem_id,celallomas_id,product_id
+  UNION ALL
+  SELECT uzem_id,forrashely_id hely_id,product_id, sum(-mennyiseg) AS mennyiseg FROM raktar_uzem_move GROUP BY uzem_id,forrashely_id,product_id
+) AS move
+GROUP BY uzem_id,hely_id,product_id
+;
+
+
+
+UPDATE summary_data
+SET current_category = (SELECT category_id
+   FROM products
+   WHERE products.product_id = summary_data.product_id)
+WHERE EXISTS (SELECT category_id
+   FROM products
+   WHERE products.product_id = summary_data.product_id);
+
+update product_product set default_code = (select megjegyzes from raktar_impex where raktar_impex.product_id = product_product.id limit 1) ;
+
+update product_price_history set cost = (select ertek from raktar_impex where product_template_id = product_id and raktar_impex.create_uid = 6)
+where exists (select ertek from raktar_impex where product_template_id = product_id and raktar_impex.create_uid = 6) ;
+
+
+select max(id) as maxid, product_id from raktar_darabjegyzek group by product_id order by product_id limit 5 ;
+
+select product_id,ertek from raktar_impex where create_uid=6 and product_id is not null limit 10;
+

@@ -1,0 +1,13 @@
+id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
+access_szefo_log_group,szefo.log,model_szefo_log,base.group_user,1,0,1,0
+access_szefo_telephely_group,szefo.telephely,model_szefo_telephely,base.group_user,1,0,0,0
+access_szefo_telephely_group_manager,szefo.telephely.manager,model_szefo_telephely,group_szefoadmin_manager,1,1,1,0
+access_szefo_parameter_group,szefo.parameter,model_szefo_parameter,base.group_user,1,0,0,0
+access_szefo_parameter_group_manager,szefo.parameter.manager,model_szefo_parameter,group_szefoadmin_manager,1,1,0,0
+access_nexon_szemely_group,nexon.szemely,model_nexon_szemely,base.group_user,1,0,0,0
+access_nexon_szemely_group_manager,nexon.szemely.manager,model_nexon_szemely,group_szefoadmin_manager,1,1,1,0
+
+access_szefo_jogosultsagnev_group_manager,szefo.jogosultsagnev.manager,model_szefo_jogosultsagnev,group_szefoadmin_manager,1,1,1,0
+access_szefo_jogosultsag_group_manager,szefo.jogosultsag.manager,model_szefo_jogosultsag,group_szefoadmin_manager,1,1,1,0
+access_szefo_jogosultsag_log_group_manager,szefo.jogosultsag_log.manager,model_szefo_jogosultsag_log,group_szefoadmin_manager,1,1,1,0
+access_szefo_jogosultsag_masol_group_manager,szefo.jogosultsag_masol.manager,model_szefo_jogosultsag_masol,group_szefoadmin_manager,1,1,1,1
