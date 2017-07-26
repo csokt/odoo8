@@ -84,6 +84,7 @@
               <field name="cikknev"/>
               <field name="bekerulesi_ar"/>
               <field name="alkatresz_e"/>
+              <field name="szefo_cikk_e"/>
               <field name="active"                groups="legrand.group_legrand_director"/>
             </group>
             <group col="2">
@@ -114,6 +115,7 @@
           <field name="cikknev"/>
           <field name="bekerulesi_ar"/>
           <field name="alkatresz_e"/>
+          <field name="szefo_cikk_e"/>
         </tree>
       </field>
     </record>

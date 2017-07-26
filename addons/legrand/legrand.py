@@ -32,6 +32,7 @@ class LegrandCikk(models.Model):
   cikkszam            = fields.Char(u'Cikkszám', required=True)
   cikknev             = fields.Char(u'Cikknév',  required=True)
   alkatresz_e         = fields.Boolean(u'Alkatrész?',   default=False)
+  szefo_cikk_e        = fields.Boolean(u'SZEFO cikk?',  default=False)
   bekerulesi_ar       = fields.Float(u'Bekerülési ár',  digits=(16, 3))
   beepulok_ids        = fields.Many2many('legrand.bom', string=u'Beépülők', domain=[('beepul_e', '=', True)])
   active              = fields.Boolean(u'Aktív?', default=True)
@@ -243,6 +244,7 @@ class LegrandMozgassor(models.Model):
   _order              = 'id'
   _rec_name           = 'cikk_id'
   mozgasfej_id        = fields.Many2one('legrand.mozgasfej',  u'Mozgásfej', index=True)
+#  cikk_id             = fields.Many2one('legrand.cikk', u'Cikkszám', domain="[('szefo_cikk_e', '=', False)]", index=True)
   cikk_id             = fields.Many2one('legrand.cikk', u'Cikkszám', index=True)
   bom_id              = fields.Many2one('legrand.bom',  u'Anyagjegyzék', index=True)
   gyartasi_lap_id     = fields.Many2one('legrand.gyartasi_lap',  u'Gyártási lap')
@@ -286,7 +288,7 @@ class LegrandMozgassor(models.Model):
       self.cikk_id = False
       cikk_ids = self.gyartasi_lap_id.bom_id.bom_line_ids.mapped('cikk_id.id')
       bom_ids  = self.gyartasi_lap_id.bom_id.cikk_id.beepulok_ids.mapped('id')
-      cikk_domain = [('id','in',cikk_ids)] if self.gyartasi_lap_id else []
+      cikk_domain = [('id','in',cikk_ids)] if self.gyartasi_lap_id else [('szefo_cikk_e', '=', False)]
       bom_domain  = [('id','in',bom_ids)]  if self.gyartasi_lap_id else []
       return {'domain': {'cikk_id': cikk_domain, 'bom_id': bom_domain}}
 
