@@ -930,21 +930,21 @@
     <!--####################################################################################################################  Menu  items  -->
     <menuitem id="menu_root" name="Legrand" sequence="63" groups="group_legrand_viewer" />
 
-    <menuitem id="menu_szallitas_uzem"    name="Szállítás (üzem)"             parent="menu_root"                  sequence="10" />
+    <menuitem id="menu_gyartas"           name="Gyártás"                      parent="menu_root"                  sequence="10" />
+      <menuitem id="menu_gylap_gyartas"   name="Gyártási lapok"               parent="menu_gyartas"               sequence="10" action="gylap_gyartas" />
+      <menuitem id="menu_muveletvegzes"   name="Műveletvégzés"                parent="menu_gyartas"               sequence="20" action="muveletvegzes" />
+      <menuitem id="menu_feljegyzes"      name="Feljegyzések"                 parent="menu_gyartas"               sequence="30" action="feljegyzes" />
+
+    <menuitem id="menu_szallitas_uzem"    name="Szállítás (üzem)"             parent="menu_root"                  sequence="20" />
       <menuitem id="menu_mozgas_belso"    name="Belső szállítás"              parent="menu_szallitas_uzem"        sequence="10" action="mozgas_belso"   />
       <menuitem id="menu_anyagigeny"      name="Anyagkérés"                   parent="menu_szallitas_uzem"        sequence="90" action="anyagigeny"  />
 
-    <menuitem id="menu_szallitas"         name="Szállítás"                    parent="menu_root"                  sequence="15"                                 groups="group_legrand_manager"/>
+    <menuitem id="menu_szallitas"         name="Szállítás"                    parent="menu_root"                  sequence="25"                                 groups="group_legrand_manager"/>
       <menuitem id="menu_mozgas_bevet"    name="Alkatrész bevételezés"        parent="menu_szallitas"             sequence="20" action="mozgas_bevet"   />
       <menuitem id="menu_mozgas_vissza"   name="Alkatrész visszaszállítás"    parent="menu_szallitas"             sequence="30" action="mozgas_vissza"  />
       <menuitem id="menu_mozgas_selejt"   name="Selejt visszaszállítás"       parent="menu_szallitas"             sequence="40" action="mozgas_selejt"  />
       <menuitem id="menu_mozgas_helyesb"  name="Készlethelyesbítés"           parent="menu_szallitas"             sequence="50" action="mozgas_helyesbit" />
       <menuitem id="menu_mozgassor"       name="Összes tétel"                 parent="menu_szallitas"             sequence="80" action="mozgassor"  />
-
-    <menuitem id="menu_gyartas"           name="Gyártás"                      parent="menu_root"                  sequence="20" />
-      <menuitem id="menu_gylap_gyartas"   name="Gyártási lapok"               parent="menu_gyartas"               sequence="10" action="gylap_gyartas" />
-      <menuitem id="menu_muveletvegzes"   name="Műveletvégzés"                parent="menu_gyartas"               sequence="20" action="muveletvegzes" />
-      <menuitem id="menu_feljegyzes"      name="Feljegyzések"                 parent="menu_gyartas"               sequence="30" action="feljegyzes" />
 
     <menuitem id="menu_raktar"            name="Termékek"                     parent="menu_root"                  sequence="30" />
       <menuitem id="menu_cikk"            name="Cikkek"                       parent="menu_raktar"                sequence="10" action="cikk" />

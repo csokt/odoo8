@@ -619,8 +619,16 @@ class LegrandGyartasiLap(models.Model):
       if self.cikkek_uid == self.bom_id.cikkek_uid:
         self.check_cikkek_uid = 'OK'
       else:
-#        self.check_cikkek_uid = u'A darabjegyzék és a műveletterv anyaglista eltér!'
-        self.check_cikkek_uid = u'Eltér!'
+        bom_cikkek    = self.bom_id.bom_line_ids.mapped('cikk_id')
+        gylap_cikkek  = self.gylap_dbjegyzek_ids.mapped('cikk_id')
+        bom_tobblet   = bom_cikkek - gylap_cikkek
+        gylap_tobblet = gylap_cikkek - bom_cikkek
+        uzenet = ''
+        if len(bom_tobblet):
+          uzenet += '+' +str([x.encode('UTF8') for x in bom_tobblet.mapped('cikkszam')])
+        if len(gylap_tobblet):
+          uzenet += ' -'+str([x.encode('UTF8') for x in gylap_tobblet.mapped('cikkszam')])
+        self.check_cikkek_uid = uzenet
 
   @api.one
   @api.depends()
