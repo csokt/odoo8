@@ -881,6 +881,7 @@ class LegrandMeoJegyzokonyv(models.Model):
   _name               = 'legrand.meo_jegyzokonyv'
   _order              = 'id desc'
 #  _rec_name           = 'muveleti_szam'
+  hely_id             = fields.Many2one('legrand.hely', string=u'Telephely', domain=[('szefo_e', '=', True)], required=True)
   gyartasi_lap_id     = fields.Many2one('legrand.gyartasi_lap',  u'Gyártási lap', required=True)
 #  name                = fields.Char(u'Művelet', readonly=True)
   visszaadott_db      = fields.Integer(u'Visszaadott darabszám')
@@ -897,7 +898,14 @@ class LegrandMeoJegyzokonyv(models.Model):
   keszaru_ell_id      = fields.Many2one('nexon.szemely', u'Készáru ellenőr')
   fioktelep_vezeto_id = fields.Many2one('nexon.szemely', u'Fióktelep vezető')
   # virtual fields
+  selejt_osszertek    = fields.Float(u'Selejt érték összesen', digits=(16, 0), compute='_compute_selejt_osszertek')
   meo_jkv_selejt_ids  = fields.One2many('legrand.meo_jkv_selejt',  'meo_jegyzokonyv_id', u'Selejtezett alkatrészek')
+
+  @api.one
+  @api.depends('meo_jkv_selejt_ids')
+  def _compute_selejt_osszertek(self):
+#    self.selejt_osszertek = sum(map(lambda r: r.ertek, self.meo_jkv_selejt_ids))
+    self.selejt_osszertek = sum(self.meo_jkv_selejt_ids.mapped('ertek'))
 
 ############################################################################################################################  MEO jegyzőkönyv selejt  ###
 class LegrandMeoJkvSelejt(models.Model):
@@ -910,7 +918,7 @@ class LegrandMeoJkvSelejt(models.Model):
   bekerulesi_ar       = fields.Float(u'Bekerülési ár', digits=(16, 3))
   # virtual fields
   cikknev             = fields.Char(u'Név', related='cikk_id.cikknev', readonly=True)
-  osszertek           = fields.Float(u'Összérték', digits=(16, 2), compute='_compute_osszertek')
+  ertek               = fields.Float(u'Érték', digits=(16, 0), compute='_compute_ertek')
 
   @api.onchange('cikk_id')
   def onchange_cikk_id(self):
@@ -918,8 +926,8 @@ class LegrandMeoJkvSelejt(models.Model):
 
   @api.one
   @api.depends('cikk_id', 'selejtezett_db')
-  def _compute_osszertek(self):
-    self.osszertek = self.selejtezett_db*self.bekerulesi_ar
+  def _compute_ertek(self):
+    self.ertek = self.selejtezett_db*self.bekerulesi_ar
 
 ############################################################################################################################  Lézer, tampon  ###
 class LegrandLezerTampon(models.Model):

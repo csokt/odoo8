@@ -197,6 +197,111 @@
       </t>
     </template>
 
+    <template id="report_meo_jegyzokonyv">
+      <t t-call="report.html_container">
+        <t t-foreach="docs"  t-as="o">
+          <t t-call="report.internal_layout">
+<!--
+-->
+            <div class="page" style="font-size: 10pt;">
+              <table class="table table-condensed table-bordered">
+                <tr>
+                  <td colspan="2"><h4><span t-field="o.hely_id.nev"/></h4></td>
+                  <td colspan="2" align="right"><h4>Jegyzőkönyv száma: #<span t-field="o.id"/></h4></td>
+                </tr>
+                <tr>
+                  <td colspan="4" align="center"><h3>VIZSGÁLATI JEGYZŐKÖNYV</h3></td>
+                </tr>
+                <tr>
+                  <td>Megnevezés:</td>              <td><span t-field="o.gyartasi_lap_id.cikk_id.cikknev"/></td>
+                  <td>Visszaadott darabszám:</td>   <td><span t-field="o.visszaadott_db"/></td>
+                </tr>
+                <tr>
+                  <td>Referencia:</td>              <td><span t-field="o.gyartasi_lap_id.cikk_id.cikkszam"/></td>
+                  <td>Dátum:</td>                   <td><span t-field="o.create_date"/></td>
+                </tr>
+                <tr>
+                  <td>Gyártási rendelés:</td>       <td><span t-field="o.gyartasi_lap_id.rendelesszam"/></td>
+                  <td>Ellenőrizte:</td>             <td><span t-field="o.ellenorizte_id"/></td>
+                </tr>
+                <tr>
+                  <td>Hiba leírása:</td>
+                  <td colspan="3"><span t-field="o.hiba_leirasa"/></td>
+                </tr>
+                <tr>
+                  <td>A hiba okozója:</td>
+                  <td colspan="3"><span t-field="o.dolgozo_id"/></td>
+                </tr>
+                <tr>
+                  <td>Művelet(ek):</td>
+                  <td colspan="3"><span t-field="o.gylap_szefo_muv_id1"/>, <span t-field="o.gylap_szefo_muv_id2"/></td>
+                </tr>
+                <tr>
+                  <td>A hiba kijavítására tett intézkedések:</td>
+                  <td colspan="3"><span t-field="o.intezkedesek"/></td>
+                </tr>
+                <tr>
+                  <td>A hiba kijavítására fordított idő:</td>
+                  <td colspan="3"><span t-field="o.javitasi_ido"/> óra</td>
+                </tr>
+                <tr>
+                  <td>A dolgozó megjegyzése:</td>
+                  <td colspan="3"><span t-field="o.dolgozo_megjegyzese"/></td>
+                </tr>
+                <tr>
+                  <td colspan="4" align="center"><h4>Selejteződött alkatrészek</h4></td>
+                </tr>
+                <tr>
+                  <td colspan="4">
+                    <table class="table table-condensed">
+                      <tr>
+                        <td><b>Cikkszám</b></td>
+                        <td><b>Cikknév</b></td>
+                        <td align="right"><b>Selejtezett db</b></td>
+                        <td align="right"><b>Bekerülési ár Ft</b></td>
+                        <td align="right"><b>Érték Ft</b></td>
+                      </tr>
+                      <tr t-foreach="o.meo_jkv_selejt_ids" t-as="oo">
+                        <td> <span t-field="oo.cikk_id"/> </td>
+                        <td> <span t-field="oo.cikknev"/> </td>
+                        <td align="right"> <span t-field="oo.selejtezett_db"/> </td>
+                        <td align="right"> <span t-field="oo.bekerulesi_ar"/> </td>
+                        <td align="right"> <span t-field="oo.ertek"/> </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td colspan="4" align="right"><b>Érték összesen: <span t-field="o.selejt_osszertek"/> Ft</b></td>
+                </tr>
+                <tr>
+                  <td colspan="4" align="center"><h4>Aláírások</h4></td>
+                </tr>
+                <tr>
+                  <td>Műszakvezető:</td>            <td colspan="3"><span t-field="o.muszakvezeto_id"/></td>
+                </tr>
+                  <td>Gyártásközi ellenőr:</td>     <td colspan="3"><span t-field="o.gyartaskozi_ell_id"/></td>
+                <tr>
+                  <td>Készáru ellenőr:</td>         <td colspan="3"><span t-field="o.keszaru_ell_id"/></td>
+                </tr>
+                <tr>
+                  <td>Dolgozó:</td>                 <td colspan="3"><span t-field="o.dolgozo_id"/></td>
+                </tr>
+                <tr> <td colspan="4"></td> </tr>
+                <tr>
+                  <td>Fióktelep vezető:</td>        <td colspan="3"><span t-field="o.fioktelep_vezeto_id"/></td>
+                </tr>
+              </table>
+<!--
+-->
+            </div>
+<!--
+-->
+          </t>
+        </t>
+      </t>
+    </template>
+
     <report
       id="report_legrand_szallitolevel"
       model="legrand.mozgasfej"
@@ -211,6 +316,14 @@
       string="Gyártási lap"
       report_type="qweb-pdf"
       name="legrand.report_gyartasi_lap"
+    />
+
+    <report
+      id="report_legrand_meo_jegyzokonyv"
+      model="legrand.meo_jegyzokonyv"
+      string="Vizsgálati jegyzőkönyv"
+      report_type="qweb-pdf"
+      name="legrand.report_meo_jegyzokonyv"
     />
 
   </data>

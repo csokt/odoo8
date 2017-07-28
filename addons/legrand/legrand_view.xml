@@ -94,7 +94,7 @@
             <field name="lezer_tampon_ids"        attrs="{'invisible': [('alkatresz_e','=',True)]}"/>
             <field name="feljegyzes_ids">
               <tree editable="top">
-                <field name="gyartasi_lap_id"/>
+                <field name="gyartasi_lap_id"     readonly="1"/>
                 <field name="feljegyzes"/>
                 <field name="create_uid"          readonly="1"    string="Felvette"/>
                 <field name="create_date"         readonly="1"    string="Létrehozás ideje"/>
@@ -120,7 +120,18 @@
       </field>
     </record>
 
-    <!--####################################################################################################################  Bom  -->
+     <record id="view_filter_cikk"    model="ir.ui.view">
+      <field  name="name">Cikk Filter</field>
+      <field  name="model">legrand.cikk</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field name="cikkszam"/>
+          <field name="cikknev"/>
+        </search>
+      </field>
+    </record>
+
+   <!--####################################################################################################################  Bom  -->
     <record id="view_form_bom"    model="ir.ui.view">
       <field  name="name">Bom Form</field>
       <field  name="model">legrand.bom</field>
@@ -456,6 +467,20 @@
       </field>
     </record>
 
+    <record id="view_filter_muveletvegzes"    model="ir.ui.view">
+      <field  name="name">Műveletvégzés Filter</field>
+      <field  name="model">legrand.muveletvegzes</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field name="szefo_muvelet_id"/>
+          <field name="gyartasi_lap_id"/>
+          <field name="hely_id"/>
+          <field name="nexon_azon"/>
+          <field name="szemely_id"/>
+        </search>
+      </field>
+    </record>
+
     <!--####################################################################################################################  Művelet  -->
     <record id="view_tree_muvelet"    model="ir.ui.view">
       <field  name="name">Művelet Tree</field>
@@ -753,8 +778,10 @@
         <form>
           <sheet>
           <group col="4">
-            <field name="gyartasi_lap_id"/>
+            <field name="hely_id"/>
             <field name="id"                    string="Jegyzőkönyv száma"  readonly="1"/>
+            <field name="gyartasi_lap_id"/>
+            <field name="write_date"            invisible="1"/>
             <field name="gylap_szefo_muv_id1"/>
             <field name="gylap_szefo_muv_id2"/>
           </group>
@@ -790,7 +817,7 @@
           <field name="cikknev"/>
           <field name="selejtezett_db"/>
           <field name="bekerulesi_ar"/>
-          <field name="osszertek"         sum="összesen"/>
+          <field name="ertek"             sum="összesen"/>
         </tree>
       </field>
     </record>
