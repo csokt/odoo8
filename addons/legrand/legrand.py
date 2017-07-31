@@ -805,10 +805,10 @@ class LegrandSzefoMuvelet(models.Model):
   fajlagos_db         = fields.Integer(u'Fajlagos db', default = 1, required=True)
   normaora            = fields.Float(u'Normaóra', digits=(16, 8), required=True)
   beall_ido           = fields.Float(u'Beállítási idő', digits=(16, 5), required=True)
+  osszes_ido          = fields.Float(u'Összes idő', digits=(16, 8), compute='_compute_ossz_ido', store=True)
+  osszes_db           = fields.Integer(u'Összes db', compute='_compute_osszes_db', store=True)
   # virtual fields
   muveletvegzes_ids   = fields.One2many('legrand.muveletvegzes',  'szefo_muvelet_id', u'Műveletvégzés')
-  osszes_ido          = fields.Float(u'Összes idő', digits=(16, 8), compute='_compute_ossz_ido', store=False)
-  osszes_db           = fields.Integer(u'Összes db', compute='_compute_osszes_db', store=False)
   kesz_db             = fields.Integer(u'Kész db',   compute='_compute_kesz_db', store=False)
   active              = fields.Boolean(u'Aktív?', related='gyartasi_lap_id.active', readonly=True)
 
@@ -840,6 +840,7 @@ class LegrandMuveletvegzes(models.Model):
   hely_id             = fields.Many2one('legrand.hely', string=u'Gyártási hely', domain=[('szefo_e', '=', True)], required=True)
   szemely_id          = fields.Many2one('nexon.szemely', u'Dolgozó', required=True)
   mennyiseg           = fields.Integer(u'Mennyiség', required=True)
+  teljesitett_ora     = fields.Float(u'Teljesített óra', digits=(16, 5), compute='_compute_teljesitett_ora', store=True)
   megjegyzes          = fields.Char(u'Megjegyzés')
   # virtual fields
   nexon_azon          = fields.Integer(u'Személy Id')
@@ -861,6 +862,12 @@ class LegrandMuveletvegzes(models.Model):
   @api.onchange('nexon_azon')
   def onchange_nexon_azon(self):
     self.szemely_id = self.env['nexon.szemely'].search([('SzemelyId', '=', self.nexon_azon)], limit=1, order='id').id
+
+  @api.one
+  @api.depends('mennyiseg', 'szefo_muvelet_id.osszes_db', 'szefo_muvelet_id.osszes_ido', 'szefo_muvelet_id.beall_ido')
+  def _compute_teljesitett_ora(self):
+    if self.szefo_muvelet_id:
+      self.teljesitett_ora = (self.szefo_muvelet_id.osszes_ido + self.szefo_muvelet_id.beall_ido) * self.mennyiseg / self.szefo_muvelet_id.osszes_db
 
 ############################################################################################################################  Feljegyzések  ###
 class LegrandFeljegyzes(models.Model):

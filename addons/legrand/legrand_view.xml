@@ -460,6 +460,7 @@
           <field name="osszes_db"/>
           <field name="kesz_db"/>
           <field name="mennyiseg"/>
+          <field name="teljesitett_ora"/>
           <field name="megjegyzes"/>
           <field name="create_uid"          readonly="1"    string="Felvette"/>
           <field name="create_date"         readonly="1"    string="Létrehozás ideje"/>
@@ -998,7 +999,7 @@
       <menuitem id="menu_lezer_tampon"    name="Lézer, tampon minta"          parent="menu_egyeb"                 sequence="10" action="lezer_tampon"/>
       <menuitem id="menu_meo_jkonyv"      name="Vizsgálati jegyzőkönyv"       parent="menu_egyeb"                 sequence="20" action="meo_jegyzokonyv"/>
 
-    <menuitem id="menu_administrator"     name="Administrator"                parent="menu_root"                  sequence="90"                                 groups="group_legrand_admin" />
+    <menuitem id="menu_administrator"     name="Administrator"                parent="menu_root"                  sequence="900"                                groups="group_legrand_admin" />
       <menuitem id="menu_homogen"         name="Homogén"                      parent="menu_administrator"         sequence="50" action="homogen" />
       <menuitem id="menu_hely"            name="Helyek"                       parent="menu_administrator"         sequence="60" action="hely" />
       <menuitem id="menu_hibakod"         name="Hibakód"                      parent="menu_administrator"         sequence="70" action="hibakod" />

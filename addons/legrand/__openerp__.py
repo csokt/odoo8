@@ -10,7 +10,7 @@
     'legrand_view.xml',
     'data/legrand.hely.csv',
     'data/legrand.parameter.csv',
-#    'report/legrand_pivot_view.xml',
+    'report/legrand_pivot_view.xml',
     'report/legrand_report.xml',
 #    'data/cron.xml',
   ],
