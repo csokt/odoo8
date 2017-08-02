@@ -88,10 +88,10 @@
               <field name="active"                groups="legrand.group_legrand_director"/>
             </group>
             <group col="2">
-              <field name="beepulok_ids"          attrs="{'invisible': [('alkatresz_e','=',True)]}" widget="many2many_tags" options="{'no_create': True}"/>
+              <field name="beepulok_ids"          attrs="{'invisible': ['|',('alkatresz_e','=',True),('alkatresz_e','=',True)]}" widget="many2many_tags" options="{'no_create': True}"/>
             </group>
-            <field name="muvelet_ids"             attrs="{'invisible': [('alkatresz_e','=',True)]}"/>
-            <field name="lezer_tampon_ids"        attrs="{'invisible': [('alkatresz_e','=',True)]}"/>
+            <field name="muvelet_ids"             attrs="{'invisible': ['|',('alkatresz_e','=',True),('szefo_cikk_e','=',True)]}"/>
+            <field name="lezer_tampon_ids"        attrs="{'invisible': ['|',('alkatresz_e','=',True),('alkatresz_e','=',True)]}"/>
             <field name="feljegyzes_ids">
               <tree editable="top">
                 <field name="gyartasi_lap_id"     readonly="1"/>
@@ -656,6 +656,7 @@
           <field name="osszes_ido"/>
           <field name="osszes_db"/>
           <field name="kesz_db"/>
+          <field name="elter_db"/>
         </tree>
       </field>
     </record>
@@ -896,7 +897,6 @@
         <tree create="false" >
           <button name="calc_impex"         type="object" string="Impex id keres"             confirm="Az impex adattáblában kikeresi és beírja a hivatkozásokat." />
           <button name="gylap_ellenorzes"   type="object" string="Gyártási lapok ellenőrzése" confirm="Végigmegy a lezáratlan gyártási lapokon, a hibákak beírja az impex adattáblába." />
-          <button name="homogen_ellenorzes" type="object" string="Homogének ellenőrzése"      confirm="Végigmegy a homogéneken, az időadatokat összeveti a gyártási műveletekkel, az eltéréseket beírja az impex adattáblába." />
         </tree>
       </field>
     </record>

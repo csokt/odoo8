@@ -575,7 +575,7 @@ class LegrandGyartasiLap(models.Model):
   utolso_feljegyzes   = fields.Char(u'Utolsó feljegyzés', compute='_compute_utolso_feljegyzes')
   check_cikkek_uid    = fields.Char(u'Ellenőrzés', compute='_compute_check_cikkek_uid')
   cikkhiany           = fields.Char(u'Cikkhiány', compute='_compute_cikkhiany')
-  cikkhiany_count     = fields.Integer(u'Cikkhiány', compute='_compute_cikkhiany')
+  cikkhiany_count     = fields.Integer(u'Cikkhiány db', compute='_compute_cikkhiany')
   szefo_muvelet_ids   = fields.One2many('legrand.gylap_szefo_muvelet',  'gyartasi_lap_id', u'Szefo műveletek',      readonly=True,  states={'uj': [('readonly', False)]})
   lezer_tampon_ids    = fields.One2many('legrand.lezer_tampon',         'termek_id',       u'Lézer, tampon',        readonly=True,  related='cikk_id.lezer_tampon_ids')
   gylap_homogen_ids   = fields.One2many('legrand.gylap_homogen',        'gyartasi_lap_id', u'Homogén',              states={'kesz': [('readonly', True)]})
@@ -805,11 +805,13 @@ class LegrandSzefoMuvelet(models.Model):
   fajlagos_db         = fields.Integer(u'Fajlagos db', default = 1, required=True)
   normaora            = fields.Float(u'Normaóra', digits=(16, 8), required=True)
   beall_ido           = fields.Float(u'Beállítási idő', digits=(16, 5), required=True)
-  osszes_ido          = fields.Float(u'Összes idő', digits=(16, 8), compute='_compute_ossz_ido', store=True)
-  osszes_db           = fields.Integer(u'Összes db', compute='_compute_osszes_db', store=True)
+  osszes_ido          = fields.Float(u'Összes idő', digits=(16, 8), compute='_compute_ossz_ido',  store=True)
+  osszes_db           = fields.Integer(u'Összes db',                compute='_compute_osszes_db', store=True)
+  kesz_db             = fields.Integer(u'Kész db',                  compute='_compute_kesz_db',   store=True)
+  elter_db            = fields.Integer(u'Eltér db',                 compute='_compute_elter',     store=True)
+  elter_e             = fields.Boolean(u'Eltér?',                   compute='_compute_elter',     store=True)
   # virtual fields
   muveletvegzes_ids   = fields.One2many('legrand.muveletvegzes',  'szefo_muvelet_id', u'Műveletvégzés')
-  kesz_db             = fields.Integer(u'Kész db',   compute='_compute_kesz_db', store=False)
   active              = fields.Boolean(u'Aktív?', related='gyartasi_lap_id.active', readonly=True)
 
   @api.one
@@ -828,9 +830,15 @@ class LegrandSzefoMuvelet(models.Model):
     self.osszes_db = self.gyartasi_lap_id.modositott_db * self.fajlagos_db
 
   @api.one
-  @api.depends('muveletvegzes_ids')
+  @api.depends('muveletvegzes_ids', 'muveletvegzes_ids.mennyiseg')
   def _compute_kesz_db(self):
     self.kesz_db = sum(self.muveletvegzes_ids.mapped('mennyiseg'))
+
+  @api.one
+  @api.depends('osszes_db', 'kesz_db')
+  def _compute_elter(self):
+    self.elter_db = self.kesz_db - self.osszes_db
+    self.elter_e  = self.elter_db != 0
 
 ############################################################################################################################  Műveletvégzés  ###
 class LegrandMuveletvegzes(models.Model):
@@ -973,9 +981,10 @@ class LegrandImpex(models.Model):
 #  # computed fields
   ora                 = fields.Float(u'Óra', digits=(16, 2), compute='_compute_ora', store=True)
 #  # virtual fields
-  gylap_state          = fields.Selection([('uj',u'Új'),('mterv',u'Műveletterv'),('gyartas',u'Gyártás'),('gykesz',u'Gyártás kész'),('kesz',u'Rendelés teljesítve')], u'Állapot', related='gyartasi_lap_id.state')
-  gyartasi_hely_ids   = fields.Many2many('legrand.hely', string=u'Gyártási helyek', related='gyartasi_lap_id.gyartasi_hely_ids')
-  price               = fields.Float(u'Price', digits=(16, 3), related='cikk_id.bekerulesi_ar')
+  gylap_state         = fields.Selection([('uj',u'Új'),('mterv',u'Műveletterv'),('gyartas',u'Gyártás'),('gykesz',u'Gyártás kész'),('kesz',u'Rendelés teljesítve')],
+                        u'Állapot', related='gyartasi_lap_id.state', readonly=True)
+  gyartasi_hely_ids   = fields.Many2many('legrand.hely', string=u'Gyártási helyek', related='gyartasi_lap_id.gyartasi_hely_ids', readonly=True)
+  price               = fields.Float(u'Price', digits=(16, 3), related='cikk_id.bekerulesi_ar', readonly=True)
 
   @api.one
   @api.depends('mennyiseg', 'gyartasi_lap_id')
