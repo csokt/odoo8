@@ -277,3 +277,15 @@ order by referencia
 select * from ( values ('egy','ketto'), ('3','4') ) as t (colname1, colname2);
 
 WITH temp (k,v) AS (VALUES (0,-9999), (1, 100)) SELECT * FROM temp;
+
+
+
+Az augusztusi leállás és leltár után történt néhány változás, ezeket foglalnám össze.
+A szállítólevelek mostantól raktári mozgásokat is előírnak, amivel Szilvinek még további teendői is vannak, ezért:
+Minden mozgásról készüljön elektronikus szállítólevél.
+Ha kézi szállítón ment ki, akkor is fel kell venni az elektronikus szállítót, forrásdokumentumként a kézi szállítólevél sorszámát megadva, kinyomtatni nem szükséges.
+Ha megérkeznek az alkatrészek, akkor átvételi ellenőrzés után az adott szállítólevélnél ha nem volt eltérés az "Átszállítva", ha eltérés volt akkor az "Átszállítva eltérésekkel" gombra kattintani. A szállítólevél státusza ilyenkor értelemszerűen megváltozik.
+A szállítólevél egy példányát az esetleges eltérések rögzítésével a következő fuvarral a Depóba kell küldeni Szilvinek.
+További fejlesztés, hogy minden üzemnek lehetővé tettem, hogy a saját készletét a VIR-től és a többi üzemtől függetlenül saját maga tartsa nyilván. Adatokat lehet mozgatni a VIR és a saját nyilvántartás között, ez azonban nem automatikus, csupán azt szolgálja, hogy minél kevesebbet kelljen gépelni, így csökkenjen a hibalehetőség.
+További információ és betanítás végett keressétek Csenki Arankát vagy engem.
+Köszönettel: Csók Tibor

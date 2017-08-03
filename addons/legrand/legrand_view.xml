@@ -541,6 +541,7 @@
             <field name="szamlazhato_db"      />
 
             <field name="javitas_e"           />
+            <field name="muveletek_elvegezve" />
             <field name="active"              groups="legrand.group_legrand_director"/>
           </group>
           <group col="4">
@@ -632,6 +633,8 @@
           <filter name="filter_kesz"      string="Rendelés teljesítve"  domain="[('state','=','kesz')]"/>
           <filter name="szamlazhato"      string="Számlázható"          domain="[('szamlazhato_db','>',0)]"/>
           <separator/>
+          <filter name="filter_fuggo_muv" string="Befejezetlen műveletek"  domain="[('muveletek_elvegezve','=',False)]"/>
+          <separator/>
           <filter name="filter_lezer"     string="Lézer"                domain="[('lezer_tampon_ids','like','lézer')]"/>
           <filter name="filter_tampon"    string="Tampon"               domain="[('lezer_tampon_ids','like','tampon')]"/>
           <group expand="0" string="Csoportosítás">
@@ -642,8 +645,8 @@
     </record>
 
     <!--####################################################################################################################  Gylap Szefo művelet  -->
-    <record id="view_tree_szefo_muvelet"    model="ir.ui.view">
-      <field  name="name">Szefo műveleti utasítás Tree</field>
+    <record id="view_tree_szefo_muvelet_default"    model="ir.ui.view">
+      <field  name="name">Szefo műveleti utasítás default Tree</field>
       <field  name="model">legrand.gylap_szefo_muvelet</field>
       <field  name="priority" eval="15"/>
       <field  name="arch" type="xml">
@@ -658,6 +661,37 @@
           <field name="kesz_db"/>
           <field name="elter_db"/>
         </tree>
+      </field>
+    </record>
+
+    <record id="view_tree_szefo_muvelet"    model="ir.ui.view">
+      <field  name="name">Szefo műveleti utasítás Tree</field>
+      <field  name="model">legrand.gylap_szefo_muvelet</field>
+      <field  name="arch" type="xml">
+        <tree>
+          <field name="gyartasi_lap_id"/>
+          <field name="muveletszam"/>
+          <field name="muveletnev"/>
+          <field name="osszes_db"/>
+          <field name="kesz_db"/>
+          <field name="elter_db"/>
+          <field name="osszes_ora"        sum="összes óra"/>
+          <field name="kesz_ora"          sum="kész óra"/>
+          <field name="elter_ora"         sum="eltér óra"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_szefo_muvelet"    model="ir.ui.view">
+      <field  name="name">Szefo műveleti utasítás Filter</field>
+      <field  name="model">legrand.gylap_szefo_muvelet</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field name="gyartasi_lap_id"/>
+          <field name="muveletszam"/>
+          <field name="muveletnev"/>
+          <filter name="filter_tulgyartas" string="Túlgyártás" domain="[('elter_db','>',0)]"/>
+        </search>
       </field>
     </record>
 
@@ -931,7 +965,7 @@
     <act_window id="gylap_dbjegyzek"    name="Darabjegyzék"       res_model="legrand.gylap_dbjegyzek"                                               view_mode="tree,form"/>
     <act_window id="gylap_muvelet"      name="Művelet"            res_model="legrand.gylap_legrand_muvelet"                                         view_mode="tree,form"/>
     <act_window id="gylap_homogen"      name="Homogén"            res_model="legrand.gylap_homogen"                                                 view_mode="tree,form"/>
-    <act_window id="szefo_muvelet"      name="Művelet"            res_model="legrand.gylap_szefo_muvelet"                                           view_mode="tree,form"/>
+    <act_window id="szefo_muvelet"      name="Művelet"            res_model="legrand.gylap_szefo_muvelet" view_id="view_tree_szefo_muvelet"         view_mode="tree"/>
     <act_window id="muveletvegzes"      name="Műveletvégzés"      res_model="legrand.muveletvegzes"                                                 view_mode="tree"/>
     <act_window id="feljegyzes"         name="Fejegyzés"          res_model="legrand.feljegyzes"                                                    view_mode="tree"/>
 

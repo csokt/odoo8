@@ -48,6 +48,12 @@ def calc_cikkek_uid(recordset, field):
 class LegrandParameter(models.Model):
   _name  = 'legrand.parameter'
 
+############################################################################################################################  Legrand scheduler  ###
+  @api.model
+  def process_legrand_scheduler_queue(self):
+    for gylap in self.env['legrand.gyartasi_lap'].search([('state', '=', 'gyartas'), ('muveletek_elvegezve', '=', True)]):
+      gylap.state = 'gykesz'
+
 ############################################################################################################################  Gyártási lap import  ###
   @api.one
   def gyartasi_lap_import(self):

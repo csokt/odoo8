@@ -55,8 +55,9 @@
 
     <!--####################################################################################################################  Menu  items  -->
     <menuitem id="menu_kimutatas"               name="Kimutatások"                  parent="menu_root"                  sequence="110"                         />
-      <menuitem id="menu_gylap_ertekel"         name="Gyártási lap értékelés"       parent="menu_kimutatas"             sequence="20"   action="gylap_ertekel" />
-      <menuitem id="menu_muveletvegzes_ertekel" name="Műveletvégzés értékelés"      parent="menu_kimutatas"             sequence="30"   action="muveletvegzes_ertekel" />
-      <menuitem id="menu_homogen_ertekel"       name="Homogén értékelés"            parent="menu_kimutatas"             sequence="40"   action="homogen_ertekel" />
+      <menuitem id="menu_szefo_muvelet"         name="Gyártási lap műveletek"       parent="menu_kimutatas"             sequence="10"   action="szefo_muvelet" />
+      <menuitem id="menu_muveletvegzes_ertekel" name="Műveletvégzés értékelés"      parent="menu_kimutatas"             sequence="20"   action="muveletvegzes_ertekel" />
+      <menuitem id="menu_homogen_ertekel"       name="Homogén értékelés"            parent="menu_kimutatas"             sequence="30"   action="homogen_ertekel" />
+      <menuitem id="menu_gylap_ertekel"         name="Gyártási lap értékelés"       parent="menu_kimutatas"             sequence="40"   action="gylap_ertekel" />
   </data>
 </openerp>

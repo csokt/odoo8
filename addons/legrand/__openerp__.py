@@ -12,6 +12,6 @@
     'data/legrand.parameter.csv',
     'report/legrand_pivot_view.xml',
     'report/legrand_report.xml',
-#    'data/cron.xml',
+    'data/cron.xml',
   ],
 }
