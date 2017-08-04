@@ -40,7 +40,7 @@ def trim(list):
 def calc_cikkek_uid(recordset, field):
   cikkdict = {}
   for record in recordset:
-    cikkdict[record[field]] = 1
+    cikkdict[record[field].upper()] = 1
   cikkek = ' '.join(sorted(cikkdict.keys()))
   return hashlib.md5(cikkek.encode()).hexdigest()
 
