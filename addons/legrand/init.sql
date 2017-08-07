@@ -5,7 +5,9 @@
 -- alter sequence datawh_documents_id_seq RESTART WITH 1 ;
 
 delete from legrand_mozgassor ;
+alter sequence legrand_mozgassor_id_seq RESTART WITH 1 ;
 delete from legrand_mozgasfej ;
+alter sequence legrand_mozgasfej_id_seq RESTART WITH 1 ;
 
 delete from legrand_meo_jkv_selejt ;
 delete from legrand_meo_jegyzokonyv ;

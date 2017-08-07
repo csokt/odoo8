@@ -148,9 +148,8 @@
               <field name="cikknev"/>
               <field name="verzio"/>
               <field name="name"/>
-              <field name="gylap_default_e"/>
-              <field name="count_mozgassor_ids"/>
               <field name="beepul_e"/>
+              <field name="count_mozgassor_ids"/>
               <field name="admin_e"             invisible="1"/>
               <field name="legrand_admin_e"     invisible="1"/>
             </group>
@@ -171,7 +170,6 @@
           <field name="cikk_id"             options="{'no_create': True}"/>
           <field name="cikknev"/>
           <field name="verzio"/>
-          <field name="gylap_default_e"/>
           <field name="beepul_e"/>
         </tree>
       </field>
@@ -1019,10 +1017,10 @@
       <menuitem id="menu_szlamelleklet"   name="Számlamelléklet"              parent="menu_szamla"                sequence="30" action="szlamelleklet" />
       <menuitem id="menu_szlamellnulla"   name="Számlamelléklet nullázás"     parent="menu_szamla"                sequence="30" action="szlamellnulla" />
 
-    <menuitem id="menu_gyartas_elok"      name="Gyártás előkészítés"          parent="menu_root"                  sequence="50"                                 groups="group_legrand_manager" />
-      <menuitem id="menu_documents"       name="Dokumentumok"                 parent="menu_gyartas_elok"          sequence="10" action="szefo.datawh_legrand" />
-      <menuitem id="menu_gylap_import"    name="Gyártási lap import"          parent="menu_gyartas_elok"          sequence="20" action="gylap_import"    />
-      <menuitem id="menu_gylap_uj"        name="Műveletterv készítés"         parent="menu_gyartas_elok"          sequence="30" action="gylap_uj" />
+    <menuitem id="menu_gyartas_elok"      name="Gyártás előkészítés"          parent="menu_root"                  sequence="50"                                 groups="group_legrand_viewer" />
+      <menuitem id="menu_documents"       name="Dokumentumok"                 parent="menu_gyartas_elok"          sequence="10" action="szefo.datawh_legrand"   groups="group_legrand_director" />
+      <menuitem id="menu_gylap_import"    name="Gyártási lap import"          parent="menu_gyartas_elok"          sequence="20" action="gylap_import"           groups="group_legrand_director" />
+      <menuitem id="menu_gylap_uj"        name="Műveletterv készítés"         parent="menu_gyartas_elok"          sequence="30" action="gylap_uj"               groups="group_legrand_director" />
       <menuitem id="menu_gylap_mterv"     name="Gyártás indítás"              parent="menu_gyartas_elok"          sequence="40" action="gylap_mterv" />
 
     <menuitem id="menu_segedlet"          name="Segédeszközök"                parent="menu_root"                  sequence="70"                                 groups="group_legrand_user"/>

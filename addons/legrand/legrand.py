@@ -60,11 +60,11 @@ class LegrandBom(models.Model):
   name                = fields.Char(u'Név',           compute='_compute_name', store=True)
   cikk_id             = fields.Many2one('legrand.cikk',  u'Cikkszám', index=True, required=True, auto_join=True)
   verzio              = fields.Char(u'Verzió',        required=True)
-  gylap_default_e     = fields.Boolean(u'Gy.lap alapértelmezett?', default=False)
+#  gylap_default_e     = fields.Boolean(u'Gy.lap alapértelmezett?', default=False)
   beepul_e            = fields.Boolean(u'Beépül?',    default=False)
+  cikkek_uid          = fields.Char(u'Összes alkatrész uid', compute='_compute_cikkek_uid', store=True)
   # virtual fields
   cikknev             = fields.Char(u'Cikknév', related='cikk_id.cikknev', readonly=True)
-  cikkek_uid          = fields.Char(u'Összes alkatrész uid', compute='_compute_cikkek_uid')
   bom_line_ids        = fields.One2many('legrand.bom_line', 'bom_id', u'Anyagjegyzék sorok', auto_join=True)
   mozgassor_ids       = fields.One2many('legrand.mozgassor', 'bom_id', u'Szállítás sorok', readonly=True, auto_join=True)
   count_mozgassor_ids = fields.Integer(u'Szállítás sorok db', compute='_compute_count_mozgassor_ids')
@@ -81,7 +81,7 @@ class LegrandBom(models.Model):
       self.name = self.cikk_id.cikkszam+' '+self.verzio
 
   @api.one
-  @api.depends('bom_line_ids')
+  @api.depends('bom_line_ids', 'bom_line_ids.cikk_id')
   def _compute_cikkek_uid(self):
     self.cikkek_uid = calc_cikkek_uid(self.bom_line_ids, 'cikkszam')
 

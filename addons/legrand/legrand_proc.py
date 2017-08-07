@@ -91,20 +91,12 @@ class LegrandParameter(models.Model):
       cikk = Cikk.search([('cikkszam', 'ilike', termekkod)], limit=1)
       if not len(cikk):
         cikk = Cikk.create({'cikkszam': termekkod, 'cikknev': fej['megnevezes'], 'alkatresz_e': False})
-#      bom  = Bom.search([('cikk_id', '=', cikk.id), ('alkatresz_e', '=', True)], limit=1)
-#      if not len(bom):
-#        bom = Bom.create({'cikk_id': cikk.id, 'verzio': 'alkatrész', 'gylap_default_e': False})
-#        BomLine.create({'bom_id': bom.id, 'cikk_id': cikk.id, 'beepules': 1.0})
       for alk in gylap['darabjegyzek']:
         cikkszam = alk['cikkszam']
         if cikkszam == 'referencia': continue
         alk_cikk = Cikk.search([('cikkszam', 'ilike', cikkszam)], limit=1)
         if not len(alk_cikk):
           alk_cikk = Cikk.create({'cikkszam': cikkszam, 'cikknev': alk['megnevezes'], 'alkatresz_e': True, 'bekerulesi_ar': alk['bekerulesi_ar']})
-#        bom  = Bom.search([('cikk_id', '=', alk_cikk.id), ('alkatresz_e', '=', True)], limit=1)
-#        if not len(bom):
-#          bom = Bom.create({'cikk_id': alk_cikk.id, 'verzio': 'alkatrész', 'gylap_default_e': False})
-#          BomLine.create({'bom_id': bom.id, 'cikk_id': alk_cikk.id, 'beepules': 1.0})
 
       # muvelet feltöltés #####################################################
       if not javitas_e:
@@ -123,10 +115,12 @@ class LegrandParameter(models.Model):
             Muvelet.create(muv_row)
 
       # Ha nincs anyagjegyzék, vagy javításra adták, akkor anyagjegyzéket készítünk
-      bom  = Bom.search([('cikk_id', '=', cikk.id), ('gylap_default_e', '=', True)], limit=1)
+      gylap_cikkek_uid = calc_cikkek_uid(gylap['darabjegyzek'], 'cikkszam')
+      bom  = Bom.search([('cikk_id', '=', cikk.id), ('cikkek_uid', '=', gylap_cikkek_uid)], limit=1)
       if not len(bom) or javitas_e:
         verzio = '['+fej['rendelesszam']+']' if javitas_e else 'késztermék'
-        bom = Bom.create({'cikk_id': cikk.id, 'verzio': verzio, 'gylap_default_e': not javitas_e})
+#        bom = Bom.create({'cikk_id': cikk.id, 'verzio': verzio, 'gylap_default_e': not javitas_e})
+        bom = Bom.create({'cikk_id': cikk.id, 'verzio': verzio})
         for alk in gylap['darabjegyzek']:
           cikkszam = alk['cikkszam']
           if cikkszam != 'referencia':
@@ -136,8 +130,6 @@ class LegrandParameter(models.Model):
 
       # gyartasi_lap létrehozása ##############################################
       gyartlap_row = {
-#        'mongo_id'      : gylap['_id'],
-#        'counter'       : gylap['counter'],
         'cikk_id'       : cikk.id,
         'rendelesszam'  : fej['rendelesszam'],
         'termekcsalad'  : fej['termekcsalad'],
@@ -148,7 +140,7 @@ class LegrandParameter(models.Model):
         'hatarido_str'  : fej['hatarido_str'],
         'hatarido'      : hatarido,
         'jegyzet'       : fej['jegyzet'],
-        'cikkek_uid'    : calc_cikkek_uid(gylap['darabjegyzek'], 'cikkszam'),
+        'cikkek_uid'    : gylap_cikkek_uid,
         'bom_id'        : bom.id,
         'javitas_e'     : javitas_e,
       }
