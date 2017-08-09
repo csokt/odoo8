@@ -150,6 +150,7 @@
               <field name="name"/>
               <field name="beepul_e"/>
               <field name="count_mozgassor_ids"/>
+              <field name="active"/>
               <field name="admin_e"             invisible="1"/>
               <field name="legrand_admin_e"     invisible="1"/>
             </group>
@@ -283,8 +284,8 @@
       <field  name="priority" eval="15"/>
       <field  name="arch" type="xml">
         <tree editable="bottom">
-          <field name="gyartasi_lap_id"         options="{'no_create': True}"   invisible="context.get('mozgasnem') in ('be','helyesbit','vissza')" required="context.get('mozgasnem') in ('ki',)"/>
-          <field name="cikk_id"                 options="{'no_create': True}"   invisible="context.get('mozgasnem') in ('ki',)"                     string="Cikkszám____"/>
+          <field name="gyartasi_lap_id"         options="{'no_create': True}"   invisible="context.get('mozgasnem') not in ('ki','belso')"    required="context.get('mozgasnem') in ('ki',)"/>
+          <field name="cikk_id"                 options="{'no_create': True}"   invisible="context.get('mozgasnem') in ('ki',)"               string="Cikkszám____"/>
           <field name="bom_id"                  options="{'no_create': True}"   invisible="context.get('mozgasnem') not in ('ki','belso')"/>
           <field name="cikknev"/>
           <field name="mennyiseg"/>

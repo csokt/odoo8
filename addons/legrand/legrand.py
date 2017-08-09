@@ -57,19 +57,19 @@ class LegrandCikk(models.Model):
 class LegrandBom(models.Model):
   _name               = 'legrand.bom'
   _order              = 'name'
-  name                = fields.Char(u'Név',           compute='_compute_name', store=True)
+  name                = fields.Char(u'Név', compute='_compute_name', store=True)
   cikk_id             = fields.Many2one('legrand.cikk',  u'Cikkszám', index=True, required=True, auto_join=True)
-  verzio              = fields.Char(u'Verzió',        required=True)
-#  gylap_default_e     = fields.Boolean(u'Gy.lap alapértelmezett?', default=False)
-  beepul_e            = fields.Boolean(u'Beépül?',    default=False)
+  verzio              = fields.Char(u'Verzió', required=True)
+  beepul_e            = fields.Boolean(u'Beépül?', default=False)
   cikkek_uid          = fields.Char(u'Összes alkatrész uid', compute='_compute_cikkek_uid', store=True)
+  active              = fields.Boolean(u'Aktív?', default=True, groups='legrand.group_legrand_director')
   # virtual fields
   cikknev             = fields.Char(u'Cikknév', related='cikk_id.cikknev', readonly=True)
   bom_line_ids        = fields.One2many('legrand.bom_line', 'bom_id', u'Anyagjegyzék sorok', auto_join=True)
   mozgassor_ids       = fields.One2many('legrand.mozgassor', 'bom_id', u'Szállítás sorok', readonly=True, auto_join=True)
   count_mozgassor_ids = fields.Integer(u'Szállítás sorok db', compute='_compute_count_mozgassor_ids')
-  admin_e             = fields.Boolean(u'Admin?', compute='_check_user_group')
-  legrand_admin_e     = fields.Boolean(u'Legrand admin?', compute='_check_user_group')
+  admin_e             = fields.Boolean(u'Admin?',             compute='_check_user_group')
+  legrand_admin_e     = fields.Boolean(u'Legrand admin?',     compute='_check_user_group')
   # temporary fields
   raktar_gylap_id     = fields.Integer(u'Gyártási lap sorszám')
 
@@ -127,6 +127,7 @@ class LegrandBomLine(models.Model):
   cikk_id             = fields.Many2one('legrand.cikk',  u'Alkatrész', index=True, required=True, auto_join=True)
   beepules            = fields.Float(u'Beépülés', digits=(16, 8), required=True)
   # virtual fields
+  active              = fields.Boolean(u'Aktív?',       related='bom_id.active',    readonly=True)
   cikkszam            = fields.Char(u'Cikkszám',        related='cikk_id.cikkszam', readonly=True)
   cikknev             = fields.Char(u'Alkatrész neve',  related='cikk_id.cikknev',  readonly=True)
 
@@ -282,15 +283,24 @@ class LegrandMozgassor(models.Model):
 
   @api.onchange('gyartasi_lap_id')
   def onchange_gyartasi_lap_id(self):
+    cikk_domain = [('alkatresz_e', '=', True)]
+    bom_domain  = [('beepul_e', '=', True)]
+    if self.mozgasfej_id.mozgasnem == 'be':
+      self.bom_id = False
+      cikk_domain = [('szefo_cikk_e', '=', False)]
     if self.mozgasfej_id.mozgasnem == 'ki':
-      self.bom_id = self.gyartasi_lap_id.bom_id
+      self.bom_id = self.gyartasi_lap_id.bom_id.id
+      bom_domain  = [('id','=',self.bom_id.id)]
     else:
       self.cikk_id = False
-      cikk_ids = self.gyartasi_lap_id.bom_id.bom_line_ids.mapped('cikk_id.id')
-      bom_ids  = self.gyartasi_lap_id.bom_id.cikk_id.beepulok_ids.mapped('id')
-      cikk_domain = [('id','in',cikk_ids)] if self.gyartasi_lap_id else [('szefo_cikk_e', '=', False)]
-      bom_domain  = [('id','in',bom_ids)]  if self.gyartasi_lap_id else []
-      return {'domain': {'cikk_id': cikk_domain, 'bom_id': bom_domain}}
+      self.bom_id = False
+      if self.gyartasi_lap_id:
+        cikk_ids = self.gyartasi_lap_id.bom_id.bom_line_ids.mapped('cikk_id.id')
+        bom_ids  = self.gyartasi_lap_id.bom_id.cikk_id.beepulok_ids.mapped('id')
+        bom_ids.append(self.gyartasi_lap_id.bom_id.id)
+        cikk_domain = [('id','in',cikk_ids)]
+        bom_domain  = [('id','in',bom_ids)]
+    return {'domain': {'cikk_id': cikk_domain, 'bom_id': bom_domain}}
 
   @api.onchange('cikk_id')
   def onchange_cikk_id(self):
@@ -806,8 +816,8 @@ class LegrandMuveletvegzes(models.Model):
   mennyiseg           = fields.Integer(u'Mennyiség', required=True)
   teljesitett_ora     = fields.Float(u'Teljesített óra', digits=(16, 5), compute='_compute_teljesitett_ora', store=True)
   megjegyzes          = fields.Char(u'Megjegyzés')
-  # virtual fields
   nexon_azon          = fields.Integer(u'Személy Id')
+  # virtual fields
   gyartasi_lap_id     = fields.Many2one('legrand.gyartasi_lap',  u'Gyártási lap', related='szefo_muvelet_id.gyartasi_lap_id', readonly=True, auto_join=True)
   muveletnev          = fields.Char(u'Műveletnév',   related='szefo_muvelet_id.muveletnev', readonly=True)
   osszes_db           = fields.Integer(u'Összes db', related='szefo_muvelet_id.osszes_db', readonly=True)
