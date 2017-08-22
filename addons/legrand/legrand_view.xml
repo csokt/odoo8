@@ -291,10 +291,10 @@
           <field name="mennyiseg"/>
           <field name="hibakod_id"              options="{'no_create': True}"   invisible="context.get('mozgasnem') not in ('belso','selejt')"/>
           <field name="megjegyzes"/>
-          <field name="create_uid"              string="Felvette"/>
-          <field name="create_date"             string="Létrehozás ideje"/>
-          <field name="write_uid"               string="Módosította"/>
-          <field name="write_date"              string="Módosítás ideje"/>
+          <field name="create_uid"              readonly="1"  string="Felvette"/>
+          <field name="create_date"             readonly="1"  string="Létrehozás ideje"/>
+          <field name="write_uid"               readonly="1"  string="Módosította"/>
+          <field name="write_date"              readonly="1"  string="Módosítás ideje"/>
         </tree>
       </field>
     </record>
