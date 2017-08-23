@@ -541,6 +541,7 @@
 
             <field name="javitas_e"           />
             <field name="muveletek_elvegezve" />
+            <field name="carnet_e"            />
             <field name="active"              groups="legrand.group_legrand_director"/>
           </group>
           <group col="4">
@@ -574,6 +575,8 @@
           <field name="gyartasi_hely_ids"/>
           <field name="modositott_db"         string="Rendelt db"/>
           <field name="teljesitett_db"/>
+          <field name="rendelt_ora"           sum="rendelt óra"/>
+          <field name="teljesitett_ora"       sum="teljesített óra"/>
           <field name="szamlazott_db"/>
           <field name="szamlazhato_db"/>
           <field name="state"/>
@@ -636,6 +639,8 @@
           <separator/>
           <filter name="filter_lezer"     string="Lézer"                domain="[('lezer_tampon_ids','like','lézer')]"/>
           <filter name="filter_tampon"    string="Tampon"               domain="[('lezer_tampon_ids','like','tampon')]"/>
+          <separator/>
+          <filter name="filter_carnet"    string="Carnet"               domain="[('carnet_e','=',True)]"/>
           <group expand="0" string="Csoportosítás">
             <filter name="group_termek"   string="Termék"               context="{'group_by': 'termekkod'}"/>
           </group>

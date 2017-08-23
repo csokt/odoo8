@@ -199,11 +199,14 @@ class LegrandMozgasfej(models.Model):
     self.env['legrand.impex'].search([]).unlink()
     for sor in self.mozgassor_ids:
       impex_row = {
+        'sorszam'         : sor.gyartasi_lap_id.id,
         'gyartasi_lap_id' : sor.gyartasi_lap_id.id,
         'cikk_id'         : sor.cikk_id.id,
         'bom_id'          : sor.bom_id.id,
         'mennyiseg'       : sor.mennyiseg,
         'hibakod_id'      : sor.hibakod_id.id,
+        'rendelesszam'    : sor.gyartasi_lap_id.rendelesszam,
+        'cikkszam'        : sor.gyartasi_lap_id.termekkod,
         'megjegyzes'      : sor.megjegyzes,
       }
       self.env['legrand.impex'].create(impex_row)
@@ -255,7 +258,7 @@ class LegrandMozgassor(models.Model):
   # computed fields
   mozgasfej_sorszam   = fields.Integer(u'Sz.lev.')
   # virtual fields
-  cikknev             = fields.Char(u'Cikknév', compute='_compute_cikknev')
+  cikknev             = fields.Char(u'Cikknév', compute='_compute_cikknev', required=True)
   state               = fields.Selection([('terv',u'Tervezet'),('szallit',u'Szállítás'),('elter',u'Átszállítva eltérésekkel'),('kesz',u'Átszállítva'),('konyvelt',u'Könyvelve')],
                                         u'Állapot',  related='mozgasfej_id.state')
   mozgasnem           = fields.Selection([('be',u'Alkatrész bevételezés'),('ki',u'Termék kiszállítás'),('belso',u'Belső szállítás'),
@@ -317,7 +320,7 @@ class LegrandAnyagigeny(models.Model):
   state               = fields.Selection([('terv',u'Tervezet'),('uj',u'Új igény'),('nyugta',u'Nyugtázva')], u'Állapot', default='terv', readonly=True)
   cikk_id             = fields.Many2one('legrand.cikk', u'Cikkszám',                                                          readonly=True, states={'terv': [('readonly', False)]}, auto_join=True)
   gyartasi_lap_id     = fields.Many2one('legrand.gyartasi_lap',  u'Gyártási lap',                                             readonly=True, states={'terv': [('readonly', False)]}, auto_join=True)
-  mennyiseg           = fields.Float(u'Mennyiség', digits=(16, 2), required=True,                                             readonly=True, states={'terv': [('readonly', False)]})
+  mennyiseg           = fields.Float(u'Mennyiség', digits=(16, 2),                                                            readonly=True, states={'terv': [('readonly', False)]}, required=True)
   hely_id             = fields.Many2one('legrand.hely', u'Üzem', domain=[('belso_szallitas_e', '=', True)],                   readonly=True, states={'terv': [('readonly', False)]}, required=True, auto_join=True)
   igeny_ok            = fields.Selection([('hiany',u'hiánypótlás'),('selejt',u'selejtpótlás')], 'Kérés oka', default='hiany', readonly=True, states={'terv': [('readonly', False)]}, required=True)
   megjegyzes          = fields.Char(u'Megjegyzés',                                                                            states={'nyugta': [('readonly', True)]})
@@ -513,6 +516,7 @@ class LegrandGyartasiLap(models.Model):
   raklap_max          = fields.Char(u'raklap_max',  readonly=True)
   rakat_tipus         = fields.Char(u'rakat_tipus', readonly=True)
   muveletek_elvegezve = fields.Boolean(u'Műveletek elvégezve?', compute='_compute_muveletek_elvegezve', store=True)
+  carnet_e            = fields.Boolean(u'Carnet?', default=False)
   active              = fields.Boolean(u'Aktív?', default=True)
   # virtual fields
   rendelt_ora         = fields.Float(u'Rendelt óra', digits=(16, 2), compute='_compute_rendelt_ora')
@@ -550,12 +554,12 @@ class LegrandGyartasiLap(models.Model):
   @api.one
   @api.depends('gylap_homogen_ids')
   def _compute_rendelt_ora(self):
-    self.rendelt_ora = sum(map(lambda r: r.ossz_ido+r.beall_ido, self.gylap_homogen_ids.filtered('sajat')))
+    self.rendelt_ora = sum(map(lambda r: r.ossz_ido+r.beall_ido, self.gylap_homogen_ids.filtered('sajat'))) * self.modositott_db / self.rendelt_db
 
   @api.one
   @api.depends('rendelt_ora', 'teljesitett_db', 'rendelt_db')
   def _compute_teljesitett_ora(self):
-    self.teljesitett_ora = self.rendelt_ora * self.teljesitett_db / self.rendelt_db
+    self.teljesitett_ora = self.rendelt_ora * self.teljesitett_db / self.modositott_db
 
   @api.one
   @api.depends('cikk_id')
@@ -917,9 +921,9 @@ class LegrandLezerTampon(models.Model):
   _rec_name           = 'muvelet'
   muvelet             = fields.Char(u'Művelet')
   termekkod           = fields.Char(u'Termékkód')
-  termek_id           = fields.Many2one('product.product',  u'Termék', auto_join=True)
+  termek_id           = fields.Many2one('legrand.cikk',  u'Termék', auto_join=True)
   alkatresz           = fields.Char(u'Alkatrészkód')
-  alkatresz_id        = fields.Many2one('product.product',  u'Alkatrész', auto_join=True)
+  alkatresz_id        = fields.Many2one('legrand.cikk',  u'Alkatrész', auto_join=True)
   pozicio             = fields.Char(u'Pozíció')
   rajz_felirat        = fields.Char(u'Rajz/Felirat')
   muvelet_db          = fields.Integer(u'Művelet db')
