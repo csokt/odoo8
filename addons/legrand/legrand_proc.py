@@ -267,3 +267,18 @@ class LegrandParameter(models.Model):
       }
       Impex.create(impex_row)
     return True
+
+  @api.one
+  def impex_uzem_keszlet(self):
+    Impex  = self.env['legrand.impex']
+    hely_id = Impex.search([], limit=1).hely_id.id
+    if not hely_id:
+     raise exceptions.Warning(u'Az impex első sorában a Hely id nincs kitöltve!')
+    Impex.search([]).write({'hely_id': hely_id, 'ertek': 0.0, 'megjegyzes': ''})
+    self.env.cr.execute("""
+      WITH uzemi AS
+      ( SELECT keszlet.cikk_id, keszlet.raktaron AS keszlet FROM legrand_impex AS impex JOIN legrand_keszlet AS keszlet ON impex.cikk_id = keszlet.cikk_id AND impex.hely_id = keszlet.hely_id )
+      UPDATE legrand_impex AS impex SET ertek = uzemi.keszlet FROM uzemi WHERE impex.cikk_id = uzemi.cikk_id
+      """)
+    self.env.cr.execute("""UPDATE legrand_impex SET megjegyzes = 'hiány' WHERE mennyiseg > ertek""")
+    return True

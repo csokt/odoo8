@@ -355,7 +355,10 @@ class LegrandKeszlet(models.Model):
   hely_id             = fields.Many2one('legrand.hely', u'Raktárhely', readonly=True, auto_join=True)
   szefo_e             = fields.Boolean(u'SZEFO készletbe számít?', readonly=True)
   legrand_e           = fields.Boolean(u'Legrand készletbe számít?', readonly=True)
-  raktaron            = fields.Float(string=u'Raktáron', readonly=True)
+  terv                = fields.Float(string=u'Terv',        readonly=True)
+  szallitason         = fields.Float(string=u'Szállításon', readonly=True)
+  megerkezett         = fields.Float(string=u'Megérkezett', readonly=True)
+  raktaron            = fields.Float(string=u'Raktáron',    readonly=True)
   varhato             = fields.Float(string=u'Előrejelzés', readonly=True)
   # virtual fields
   cikknev             = fields.Char(u'Cikknév', related='cikk_id.cikknev', readonly=True)
@@ -370,29 +373,32 @@ class LegrandKeszlet(models.Model):
           hely_id,
           szefo_e,
           legrand_e,
+          sum(CASE WHEN state = 'terv' THEN mennyiseg ELSE 0.0 END) AS terv,
+          sum(CASE WHEN state = 'szallit' THEN mennyiseg ELSE 0.0 END) AS szallitason,
+          sum(CASE WHEN state NOT IN ('terv', 'szallit') THEN mennyiseg ELSE 0.0 END) AS megerkezett,
           sum(CASE WHEN raktaron_e THEN mennyiseg ELSE 0.0 END) AS raktaron,
           sum(mennyiseg) AS varhato
         FROM (
-          SELECT sor.cikk_id, hely.id AS hely_id, hely.szefo_e, hely.legrand_e, fej.state NOT IN ('terv', 'szallit') AS raktaron_e,  sor.mennyiseg AS mennyiseg
+          SELECT sor.cikk_id, hely.id AS hely_id, hely.szefo_e, hely.legrand_e, fej.state, fej.state NOT IN ('terv', 'szallit') AS raktaron_e,  sor.mennyiseg AS mennyiseg
           FROM legrand_mozgassor AS sor
           JOIN legrand_mozgasfej AS fej  ON fej.id  = sor.mozgasfej_id
           JOIN legrand_hely      AS hely ON hely.id = fej.celallomas_id
           WHERE cikk_id > 0
           UNION ALL
-          SELECT sor.cikk_id, hely.id AS hely_id, hely.szefo_e, hely.legrand_e, fej.state NOT IN ('terv', 'szallit') AS raktaron_e, -sor.mennyiseg AS mennyiseg
+          SELECT sor.cikk_id, hely.id AS hely_id, hely.szefo_e, hely.legrand_e, fej.state, fej.state != 'terv' AS raktaron_e, -sor.mennyiseg AS mennyiseg
           FROM legrand_mozgassor AS sor
           JOIN legrand_mozgasfej AS fej  ON fej.id  = sor.mozgasfej_id
           JOIN legrand_hely      AS hely ON hely.id = fej.forrashely_id
           WHERE cikk_id > 0
           UNION ALL
-          SELECT line.cikk_id, hely.id AS hely_id, hely.szefo_e, hely.legrand_e, fej.state NOT IN ('terv', 'szallit') AS raktaron_e,  sor.mennyiseg*line.beepules AS mennyiseg
+          SELECT line.cikk_id, hely.id AS hely_id, hely.szefo_e, hely.legrand_e, fej.state, fej.state NOT IN ('terv', 'szallit') AS raktaron_e,  sor.mennyiseg*line.beepules AS mennyiseg
           FROM legrand_mozgassor AS sor
           JOIN legrand_mozgasfej AS fej  ON fej.id  = sor.mozgasfej_id
           JOIN legrand_hely      AS hely ON hely.id = fej.celallomas_id
           JOIN legrand_bom_line  AS line ON sor.bom_id = line.bom_id
           WHERE sor.bom_id > 0
           UNION ALL
-          SELECT line.cikk_id, hely.id AS hely_id, hely.szefo_e, hely.legrand_e, fej.state NOT IN ('terv', 'szallit') AS raktaron_e, -sor.mennyiseg*line.beepules AS mennyiseg
+          SELECT line.cikk_id, hely.id AS hely_id, hely.szefo_e, hely.legrand_e, fej.state, fej.state != 'terv' AS raktaron_e, -sor.mennyiseg*line.beepules AS mennyiseg
           FROM legrand_mozgassor AS sor
           JOIN legrand_mozgasfej AS fej  ON fej.id  = sor.mozgasfej_id
           JOIN legrand_hely      AS hely ON hely.id = fej.forrashely_id
@@ -1005,7 +1011,7 @@ class LegrandImpex(models.Model):
   homogen             = fields.Char(u'Homogén')
   db                  = fields.Integer(u'db')
   mennyiseg           = fields.Float(u'Mennyiség', digits=(16, 2))
-  ertek               = fields.Float(u'Érték', digits=(16, 8))
+  ertek               = fields.Float(u'Érték', digits=(16, 2))
   datum               = fields.Datetime(u'Dátum')
   megjegyzes          = fields.Char(u'Megjegyzés')
   gyartasi_lap_id     = fields.Many2one('legrand.gyartasi_lap',  u'Gyártási_lap id', auto_join=True)

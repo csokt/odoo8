@@ -401,8 +401,11 @@
           <field name="cikk_id"/>
           <field name="cikknev"/>
           <field name="hely_id"/>
-          <field name="raktaron"/>
+          <field name="terv"/>
+          <field name="szallitason"/>
+          <field name="megerkezett"/>
           <field name="varhato"/>
+          <field name="raktaron"/>
         </tree>
       </field>
     </record>
@@ -934,6 +937,7 @@
       <field  name="arch" type="xml">
         <tree create="false" >
           <button name="calc_impex"         type="object" string="Impex id keres"             confirm="Az impex adattáblában kikeresi és beírja a hivatkozásokat." />
+          <button name="impex_uzem_keszlet" type="object" string="Impex - Üzem készlet"       confirm="Az impex adattáblában lévő cikk mennyiség összevetése az üzem készletével." />
           <button name="gylap_ellenorzes"   type="object" string="Gyártási lapok ellenőrzése" confirm="Végigmegy a lezáratlan gyártási lapokon, a hibákak beírja az impex adattáblába." />
         </tree>
       </field>
