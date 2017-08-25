@@ -178,7 +178,15 @@ class LegrandMozgasfej(models.Model):
       forr_id = self.env['legrand.hely'].search([('azonosito', '=', forrdict[vals['mozgasnem']])]).id
       cel_id  = self.env['legrand.hely'].search([('azonosito', '=', celdict[vals['mozgasnem']])]).id
       vals['forrashely_id'], vals['celallomas_id'] = forr_id, cel_id
-    return super(LegrandMozgasfej, self).create(vals)
+    new = super(LegrandMozgasfej, self).create(vals)
+    self.env.cr.execute('REFRESH MATERIALIZED VIEW legrand_keszlet')
+    return new
+
+  @api.multi
+  def write(self, vals):
+    super(LegrandMozgasfej, self).write(vals)
+    self.env.cr.execute('REFRESH MATERIALIZED VIEW legrand_keszlet')
+    return True
 
   @api.one
   def import_impex(self):
@@ -362,12 +370,15 @@ class LegrandKeszlet(models.Model):
   varhato             = fields.Float(string=u'Előrejelzés', readonly=True)
   # virtual fields
   cikknev             = fields.Char(u'Cikknév', related='cikk_id.cikknev', readonly=True)
-  alkatresz_e         = fields.Boolean(u'Alkatrész', related='cikk_id.alkatresz_e', readonly=True)
+  alkatresz_e         = fields.Boolean(u'Alkatrész',  related='cikk_id.alkatresz_e',  readonly=True)
+  kesztermek_e        = fields.Boolean(u'Késztermék', related='cikk_id.kesztermek_e', readonly=True)
 
   def init(self, cr):
+    return
     tools.drop_view_if_exists(cr, self._table)
     cr.execute(
-      """CREATE or REPLACE VIEW %s as (
+#      """CREATE or REPLACE VIEW %s as (
+      """CREATE MATERIALIZED VIEW %s as (
         SELECT
           row_number() over() AS id,
           cikk_id,
