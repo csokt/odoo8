@@ -82,8 +82,9 @@
             <group col="4">
               <field name="cikkszam"/>
               <field name="cikknev"/>
-              <field name="bekerulesi_ar"/>
               <field name="alkatresz_e"/>
+              <field name="bekerulesi_ar"/>
+              <field name="kesztermek_e"/>
               <field name="szefo_cikk_e"/>
               <field name="active"                groups="legrand.group_legrand_director"/>
             </group>
@@ -416,18 +417,20 @@
       <field  name="arch" type="xml">
         <search>
           <field  name="cikk_id"/>
-          <filter name="filter_depo"      string="Depó"                 domain="[('hely_id.azonosito','=','depo')]"/>
-          <filter name="filter_szentes"   string="Szentes"              domain="[('hely_id.azonosito','=','szentes')]"/>
-          <filter name="filter_hmvhely"   string="Hódmezővásárhely"     domain="[('hely_id.azonosito','=','hmvhely')]"/>
-          <filter name="filter_berkert"   string="Bérkert"              domain="[('hely_id.azonosito','=','berkert')]"/>
-          <filter name="filter_mako"      string="Makó"                 domain="[('hely_id.azonosito','=','mako')]"/>
-          <filter name="filter_oroshaza"  string="Orosháza"             domain="[('hely_id.azonosito','=','oroshaza')]"/>
-          <filter name="filter_apatfalva" string="Apátfalva"            domain="[('hely_id.azonosito','=','apatfalva')]"/>
-          <filter name="filter_selejt"    string="Selejt"               domain="[('hely_id.azonosito','=','selejt')]"/>
+          <filter name="filter_depo"        string="Depó"                 domain="[('hely_id.azonosito','=','depo')]"/>
+          <filter name="filter_szentes"     string="Szentes"              domain="[('hely_id.azonosito','=','szentes')]"/>
+          <filter name="filter_hmvhely"     string="Hódmezővásárhely"     domain="[('hely_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_berkert"     string="Bérkert"              domain="[('hely_id.azonosito','=','berkert')]"/>
+          <filter name="filter_mako"        string="Makó"                 domain="[('hely_id.azonosito','=','mako')]"/>
+          <filter name="filter_oroshaza"    string="Orosháza"             domain="[('hely_id.azonosito','=','oroshaza')]"/>
+          <filter name="filter_apatfalva"   string="Apátfalva"            domain="[('hely_id.azonosito','=','apatfalva')]"/>
+          <filter name="filter_selejt"      string="Selejt"               domain="[('hely_id.azonosito','=','selejt')]"/>
           <separator/>
-          <filter name="filter_szefo_e"   string="Szefo készlet"        domain="[('szefo_e','=',True)]"/>
+          <filter name="filter_kesztermek"  string="Késztermék"           domain="[('alkatresz_e','=',False)]"/>
+          <separator/>
+          <filter name="filter_szefo_e"     string="Szefo készlet"        domain="[('szefo_e','=',True)]"/>
           <group expand="0" string="Csoportosítás">
-            <filter name="group_cikk"     string="Cikk"                 context="{'group_by': 'cikk_id'}"/>
+            <filter name="group_cikk"       string="Cikk"                 context="{'group_by': 'cikk_id'}"/>
           </group>
         </search>
       </field>
@@ -575,7 +578,9 @@
         <tree create="false">
           <field name="name"/>
           <field name="hatarido"/>
+          <field name="carnet_e"/>
           <field name="gyartasi_hely_ids"/>
+          <field name="depo_db"/>
           <field name="modositott_db"         string="Rendelt db"/>
           <field name="teljesitett_db"/>
           <field name="rendelt_ora"           sum="rendelt óra"/>
@@ -610,6 +615,7 @@
         <tree create="false" colors="green:cikkhiany_count==0">
           <field name="name"/>
           <field name="hatarido"/>
+          <field name="carnet_e"/>
           <field name="gyartasi_hely_ids"/>
           <field name="jegyzet"/>
           <field name="modositott_db"         string="Rendelt db"/>
@@ -913,6 +919,7 @@
           <field name="gyartasi_hely_ids"   widget="many2many_tags"/>
           <field name="cikk_id"/>
           <field name="bom_id"/>
+          <field name="cikknev"/>
           <field name="price"/>
           <field name="db"/>
           <field name="mennyiseg"/>

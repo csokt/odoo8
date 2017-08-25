@@ -32,6 +32,7 @@ class LegrandCikk(models.Model):
   cikkszam            = fields.Char(u'Cikkszám', required=True)
   cikknev             = fields.Char(u'Cikknév',  required=True)
   alkatresz_e         = fields.Boolean(u'Alkatrész?',   default=False)
+  kesztermek_e        = fields.Boolean(u'Késztermék?',  default=False)
   szefo_cikk_e        = fields.Boolean(u'SZEFO cikk?',  default=False)
   bekerulesi_ar       = fields.Float(u'Bekerülési ár',  digits=(16, 3))
   beepulok_ids        = fields.Many2many('legrand.bom', string=u'Beépülők', domain=[('beepul_e', '=', True)])
@@ -350,7 +351,6 @@ class LegrandKeszlet(models.Model):
   _auto = False
   _rec_name = 'cikk_id'
   _order = 'cikk_id, hely_id'
-#  bom_id              = fields.Many2one('legrand.bom',  u'Termék', readonly=True)
   cikk_id             = fields.Many2one('legrand.cikk', string=u'Cikkszám', readonly=True, auto_join=True)
   hely_id             = fields.Many2one('legrand.hely', u'Raktárhely', readonly=True, auto_join=True)
   szefo_e             = fields.Boolean(u'SZEFO készletbe számít?', readonly=True)
@@ -362,6 +362,7 @@ class LegrandKeszlet(models.Model):
   varhato             = fields.Float(string=u'Előrejelzés', readonly=True)
   # virtual fields
   cikknev             = fields.Char(u'Cikknév', related='cikk_id.cikknev', readonly=True)
+  alkatresz_e         = fields.Boolean(u'Alkatrész', related='cikk_id.alkatresz_e', readonly=True)
 
   def init(self, cr):
     tools.drop_view_if_exists(cr, self._table)
@@ -531,6 +532,7 @@ class LegrandGyartasiLap(models.Model):
   check_cikkek_uid    = fields.Char(u'Ellenőrzés', compute='_compute_check_cikkek_uid')
   cikkhiany           = fields.Char(u'Cikkhiány', compute='_compute_cikkhiany')
   cikkhiany_count     = fields.Integer(u'Cikkhiány db', compute='_compute_cikkhiany')
+  depo_db             = fields.Integer(u'Depó db', compute='_compute_depo_db')
   szefo_muvelet_ids   = fields.One2many('legrand.gylap_szefo_muvelet',  'gyartasi_lap_id', u'Szefo műveletek',      readonly=True,  states={'uj': [('readonly', False)]}, auto_join=True)
   lezer_tampon_ids    = fields.One2many('legrand.lezer_tampon',         'termek_id',       u'Lézer, tampon',        readonly=True,  related='cikk_id.lezer_tampon_ids', auto_join=True)
   gylap_homogen_ids   = fields.One2many('legrand.gylap_homogen',        'gyartasi_lap_id', u'Homogén',              states={'kesz': [('readonly', True)]}, auto_join=True)
@@ -606,6 +608,12 @@ class LegrandGyartasiLap(models.Model):
         count += 1
     self.cikkhiany = hiany
     self.cikkhiany_count = count
+
+  @api.one
+  @api.depends()
+  def _compute_depo_db(self):
+    hely_id = self.env['legrand.hely'].search([('azonosito','=','depo')]).id
+    self.depo_db = self.env['legrand.keszlet'].search([('cikk_id', '=', self.cikk_id.id),('hely_id','=',hely_id)]).varhato
 
   @api.one
   def state2uj(self):
@@ -1025,6 +1033,7 @@ class LegrandImpex(models.Model):
 #  # virtual fields
   gylap_state         = fields.Selection([('uj',u'Új'),('mterv',u'Műveletterv'),('gyartas',u'Gyártás'),('gykesz',u'Gyártás kész'),('kesz',u'Rendelés teljesítve')],
                         u'Állapot', related='gyartasi_lap_id.state', readonly=True)
+  cikknev             = fields.Char(u'Cikknév', compute='_compute_cikknev')
   gyartasi_hely_ids   = fields.Many2many('legrand.hely', string=u'Gyártási helyek', related='gyartasi_lap_id.gyartasi_hely_ids', readonly=True)
   price               = fields.Float(u'Price', digits=(16, 3), related='cikk_id.bekerulesi_ar', readonly=True)
 
@@ -1032,3 +1041,8 @@ class LegrandImpex(models.Model):
   @api.depends('mennyiseg', 'gyartasi_lap_id')
   def _compute_ora(self):
     self.ora = self.gyartasi_lap_id.rendelt_ora * self.mennyiseg / self.gyartasi_lap_id.rendelt_db if self.gyartasi_lap_id else 0.0
+
+  @api.one
+  @api.depends('cikk_id', 'bom_id')
+  def _compute_cikknev(self):
+    self.cikknev = self.cikk_id.cikknev if self.cikk_id else self.bom_id.cikk_id.cikknev
