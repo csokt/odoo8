@@ -89,10 +89,10 @@
               <field name="active"                groups="legrand.group_legrand_director"/>
             </group>
             <group col="2">
-              <field name="beepulok_ids"          attrs="{'invisible': ['|',('alkatresz_e','=',True),('alkatresz_e','=',True)]}" widget="many2many_tags" options="{'no_create': True}"/>
+              <field name="beepulok_ids"          attrs="{'invisible': [('kesztermek_e','=',False)]}" widget="many2many_tags" options="{'no_create': True}"/>
             </group>
-            <field name="muvelet_ids"             attrs="{'invisible': ['|',('alkatresz_e','=',True),('szefo_cikk_e','=',True)]}"/>
-            <field name="lezer_tampon_ids"        attrs="{'invisible': ['|',('alkatresz_e','=',True),('alkatresz_e','=',True)]}"/>
+            <field name="muvelet_ids"             attrs="{'invisible': [('kesztermek_e','=',False)]}"/>
+            <field name="lezer_tampon_ids"        attrs="{'invisible': [('kesztermek_e','=',False)]}"/>
             <field name="feljegyzes_ids">
               <tree editable="top">
                 <field name="gyartasi_lap_id"     readonly="1"/>
@@ -116,6 +116,7 @@
           <field name="cikknev"/>
           <field name="bekerulesi_ar"/>
           <field name="alkatresz_e"/>
+          <field name="kesztermek_e"/>
           <field name="szefo_cikk_e"/>
         </tree>
       </field>
@@ -187,6 +188,7 @@
           <field name="cikk_id"             options="{'no_create': True}"/>
           <field name="cikknev"/>
           <field name="beepules"/>
+          <field name="depo_felhasznalas"/>
         </tree>
       </field>
     </record>
@@ -289,6 +291,7 @@
           <field name="cikk_id"                 options="{'no_create': True}"   invisible="context.get('mozgasnem') in ('ki',)"               string="Cikkszám____"/>
           <field name="bom_id"                  options="{'no_create': True}"   invisible="context.get('mozgasnem') not in ('ki','belso')"/>
           <field name="cikknev"/>
+          <field name="forrashelyen"            attrs="{'invisible': [('state','in',('szallit','kesz','konyvelt'))]}"/>
           <field name="mennyiseg"/>
           <field name="hibakod_id"              options="{'no_create': True}"   invisible="context.get('mozgasnem') not in ('belso','selejt')"/>
           <field name="megjegyzes"/>
@@ -296,6 +299,9 @@
           <field name="create_date"             readonly="1"  string="Létrehozás ideje"/>
           <field name="write_uid"               readonly="1"  string="Módosította"/>
           <field name="write_date"              readonly="1"  string="Módosítás ideje"/>
+          <field name="state"                   invisible="1"/>
+          <field name="mozgasfej_id"            invisible="1"/>
+          <field name="forrashely_id"           invisible="1"/>
         </tree>
       </field>
     </record>
@@ -311,6 +317,7 @@
           <field name="forrashely_id"/>
           <field name="celallomas_id"/>
           <field name="gyartasi_lap_id"/>
+          <field name="create_date"             string="Létrehozás ideje"/>
           <field name="cikk_id"/>
           <field name="bom_id"/>
           <field name="cikknev"/>
@@ -1014,6 +1021,7 @@
 
     <menuitem id="menu_szallitas_uzem"    name="Szállítás (üzem)"             parent="menu_root"                  sequence="20" />
       <menuitem id="menu_mozgas_belso"    name="Belső szállítás"              parent="menu_szallitas_uzem"        sequence="10" action="mozgas_belso"   />
+      <menuitem id="menu_mozgassor"       name="Szállítástételek"             parent="menu_szallitas_uzem"        sequence="20" action="mozgassor"  />
       <menuitem id="menu_anyagigeny"      name="Anyagkérés"                   parent="menu_szallitas_uzem"        sequence="90" action="anyagigeny"  />
 
     <menuitem id="menu_szallitas"         name="Szállítás"                    parent="menu_root"                  sequence="25"                                 groups="group_legrand_manager"/>
@@ -1021,7 +1029,6 @@
       <menuitem id="menu_mozgas_vissza"   name="Alkatrész visszaszállítás"    parent="menu_szallitas"             sequence="30" action="mozgas_vissza"  />
       <menuitem id="menu_mozgas_selejt"   name="Selejt visszaszállítás"       parent="menu_szallitas"             sequence="40" action="mozgas_selejt"  />
       <menuitem id="menu_mozgas_helyesb"  name="Készlethelyesbítés"           parent="menu_szallitas"             sequence="50" action="mozgas_helyesbit" />
-      <menuitem id="menu_mozgassor"       name="Összes tétel"                 parent="menu_szallitas"             sequence="80" action="mozgassor"  />
 
     <menuitem id="menu_raktar"            name="Termékek"                     parent="menu_root"                  sequence="30" />
       <menuitem id="menu_cikk"            name="Cikkek"                       parent="menu_raktar"                sequence="10" action="cikk" />

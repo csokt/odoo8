@@ -127,6 +127,7 @@ class LegrandBomLine(models.Model):
   bom_id              = fields.Many2one('legrand.bom',  u'BOM', index=True, required=True, auto_join=True)
   cikk_id             = fields.Many2one('legrand.cikk',  u'Alkatrész', index=True, required=True, auto_join=True)
   beepules            = fields.Float(u'Beépülés', digits=(16, 8), required=True)
+  depo_felhasznalas   = fields.Boolean(u'Depó felhasználás?', default=False)
   # virtual fields
   active              = fields.Boolean(u'Aktív?',       related='bom_id.active',    readonly=True)
   cikkszam            = fields.Char(u'Cikkszám',        related='cikk_id.cikkszam', readonly=True)
@@ -256,7 +257,7 @@ class LegrandMozgassor(models.Model):
   _name               = 'legrand.mozgassor'
   _order              = 'id'
   _rec_name           = 'cikk_id'
-  mozgasfej_id        = fields.Many2one('legrand.mozgasfej',  u'Mozgásfej', index=True, auto_join=True)
+  mozgasfej_id        = fields.Many2one('legrand.mozgasfej',  u'Mozgásfej', index=True, readonly=True, auto_join=True)
 #  cikk_id             = fields.Many2one('legrand.cikk', u'Cikkszám', domain="[('szefo_cikk_e', '=', False)]", index=True)
   cikk_id             = fields.Many2one('legrand.cikk', u'Cikkszám', index=True, auto_join=True)
   bom_id              = fields.Many2one('legrand.bom',  u'Anyagjegyzék', index=True, auto_join=True)
@@ -269,12 +270,13 @@ class LegrandMozgassor(models.Model):
   # virtual fields
   cikknev             = fields.Char(u'Cikknév', compute='_compute_cikknev', required=True)
   state               = fields.Selection([('terv',u'Tervezet'),('szallit',u'Szállítás'),('elter',u'Átszállítva eltérésekkel'),('kesz',u'Átszállítva'),('konyvelt',u'Könyvelve')],
-                                        u'Állapot',  related='mozgasfej_id.state')
+                                        u'Állapot',  related='mozgasfej_id.state', readonly=True)
   mozgasnem           = fields.Selection([('be',u'Alkatrész bevételezés'),('ki',u'Termék kiszállítás'),('belso',u'Belső szállítás'),
                                           ('helyesbit',u'Készlethelyesbítés'),('vissza',u'Alkatrész visszaszállítás'),('selejt',u'Selejt visszaszállítás')],
-                                          u'Mozgásnem',  related='mozgasfej_id.mozgasnem')
-  forrashely_id       = fields.Many2one('legrand.hely', u'Forráshely',       related='mozgasfej_id.forrashely_id', auto_join=True)
-  celallomas_id       = fields.Many2one('legrand.hely', u'Célállomás helye', related='mozgasfej_id.celallomas_id', auto_join=True)
+                                          u'Mozgásnem',  related='mozgasfej_id.mozgasnem', readonly=True)
+  forrashely_id       = fields.Many2one('legrand.hely', u'Forráshely',       related='mozgasfej_id.forrashely_id', readonly=True, auto_join=True)
+  celallomas_id       = fields.Many2one('legrand.hely', u'Célállomás helye', related='mozgasfej_id.celallomas_id', readonly=True, auto_join=True)
+  forrashelyen        = fields.Float(u'Készlet', digits=(16, 2), compute='_compute_forrashelyen')
 
   @api.model
   def create(self, vals):
@@ -321,6 +323,11 @@ class LegrandMozgassor(models.Model):
   @api.onchange('bom_id')
   def onchange_bom_id(self):
     self.cikk_id = False
+
+  @api.one
+  @api.depends('cikk_id', 'forrashely_id')
+  def _compute_forrashelyen(self):
+    self.forrashelyen = self.env['legrand.keszlet'].search([('cikk_id', '=', self.cikk_id.id), ('hely_id', '=', self.forrashely_id.id)]).raktaron
 
 ############################################################################################################################  Anyagigénylés  ###
 class LegrandAnyagigeny(models.Model):
