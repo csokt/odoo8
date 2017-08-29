@@ -482,6 +482,56 @@ class LegrandVallKeszlet(models.Model):
       % (self._table)
     )
 
+############################################################################################################################  Anyagjegyzék készlet  ###
+class LegrandAnyagjegyzekKeszlet(models.Model):
+  _name = 'legrand.anyagjegyzek_keszlet'
+  _auto = False
+  _rec_name = 'bom_id'
+  _order = 'bom_id, hely_id'
+  bom_id              = fields.Many2one('legrand.bom', string=u'Anyagjegyzék', readonly=True, auto_join=True)
+  hely_id             = fields.Many2one('legrand.hely', u'Raktárhely', readonly=True, auto_join=True)
+  szefo_e             = fields.Boolean(u'SZEFO készletbe számít?', readonly=True)
+  legrand_e           = fields.Boolean(u'Legrand készletbe számít?', readonly=True)
+  terv                = fields.Float(string=u'Terv',        readonly=True)
+  szallitason         = fields.Float(string=u'Szállításon', readonly=True)
+  megerkezett         = fields.Float(string=u'Megérkezett', readonly=True)
+  raktaron            = fields.Float(string=u'Raktáron',    readonly=True)
+  varhato             = fields.Float(string=u'Előrejelzés', readonly=True)
+  # virtual fields
+
+  def init(self, cr):
+    tools.drop_view_if_exists(cr, self._table)
+    cr.execute(
+      """CREATE or REPLACE VIEW %s as (
+        SELECT
+          row_number() over() AS id,
+          bom_id,
+          hely_id,
+          szefo_e,
+          legrand_e,
+          sum(CASE WHEN state = 'terv' THEN mennyiseg ELSE 0.0 END) AS terv,
+          sum(CASE WHEN state = 'szallit' THEN mennyiseg ELSE 0.0 END) AS szallitason,
+          sum(CASE WHEN state NOT IN ('terv', 'szallit') THEN mennyiseg ELSE 0.0 END) AS megerkezett,
+          sum(CASE WHEN raktaron_e THEN mennyiseg ELSE 0.0 END) AS raktaron,
+          sum(mennyiseg) AS varhato
+        FROM (
+          SELECT sor.bom_id, hely.id AS hely_id, hely.szefo_e, hely.legrand_e, fej.state, fej.state NOT IN ('terv', 'szallit') AS raktaron_e,  sor.mennyiseg AS mennyiseg
+          FROM legrand_mozgassor AS sor
+          JOIN legrand_mozgasfej AS fej  ON fej.id  = sor.mozgasfej_id
+          JOIN legrand_hely      AS hely ON hely.id = fej.celallomas_id
+          WHERE bom_id > 0
+          UNION ALL
+          SELECT sor.bom_id, hely.id AS hely_id, hely.szefo_e, hely.legrand_e, fej.state, fej.state != 'terv' AS raktaron_e, -sor.mennyiseg AS mennyiseg
+          FROM legrand_mozgassor AS sor
+          JOIN legrand_mozgasfej AS fej  ON fej.id  = sor.mozgasfej_id
+          JOIN legrand_hely      AS hely ON hely.id = fej.forrashely_id
+          WHERE bom_id > 0
+        ) AS move
+        GROUP BY bom_id, hely_id, szefo_e, legrand_e
+      )"""
+      % (self._table)
+    )
+
 ############################################################################################################################  Homogén  ###
 class LegrandHomogen(models.Model):
   _name               = 'legrand.homogen'
@@ -631,7 +681,7 @@ class LegrandGyartasiLap(models.Model):
   @api.depends()
   def _compute_depo_db(self):
     hely_id = self.env['legrand.hely'].search([('azonosito','=','depo')]).id
-    self.depo_db = self.env['legrand.keszlet'].search([('cikk_id', '=', self.cikk_id.id),('hely_id','=',hely_id)]).varhato
+    self.depo_db = self.env['legrand.anyagjegyzek_keszlet'].search([('bom_id', '=', self.bom_id.id),('hely_id','=',hely_id)]).raktaron
 
   @api.one
   def state2uj(self):

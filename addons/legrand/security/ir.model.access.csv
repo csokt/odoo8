@@ -26,6 +26,7 @@ access_legrand_anyagigeny_group_user,legrand.anyagigeny.user,model_legrand_anyag
 
 access_legrand_keszlet_group_viewer,legrand.keszlet.viewer,model_legrand_keszlet,group_legrand_viewer,1,0,0,0
 access_legrand_vall_keszlet_group_viewer,legrand.vall_keszlet.viewer,model_legrand_vall_keszlet,group_legrand_viewer,1,0,0,0
+access_legrand_anyagjegyzek_keszlet_group_viewer,legrand.anyagjegyzek_keszlet.viewer,model_legrand_anyagjegyzek_keszlet,group_legrand_viewer,1,0,0,0
 access_legrand_lefoglalt_group_viewer,legrand.lefoglalt.viewer,model_legrand_lefoglalt,group_legrand_viewer,1,0,0,0
 access_legrand_cikk_keszlet_group_viewer,legrand.cikk_keszlet.viewer,model_legrand_cikk_keszlet,group_legrand_viewer,1,0,0,0
 
