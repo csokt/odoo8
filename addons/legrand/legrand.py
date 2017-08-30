@@ -410,17 +410,20 @@ class LegrandKeszlet(models.Model):
           JOIN legrand_hely      AS hely ON hely.id = fej.forrashely_id
           WHERE cikk_id > 0
           UNION ALL
-          SELECT line.cikk_id, hely.id AS hely_id, hely.szefo_e, hely.legrand_e, fej.state, fej.state NOT IN ('terv', 'szallit') AS raktaron_e,  sor.mennyiseg*line.beepules AS mennyiseg
+          SELECT line.cikk_id, hely.id AS hely_id, hely.szefo_e, hely.legrand_e, fej.state, fej.state NOT IN ('terv', 'szallit') AS raktaron_e,
+            CASE WHEN line.depo_felhasznalas THEN CASE WHEN hely.legrand_e THEN sor.mennyiseg*line.beepules ELSE 0.0 END ELSE sor.mennyiseg*line.beepules END AS mennyiseg
           FROM legrand_mozgassor AS sor
           JOIN legrand_mozgasfej AS fej  ON fej.id  = sor.mozgasfej_id
           JOIN legrand_hely      AS hely ON hely.id = fej.celallomas_id
           JOIN legrand_bom_line  AS line ON sor.bom_id = line.bom_id
           WHERE sor.bom_id > 0
           UNION ALL
-          SELECT line.cikk_id, hely.id AS hely_id, hely.szefo_e, hely.legrand_e, fej.state, fej.state != 'terv' AS raktaron_e, -sor.mennyiseg*line.beepules AS mennyiseg
+          SELECT line.cikk_id, hely.id AS hely_id, hely.szefo_e, hely.legrand_e, fej.state, fej.state != 'terv' AS raktaron_e,
+            CASE WHEN line.depo_felhasznalas THEN CASE WHEN cel.legrand_e THEN -sor.mennyiseg*line.beepules ELSE 0.0 END ELSE -sor.mennyiseg*line.beepules END AS mennyiseg
           FROM legrand_mozgassor AS sor
           JOIN legrand_mozgasfej AS fej  ON fej.id  = sor.mozgasfej_id
           JOIN legrand_hely      AS hely ON hely.id = fej.forrashely_id
+          JOIN legrand_hely      AS cel  ON cel.id  = fej.celallomas_id
           JOIN legrand_bom_line  AS line ON sor.bom_id = line.bom_id
           WHERE sor.bom_id > 0
         ) AS move
@@ -594,8 +597,9 @@ class LegrandGyartasiLap(models.Model):
   carnet_e            = fields.Boolean(u'Carnet?', default=False)
   active              = fields.Boolean(u'Aktív?', default=True)
   # virtual fields
-  rendelt_ora         = fields.Float(u'Rendelt óra', digits=(16, 2), compute='_compute_rendelt_ora')
-  teljesitett_ora     = fields.Float(u'Teljesített óra', digits=(16, 2), compute='_compute_teljesitett_ora')
+  rendelt_ora         = fields.Float(u'Rendelt óra',      digits=(16, 2), compute='_compute_rendelt_ora')
+  teljesitett_ora     = fields.Float(u'Teljesített óra',  digits=(16, 2), compute='_compute_teljesitett_ora')
+  szamlazott_ora      = fields.Float(u'Számlázott óra',   digits=(16, 2), compute='_compute_szamlazott_ora')
   utolso_feljegyzes   = fields.Char(u'Utolsó feljegyzés', compute='_compute_utolso_feljegyzes')
   check_cikkek_uid    = fields.Char(u'Ellenőrzés', compute='_compute_check_cikkek_uid')
   cikkhiany           = fields.Char(u'Cikkhiány', compute='_compute_cikkhiany')
@@ -633,9 +637,14 @@ class LegrandGyartasiLap(models.Model):
     self.rendelt_ora = sum(map(lambda r: r.ossz_ido+r.beall_ido, self.gylap_homogen_ids.filtered('sajat'))) * self.modositott_db / self.rendelt_db
 
   @api.one
-  @api.depends('rendelt_ora', 'teljesitett_db', 'rendelt_db')
+  @api.depends('rendelt_ora', 'teljesitett_db', 'modositott_db')
   def _compute_teljesitett_ora(self):
     self.teljesitett_ora = self.rendelt_ora * self.teljesitett_db / self.modositott_db
+
+  @api.one
+  @api.depends('rendelt_ora', 'szamlazott_db', 'modositott_db')
+  def _compute_szamlazott_ora(self):
+    self.szamlazott_ora = self.rendelt_ora * self.szamlazott_db / self.modositott_db
 
   @api.one
   @api.depends('cikk_id')

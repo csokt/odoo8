@@ -312,18 +312,18 @@
       <field  name="arch" type="xml">
         <tree>
           <field name="mozgasfej_sorszam"/>
-          <field name="mozgasnem"/>
-          <field name="state"/>
           <field name="forrashely_id"/>
           <field name="celallomas_id"/>
           <field name="gyartasi_lap_id"/>
-          <field name="create_date"             string="Létrehozás ideje"/>
           <field name="cikk_id"/>
           <field name="bom_id"/>
           <field name="cikknev"/>
           <field name="mennyiseg"/>
           <field name="hibakod_id"/>
           <field name="megjegyzes"/>
+          <field name="mozgasnem"/>
+          <field name="state"/>
+          <field name="create_date"             string="Létrehozás ideje"/>
         </tree>
       </field>
     </record>
@@ -339,6 +339,14 @@
           <field  name="gyartasi_lap_id"/>
           <field  name="cikk_id"/>
           <field  name="bom_id"/>
+          <filter name="filter_depo"      string="Depó"                       domain="[('|'),('forrashely_id.azonosito','=','depo'),      ('celallomas_id.azonosito','=','depo')]"/>
+          <filter name="filter_szentes"   string="Szentes"                    domain="[('|'),('forrashely_id.azonosito','=','szentes'),   ('celallomas_id.azonosito','=','szentes')]"/>
+          <filter name="filter_hmvhely"   string="Hódmezővásárhely"           domain="[('|'),('forrashely_id.azonosito','=','hmvhely'),   ('celallomas_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_berkert"   string="Bérkert"                    domain="[('|'),('forrashely_id.azonosito','=','berkert'),   ('celallomas_id.azonosito','=','berkert')]"/>
+          <filter name="filter_mako"      string="Makó"                       domain="[('|'),('forrashely_id.azonosito','=','mako'),      ('celallomas_id.azonosito','=','mako')]"/>
+          <filter name="filter_oroshaza"  string="Orosháza"                   domain="[('|'),('forrashely_id.azonosito','=','oroshaza'),  ('celallomas_id.azonosito','=','oroshaza')]"/>
+          <filter name="filter_apatfalva" string="Apátfalva"                  domain="[('|'),('forrashely_id.azonosito','=','apatfalva'), ('celallomas_id.azonosito','=','apatfalva')]"/>
+          <separator/>
           <filter name="filter_be"        string="Alkatrész bevételezés"      domain="[('mozgasfej_id.mozgasnem','=','be')]"/>
           <filter name="filter_ki"        string="Termék kiszállítás"         domain="[('mozgasfej_id.mozgasnem','=','ki')]"/>
           <filter name="filter_belso"     string="Belső szállítás"            domain="[('mozgasfej_id.mozgasnem','=','belso')]"/>
@@ -384,11 +392,18 @@
       <field  name="model">legrand.anyagigeny</field>
       <field  name="arch" type="xml">
         <search>
-          <field name="gyartasi_lap_id"/>
-          <field name="cikk_id"/>
-          <field name="igeny_ok"/>
-          <field name="hely_id"/>
-          <field name="state"/>
+          <field  name="gyartasi_lap_id"/>
+          <field  name="cikk_id"/>
+          <field  name="igeny_ok"/>
+          <field  name="hely_id"/>
+          <field  name="state"/>
+          <filter name="filter_szentes"   string="Szentes"              domain="[('hely_id.azonosito','=','szentes')]"/>
+          <filter name="filter_hmvhely"   string="Hódmezővásárhely"     domain="[('hely_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_berkert"   string="Bérkert"              domain="[('hely_id.azonosito','=','berkert')]"/>
+          <filter name="filter_mako"      string="Makó"                 domain="[('hely_id.azonosito','=','mako')]"/>
+          <filter name="filter_oroshaza"  string="Orosháza"             domain="[('hely_id.azonosito','=','oroshaza')]"/>
+          <filter name="filter_apatfalva" string="Apátfalva"            domain="[('hely_id.azonosito','=','apatfalva')]"/>
+          <separator/>
           <filter name="filter_terv"      string="Tervezet"     domain="[('state','=','terv')]"/>
           <filter name="filter_uj"        string="Új igény"     domain="[('state','=','uj')]"/>
           <filter name="filter_nyugta"    string="Nyugtázva"    domain="[('state','=','nyugta')]"/>
@@ -457,6 +472,7 @@
       </field>
     </record>
 
+    <!--####################################################################################################################  Anyagjegyzék készlet  -->
     <record id="view_tree_anyagj_keszlet"    model="ir.ui.view">
       <field  name="name">Anyagjegyzék készlet Tree</field>
       <field  name="model">legrand.anyagjegyzek_keszlet</field>
@@ -471,6 +487,29 @@
           <field name="varhato"/>
           <field name="raktaron"/>
         </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_anyagj_keszlet"    model="ir.ui.view">
+      <field  name="name">Anyagjegyzék készlet Filter</field>
+      <field  name="model">legrand.anyagjegyzek_keszlet</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field  name="bom_id"/>
+          <filter name="filter_depo"        string="Depó"                 domain="[('hely_id.azonosito','=','depo')]"/>
+          <filter name="filter_szentes"     string="Szentes"              domain="[('hely_id.azonosito','=','szentes')]"/>
+          <filter name="filter_hmvhely"     string="Hódmezővásárhely"     domain="[('hely_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_berkert"     string="Bérkert"              domain="[('hely_id.azonosito','=','berkert')]"/>
+          <filter name="filter_mako"        string="Makó"                 domain="[('hely_id.azonosito','=','mako')]"/>
+          <filter name="filter_oroshaza"    string="Orosháza"             domain="[('hely_id.azonosito','=','oroshaza')]"/>
+          <filter name="filter_apatfalva"   string="Apátfalva"            domain="[('hely_id.azonosito','=','apatfalva')]"/>
+          <filter name="filter_selejt"      string="Selejt"               domain="[('hely_id.azonosito','=','selejt')]"/>
+          <separator/>
+          <filter name="filter_szefo_e"     string="Szefo készlet"        domain="[('szefo_e','=',True)]"/>
+          <group expand="0" string="Csoportosítás">
+            <filter name="group_bom"        string="Anyagjegyzék"         context="{'group_by': 'bom_id'}"/>
+          </group>
+        </search>
       </field>
     </record>
 
@@ -609,6 +648,7 @@
           <field name="teljesitett_db"/>
           <field name="rendelt_ora"           sum="rendelt óra"/>
           <field name="teljesitett_ora"       sum="teljesített óra"/>
+          <field name="szamlazott_ora"        sum="számlázott óra"/>
           <field name="utolso_feljegyzes"/>
           <field name="state"/>
         </tree>
