@@ -124,7 +124,7 @@ class LegrandBomLine(models.Model):
   _order              = 'id'
   _rec_name           = 'cikk_id'
 #  name                = fields.Char(u'Név',      compute='_compute_name', store=True)
-  bom_id              = fields.Many2one('legrand.bom',  u'BOM', index=True, required=True, auto_join=True)
+  bom_id              = fields.Many2one('legrand.bom',  u'Anyagjegyzék', index=True, required=True, auto_join=True)
   cikk_id             = fields.Many2one('legrand.cikk',  u'Alkatrész', index=True, required=True, auto_join=True)
   beepules            = fields.Float(u'Beépülés', digits=(16, 8), required=True)
   depo_felhasznalas   = fields.Boolean(u'Depó felhasználás?', default=False)
