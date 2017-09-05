@@ -235,12 +235,12 @@
               <field name="id"                  attrs="{'invisible': [('mozgasnem', 'in', ('be',))]}"   string="Szállítólevél száma"/>
               <field name="mozgasnem"           invisible="1"/>
               <field name="mozgasnem"           invisible="1"/>
-              <field name="forrashely_id"       attrs="{'readonly': ['|',('state','!=','terv'),('mozgasnem', 'not in', ('belso',))], 'required': [('mozgasnem', 'in', ('belso',))]}"
+              <field name="forrashely_id"       attrs="{'readonly': ['|',('state','not in',('terv','elter')),('mozgasnem', 'not in', ('belso',))], 'required': [('mozgasnem', 'in', ('belso',))]}"
                                                 options="{'no_create': True, 'no_open': True}"
                                                 domain="[('belso_szallitas_e', '=', True)]"/>
               <field name="create_uid"          readonly="1"    string="Felvette"/>
               <field name="create_date"         readonly="1"    string="Létrehozás ideje"/>
-              <field name="celallomas_id"       attrs="{'readonly': ['|',('state','!=','terv'),('mozgasnem', 'not in', ('belso','helyesbit'))], 'required': [('mozgasnem', 'in', ('belso','helyesbit'))]}"
+              <field name="celallomas_id"       attrs="{'readonly': ['|',('state','not in',('terv','elter')),('mozgasnem', 'not in', ('belso','helyesbit'))], 'required': [('mozgasnem', 'in', ('belso','helyesbit'))]}"
                                                 options="{'no_create': True, 'no_open': True}"
                                                 domain="[('belso_szallitas_e', '=', True)]"/>
               <field name="write_uid"           readonly="1"    string="Módosította"/>
@@ -248,7 +248,7 @@
             </group>
             <group col="2">
               <field name="forrasdokumentum"    attrs="{'readonly': [('state','!=','terv')]}"/>
-              <field name="megjegyzes"          attrs="{'readonly': [('state','=','konyvelt')]}"/>
+              <field name="megjegyzes"          />
             </group>
             <field name="mozgassor_ids"         attrs="{'readonly': [('state','not in',('terv','elter'))]}"   context="{'mozgasnem': context.get('mozgasnem')}"/>
         </form>
