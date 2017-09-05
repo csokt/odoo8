@@ -305,7 +305,7 @@
           <field name="cikk_id"                 options="{'no_create': True}"   invisible="context.get('mozgasnem') in ('ki',)"               string="Cikkszám____"/>
           <field name="bom_id"                  options="{'no_create': True}"   invisible="context.get('mozgasnem') not in ('ki','belso')"/>
           <field name="cikknev"/>
-          <field name="forrashelyen"            attrs="{'invisible': [('state','in',('szallit','kesz','konyvelt'))]}"/>
+          <field name="forrashelyen"            invisible="context.get('mozgasnem') in ('be',)"   attrs="{'invisible': [('state','in',('szallit','kesz','konyvelt'))]}"/>
           <field name="mennyiseg"/>
           <field name="hibakod_id"              options="{'no_create': True}"   invisible="context.get('mozgasnem') not in ('belso','selejt')"/>
           <field name="megjegyzes"/>
