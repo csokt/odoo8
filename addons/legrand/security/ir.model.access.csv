@@ -16,6 +16,9 @@ access_legrand_hely_group_admin,legrand.hely.admin,model_legrand_hely,group_legr
 access_legrand_hibakod_group_viewer,legrand.hibakod.viewer,model_legrand_hibakod,group_legrand_viewer,1,0,0,0
 access_legrand_hibakod_group_admin,legrand.hibakod.admin,model_legrand_hibakod,group_legrand_admin,1,1,1,0
 
+access_legrand_lir_user_group_viewer,legrand.lir_user.viewer,model_legrand_lir_user,group_legrand_viewer,1,0,0,0
+access_legrand_lir_user_group_admin,legrand.lir_user.admin,model_legrand_lir_user,group_legrand_admin,1,1,1,1
+
 access_legrand_mozgasfej_group_viewer,legrand.mozgasfej.viewer,model_legrand_mozgasfej,group_legrand_viewer,1,0,0,0
 access_legrand_mozgasfej_group_user,legrand.mozgasfej.user,model_legrand_mozgasfej,group_legrand_user,1,1,1,0
 access_legrand_mozgassor_group_viewer,legrand.mozgassor.viewer,model_legrand_mozgassor,group_legrand_viewer,1,0,0,0

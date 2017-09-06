@@ -983,6 +983,21 @@
       </field>
     </record>
 
+    <!--####################################################################################################################  LIR users  -->
+    <record id="view_tree_lir_user"   model="ir.ui.view">
+      <field  name="name">LIR users Tree</field>
+      <field  name="model">legrand.lir_user</field>
+      <field  name="arch" type="xml">
+        <tree editable="top">
+          <field name="user_id"             options="{'no_create': True, 'no_open': True}"/>
+          <field name="qr"/>
+          <field name="pin"/>
+          <field name="role"/>
+          <field name="hely_id"             options="{'no_create': True, 'no_open': True}"/>
+        </tree>
+      </field>
+    </record>
+
     <!--####################################################################################################################  Impex  -->
     <record id="view_tree_legrand_impex"    model="ir.ui.view">
       <field  name="name">Impex Tree</field>
@@ -1081,6 +1096,7 @@
     <act_window id="homogen"            name="Homogén"              res_model="legrand.homogen"                                                       view_mode="tree,form"/>
     <act_window id="hely"               name="Hely"                 res_model="legrand.hely"                                                          view_mode="tree,form"/>
     <act_window id="hibakod"            name="Hibakód"              res_model="legrand.hibakod"                                                       view_mode="tree,form"/>
+    <act_window id="lir_user"           name="LIR felhasználó"      res_model="legrand.lir_user"                                                      view_mode="tree"/>
 
     <!--####################################################################################################################  Menu  items  -->
     <menuitem id="menu_root" name="Legrand" sequence="63" groups="group_legrand_viewer" />
@@ -1132,6 +1148,7 @@
       <menuitem id="menu_homogen"         name="Homogén"                      parent="menu_administrator"         sequence="50" action="homogen" />
       <menuitem id="menu_hely"            name="Helyek"                       parent="menu_administrator"         sequence="60" action="hely" />
       <menuitem id="menu_hibakod"         name="Hibakód"                      parent="menu_administrator"         sequence="70" action="hibakod" />
+      <menuitem id="menu_lir_user"        name="LIR felhasználók"             parent="menu_administrator"         sequence="80" action="lir_user" />
 
   </data>
 </openerp>

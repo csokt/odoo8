@@ -1086,6 +1086,18 @@ class LegrandCikkKeszlet(models.Model):
       % (self._table)
     )
 
+############################################################################################################################  LIR users  ###
+class LegrandLirUser(models.Model):
+  _name               = 'legrand.lir_user'
+  _order              = 'name'
+  user_id             = fields.Many2one('res.users', u'User', required=True)
+  qr                  = fields.Integer(u'QR kód', required=True)
+  pin                 = fields.Integer(u'PIN kód', required=True)
+  role                = fields.Selection([('kodolo',u'Kódoló'),('admin',u'Admin')], u'Szerepkör', default='kodolo', required=True)
+  hely_id             = fields.Many2one('legrand.hely', string=u'Gyártási hely', domain=[('szefo_e', '=', True)], required=True, auto_join=True)
+  # computed fields
+  name                = fields.Char(u'Név', related='user_id.partner_id.name', readonly=True, store=True)
+
 ############################################################################################################################  Impex  ###
 class LegrandImpex(models.Model):
   _name               = 'legrand.impex'
