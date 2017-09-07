@@ -253,6 +253,10 @@
                   <td colspan="3"><span t-field="o.dolgozo_megjegyzese"/></td>
                 </tr>
                 <tr>
+                  <td>Megjegyzés:</td>
+                  <td colspan="3"><span t-field="o.megjegyzes"/></td>
+                </tr>
+                <tr>
                   <td colspan="4" align="center"><h4>Selejteződött alkatrészek</h4></td>
                 </tr>
                 <tr>

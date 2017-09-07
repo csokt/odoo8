@@ -969,6 +969,7 @@ class LegrandMeoJegyzokonyv(models.Model):
   intezkedesek        = fields.Char(u'Intézkedések', required=True)
   javitasi_ido        = fields.Float(u'Javításra fordított idő', digits=(16, 2))
   dolgozo_megjegyzese = fields.Char(u'Dolgozó megjegyzése')
+  megjegyzes          = fields.Char(u'Megjegyzés')
   muszakvezeto_id     = fields.Many2one('nexon.szemely', u'Műszakvezető', auto_join=True)
   gyartaskozi_ell_id  = fields.Many2one('nexon.szemely', u'Gyártásközi ellenőr', auto_join=True)
   keszaru_ell_id      = fields.Many2one('nexon.szemely', u'Készáru ellenőr', auto_join=True)

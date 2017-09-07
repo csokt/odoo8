@@ -914,6 +914,7 @@
             <field name="hiba_leirasa"/>
             <field name="intezkedesek"/>
             <field name="dolgozo_megjegyzese"/>
+            <field name="megjegyzes"/>
           </group>
           <group col="4">
             <field name="visszaadott_db"/>
@@ -928,6 +929,22 @@
             <field name="meo_jkv_selejt_ids"/>
           </sheet>
         </form>
+      </field>
+    </record>
+
+    <record id="view_tree_meo_jegyzokonyv"    model="ir.ui.view">
+      <field  name="name">MEO jegyzőkönyv Tree</field>
+      <field  name="model">legrand.meo_jegyzokonyv</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <tree>
+          <field name="id"                    string="Jegyzőkönyv száma"/>
+          <field name="hely_id"/>
+          <field name="dolgozo_id"/>
+          <field name="gylap_szefo_muv_id1"/>
+          <field name="hiba_leirasa"/>
+          <field name="create_date"           string="Létrehozás ideje"/>
+        </tree>
       </field>
     </record>
 
