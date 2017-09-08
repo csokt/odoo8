@@ -167,7 +167,13 @@ class LegrandMozgasfej(models.Model):
   forrasdokumentum    = fields.Char(u'Forrásdokumentum')
   megjegyzes          = fields.Char(u'Megjegyzés')
   # virtual fields
+  mozgassor_irhato_e  = fields.Boolean(u'Tételek írható?', compute='_compute_mozgassor_irhato_e')
   mozgassor_ids       = fields.One2many('legrand.mozgassor', 'mozgasfej_id', u'Tételek', auto_join=True)
+
+  @api.one
+  @api.depends()
+  def _compute_mozgassor_irhato_e(self):
+    self.mozgassor_irhato_e = self.state == 'terv' or self.state == 'elter' and self.env.user.has_group('legrand.group_legrand_manager')
 
   @api.model
   def create(self, vals):
@@ -674,15 +680,16 @@ class LegrandGyartasiLap(models.Model):
   def _compute_cikkhiany(self):
     hiany, count = '', 0
     ids = self.bom_id.bom_line_ids.mapped('cikk_id.id')
-    query = 'SELECT id, elerheto FROM legrand_cikk_keszlet WHERE id in ({0})'.format(','.join(str(e) for e in ids))
-    self.env.cr.execute(query)
-    elerheto_dict = dict(self.env.cr.fetchall())
-    for line in self.bom_id.bom_line_ids:
-      ossz_beep = self.modositott_db * line.beepules
-      elerheto  = max(elerheto_dict[line.cikk_id.id], 0.0)
-      if ossz_beep > elerheto:
-        hiany += '{0} ({1}), '.format(line.cikk_id.cikkszam, elerheto-ossz_beep)
-        count += 1
+    if len(ids):
+      query = 'SELECT id, elerheto FROM legrand_cikk_keszlet WHERE id in ({0})'.format(','.join(str(e) for e in ids))
+      self.env.cr.execute(query)
+      elerheto_dict = dict(self.env.cr.fetchall())
+      for line in self.bom_id.bom_line_ids:
+        ossz_beep = self.modositott_db * line.beepules
+        elerheto  = max(elerheto_dict[line.cikk_id.id], 0.0)
+        if ossz_beep > elerheto:
+          hiany += '{0} ({1}), '.format(line.cikk_id.cikkszam, elerheto-ossz_beep)
+          count += 1
     self.cikkhiany = hiany
     self.cikkhiany_count = count
 
