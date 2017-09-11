@@ -171,9 +171,9 @@ class LegrandMozgasfej(models.Model):
   mozgassor_ids       = fields.One2many('legrand.mozgassor', 'mozgasfej_id', u'Tételek', auto_join=True)
 
   @api.one
-  @api.depends()
+  @api.depends('state')
   def _compute_mozgassor_irhato_e(self):
-    self.mozgassor_irhato_e = self.state == 'terv' or self.state == 'elter' and self.env.user.has_group('legrand.group_legrand_manager')
+    self.mozgassor_irhato_e = self.state == 'terv' or (self.state == 'elter' and self.env.user.has_group('legrand.group_legrand_manager'))
 
   @api.model
   def create(self, vals):
