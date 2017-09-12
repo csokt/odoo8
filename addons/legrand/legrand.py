@@ -1137,7 +1137,7 @@ class LegrandImpex(models.Model):
   @api.one
   @api.depends('mennyiseg', 'gyartasi_lap_id')
   def _compute_ora(self):
-    self.ora = self.gyartasi_lap_id.rendelt_ora * self.mennyiseg / self.gyartasi_lap_id.rendelt_db if self.gyartasi_lap_id else 0.0
+    self.ora = self.gyartasi_lap_id.rendelt_ora * self.mennyiseg / self.gyartasi_lap_id.modositott_db if self.gyartasi_lap_id else 0.0
 
   @api.one
   @api.depends('cikk_id', 'bom_id')
