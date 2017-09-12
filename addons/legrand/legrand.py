@@ -1104,7 +1104,8 @@ class LegrandLirUser(models.Model):
   role                = fields.Selection([('kodolo',u'Kódoló'),('admin',u'Admin')], u'Szerepkör', default='kodolo', required=True)
   hely_id             = fields.Many2one('legrand.hely', string=u'Gyártási hely', domain=[('szefo_e', '=', True)], required=True, auto_join=True)
   # computed fields
-  name                = fields.Char(u'Név', related='user_id.partner_id.name', readonly=True, store=True)
+  name                = fields.Char(u'Név',  related='user_id.partner_id.name', readonly=True, store=True)
+  hely                = fields.Char(u'Hely', related='hely_id.name', readonly=True, store=True)
 
 ############################################################################################################################  Impex  ###
 class LegrandImpex(models.Model):
