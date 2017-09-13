@@ -618,9 +618,14 @@
             <field name="szamlazott_db"       />
 
             <field name="hatarido"            />
-            <field name="hatarido_str"/>
-            <field name="kiadas_ideje"/>
+            <field name="hatarido_str"        />
+            <field name="kiadas_ideje"        />
             <field name="szamlazhato_db"      />
+
+            <field name="raklap"              />
+            <field name="raklap_min"          />
+            <field name="raklap_max"          />
+            <field name="rakat_tipus"         />
 
             <field name="javitas_e"           />
             <field name="muveletek_elvegezve" />

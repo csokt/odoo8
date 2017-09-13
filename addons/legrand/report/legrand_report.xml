@@ -139,14 +139,20 @@
               <h4 style="text-align: right;">Gyártási lap #<b><span t-field="o.id"/></b></h4>
               <table class="table table-condensed table-bordered">
                 <tr>
-                  <td>Gyártási rend:</td>               <td><b><span t-field="o.rendelesszam"/></b></td>
-                  <td align="right">Kiadás:</td>        <td><span t-field="o.kiadas_ideje"/></td>
-                  <td align="right">Rendelt db:</td>    <td><b><span t-field="o.rendelt_db"/></b></td>
-                  <td align="right">Határidő:</td>      <td><span t-field="o.hatarido"/></td>
+                  <td>Gyártási rend:</td>               <td> <b><span t-field="o.rendelesszam"/></b> </td>
+                  <td align="right">Kiadás:</td>        <td> <span t-field="o.kiadas_ideje"/> </td>
+                  <td align="right">Rendelt db:</td>    <td> <b><span t-field="o.rendelt_db"/></b> </td>
+                  <td align="right">Határidő:</td>      <td> <span t-field="o.hatarido"/> </td>
                 </tr>
                 <tr>
                   <td>Referencia:</td>                  <td colspan="3"><span t-field="o.cikk_id"/> <span t-field="o.cikk_id.cikknev"/> </td>
-                  <td align="right">Jegyzet:</td>       <td colspan="3"><span t-field="o.jegyzet"/></td>
+                  <td align="right">Jegyzet:</td>       <td colspan="3"><span t-field="o.jegyzet"/> </td>
+                </tr>
+
+                <tr>
+                  <td>Raklap:</td>                      <td colspan="3"><span t-field="o.raklap"/> </td>
+                  <td align="right">Raklap min:</td>    <td> <span t-field="o.raklap_min"/> </td>
+                  <td align="right">Raklap max:</td>    <td> <span t-field="o.raklap_max"/> </td>
                 </tr>
 <!--
 -->

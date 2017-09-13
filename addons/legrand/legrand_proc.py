@@ -140,12 +140,15 @@ class LegrandParameter(models.Model):
         'hatarido_str'  : fej['hatarido_str'],
         'hatarido'      : hatarido,
         'jegyzet'       : fej['jegyzet'],
+        'raklap'        : fej['raklap'],
+        'raklap_min'    : fej['raklap_min'],
+        'raklap_max'    : fej['raklap_max'],
+        'rakat_tipus'   : fej['rakat_tipus'],
         'cikkek_uid'    : gylap_cikkek_uid,
         'bom_id'        : bom.id,
         'javitas_e'     : javitas_e,
       }
       gyartlap = Gyartlap.create(gyartlap_row)
-#      gyartlap_row['hatarido'] = str(hatarido)
 #      pub(self.env, gyartlap_row)
 
       # gylap_dbjegyzek feltöltés ###############################################
