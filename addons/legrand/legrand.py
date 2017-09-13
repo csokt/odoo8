@@ -638,19 +638,19 @@ class LegrandGyartasiLap(models.Model):
     self.hatralek_db = self.modositott_db - self.teljesitett_db
 
   @api.one
-  @api.depends('gylap_homogen_ids')
+  @api.depends('gylap_homogen_ids.rendelt_ora')
   def _compute_rendelt_ora(self):
-    self.rendelt_ora = sum(map(lambda r: r.ossz_ido+r.beall_ido, self.gylap_homogen_ids.filtered('sajat'))) * self.modositott_db / self.rendelt_db
+    self.rendelt_ora = sum(self.gylap_homogen_ids.filtered('sajat').mapped('rendelt_ora'))
 
   @api.one
-  @api.depends('rendelt_ora', 'teljesitett_db', 'modositott_db')
+  @api.depends('gylap_homogen_ids.teljesitett_ora')
   def _compute_teljesitett_ora(self):
-    self.teljesitett_ora = self.rendelt_ora * self.teljesitett_db / self.modositott_db
+    self.teljesitett_ora = sum(self.gylap_homogen_ids.filtered('sajat').mapped('teljesitett_ora'))
 
   @api.one
-  @api.depends('rendelt_ora', 'szamlazott_db', 'modositott_db')
+  @api.depends('gylap_homogen_ids.szamlazott_ora')
   def _compute_szamlazott_ora(self):
-    self.szamlazott_ora = self.rendelt_ora * self.szamlazott_db / self.modositott_db
+    self.szamlazott_ora = sum(self.gylap_homogen_ids.filtered('sajat').mapped('szamlazott_ora'))
 
   @api.one
   @api.depends('cikk_id')
@@ -804,15 +804,15 @@ class LegrandGylapHomogen(models.Model):
   name                = fields.Char(u'Azonosító', compute='_compute_name', store=True)
   gyartasi_lap_id     = fields.Many2one('legrand.gyartasi_lap',  u'Gyártási lap', readonly=True, auto_join=True)
   termekcsalad        = fields.Char(u'Termékcsalád', related='gyartasi_lap_id.termekcsalad', readonly=True, store=True)
-#  homogen             = fields.Char(u'sHomogén', readonly=True)
   homogen_id          = fields.Many2one('legrand.homogen',  u'Homogén', readonly=True, auto_join=True)
-  ossz_ido            = fields.Float(u'Összes idő', digits=(16, 5), readonly=True)
-  beall_ido           = fields.Float(u'Beállítási idő', digits=(16, 3), readonly=True)
-  korrekcios_ido      = fields.Float(u'Korrekciós idő', digits=(16, 3))
-  potido              = fields.Float(u'Pótidő', digits=(16, 3), readonly=True)
-  sajat               = fields.Boolean(u'Saját homogén?', default=True, readonly=True)
-  teljesitett_ora     = fields.Float(u'Teljesített óra', digits=(16, 5), compute='_compute_teljesitett_ora', store=True)
-  szamlazhato_ora     = fields.Float(u'Számlázható óra', digits=(16, 5), compute='_compute_szamlazhato_ora', store=True)
+  ossz_ido            = fields.Float(u'Összes idő',       digits=(16, 5), readonly=True)
+  beall_ido           = fields.Float(u'Beállítási idő',   digits=(16, 3), readonly=True)
+  korrekcios_ido      = fields.Float(u'Korrekciós idő',   digits=(16, 3))
+  sajat               = fields.Boolean(u'Saját homogén?', default=True,   readonly=True)
+  rendelt_ora         = fields.Float(u'Rendelt óra',      digits=(16, 5), compute='_compute_rendelt_ora',     store=True)
+  teljesitett_ora     = fields.Float(u'Teljesített óra',  digits=(16, 5), compute='_compute_teljesitett_ora', store=True)
+  szamlazott_ora      = fields.Float(u'Számlázott óra',   digits=(16, 5), compute='_compute_szamlazott_ora',  store=True)
+  szamlazhato_ora     = fields.Float(u'Számlázható óra',  digits=(16, 5), compute='_compute_szamlazhato_ora', store=True)
   # virtual fields
   state               = fields.Selection([('uj',u'Új'),('mterv',u'Műveletterv'),('gyartas',u'Gyártás'),('gykesz',u'Gyártás kész'),('kesz',u'Rendelés teljesítve')],
                                         u'Gy.lap állapot', related='gyartasi_lap_id.state', readonly=True)
@@ -828,18 +828,33 @@ class LegrandGylapHomogen(models.Model):
     self.name = str(self.gyartasi_lap_id.id)+'/'+self.homogen_id.homogen
 
   @api.one
-  @api.depends('ossz_ido', 'beall_ido', 'korrekcios_ido', 'potido', 'gyartasi_lap_id.rendelt_db', 'gyartasi_lap_id.teljesitett_db')
-  def _compute_teljesitett_ora(self):
-    ossz_ido  = self.ossz_ido * self.gyartasi_lap_id.teljesitett_db / self.gyartasi_lap_id.rendelt_db
-    beall_ido = self.beall_ido if self.gyartasi_lap_id.teljesitett_db > 0 else 0.0
-    self.teljesitett_ora = ossz_ido + beall_ido + self.korrekcios_ido + self.potido
+  @api.depends('ossz_ido', 'beall_ido', 'korrekcios_ido', 'gyartasi_lap_id.rendelt_db', 'gyartasi_lap_id.modositott_db')
+  def _compute_rendelt_ora(self):
+    ossz_ido        = self.ossz_ido * self.gyartasi_lap_id.modositott_db / self.gyartasi_lap_id.rendelt_db
+    korrekcios_ido  = self.korrekcios_ido * self.gyartasi_lap_id.modositott_db / self.gyartasi_lap_id.rendelt_db
+    beall_ido       = self.beall_ido if self.gyartasi_lap_id.modositott_db > 0 else 0.0
+    self.rendelt_ora = ossz_ido + beall_ido + korrekcios_ido
 
   @api.one
-  @api.depends('ossz_ido', 'beall_ido', 'korrekcios_ido', 'gyartasi_lap_id.rendelt_db', 'gyartasi_lap_id.szamlazhato_db', 'gyartasi_lap_id.szamlazott_db')
+  @api.depends('ossz_ido', 'beall_ido', 'korrekcios_ido', 'gyartasi_lap_id.rendelt_db', 'gyartasi_lap_id.teljesitett_db')
+  def _compute_teljesitett_ora(self):
+    ossz_ido        = self.ossz_ido * self.gyartasi_lap_id.teljesitett_db / self.gyartasi_lap_id.rendelt_db
+    korrekcios_ido  = self.korrekcios_ido * self.gyartasi_lap_id.teljesitett_db / self.gyartasi_lap_id.rendelt_db
+    beall_ido       = self.beall_ido if self.gyartasi_lap_id.teljesitett_db > 0 else 0.0
+    self.teljesitett_ora = ossz_ido + beall_ido + korrekcios_ido
+
+  @api.one
+  @api.depends('ossz_ido', 'beall_ido', 'korrekcios_ido', 'gyartasi_lap_id.rendelt_db', 'gyartasi_lap_id.szamlazott_db')
+  def _compute_szamlazott_ora(self):
+    ossz_ido        = self.ossz_ido * self.gyartasi_lap_id.szamlazott_db / self.gyartasi_lap_id.rendelt_db
+    korrekcios_ido  = self.korrekcios_ido * self.gyartasi_lap_id.szamlazott_db / self.gyartasi_lap_id.rendelt_db
+    beall_ido       = self.beall_ido if self.gyartasi_lap_id.szamlazott_db > 0 else 0.0
+    self.szamlazott_ora = ossz_ido + beall_ido + korrekcios_ido
+
+  @api.one
+  @api.depends('szamlazott_ora', 'teljesitett_ora')
   def _compute_szamlazhato_ora(self):
-    ossz_ido   = self.ossz_ido * self.gyartasi_lap_id.szamlazhato_db / self.gyartasi_lap_id.rendelt_db
-    beall_ido  = self.beall_ido if self.gyartasi_lap_id.szamlazott_db == 0 else 0.0
-    self.szamlazhato_ora = ossz_ido + beall_ido + self.korrekcios_ido
+    self.szamlazhato_ora = self.teljesitett_ora - self.szamlazott_ora
 
   @api.one
   def toggle_sajat(self):

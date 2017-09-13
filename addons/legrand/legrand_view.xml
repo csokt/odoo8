@@ -803,7 +803,6 @@
           <field name="ossz_ido"/>
           <field name="beall_ido"/>
           <field name="korrekcios_ido"/>
-          <field name="potido"/>
           <field name="state"                 invisible="1"/>
         </tree>
       </field>
@@ -818,8 +817,10 @@
           <field name="rendelesszam"/>
           <field name="termekkod"/>
           <field name="szamlazhato_db"/>
+          <field name="rendelt_ora"/>
+          <field name="teljesitett_ora"/>
+          <field name="szamlazott_ora"/>
           <field name="szamlazhato_ora"       string="Óra"  sum="munkaóra + beáll.idő összesen"/>
-          <field name="potido"                              sum="pótidő összesen"/>
           <field name="homogen_id"/>
           <field name="termekcsalad"/>
           <field name="hatarido"/>
