@@ -335,6 +335,59 @@ class LegrandMozgassor(models.Model):
   def _compute_forrashelyen(self):
     self.forrashelyen = self.env['legrand.keszlet'].search([('cikk_id', '=', self.cikk_id.id), ('hely_id', '=', self.forrashely_id.id)]).raktaron
 
+############################################################################################################################  Cikk mozgás  ###
+class LegrandCikkMozgas(models.Model):
+  _name = 'legrand.cikk_mozgas'
+  _auto = False
+  _rec_name = 'cikk_id'
+  _order = 'mozgasfej_id'
+  state               = fields.Selection([('terv',u'Tervezet'),('szallit',u'Szállítás'),('elter',u'Átszállítva eltérésekkel'),('kesz',u'Átszállítva'),('konyvelt',u'Könyvelve')],
+                        u'Állapot', readonly=True)
+  mozgasnem           = fields.Selection([('be',u'Alkatrész bevételezés'),('ki',u'Termék kiszállítás'),('belso',u'Belső szállítás'),
+                                          ('helyesbit',u'Készlethelyesbítés'),('vissza',u'Alkatrész visszaszállítás'),('selejt',u'Selejt visszaszállítás')],
+                                          u'Mozgásnem', readonly=True)
+  mozgasfej_id        = fields.Integer(u'Mozgásfej')
+  forrashely_id       = fields.Many2one('legrand.hely',       u'Forráshely',        readonly=True, auto_join=True)
+  celallomas_id       = fields.Many2one('legrand.hely',       u'Célállomás helye',  readonly=True, auto_join=True)
+  cikk_id             = fields.Many2one('legrand.cikk',       u'Cikkszám',          readonly=True, auto_join=True)
+  bom_id              = fields.Many2one('legrand.bom',        u'Anyagjegyzék',      readonly=True, auto_join=True)
+  mennyiseg           = fields.Float(u'Mennyiség', digits=(16, 2), readonly=True)
+  datum               = fields.Date(u'Létrehozás ideje', readonly=True)
+  # virtual fields
+  cikknev             = fields.Char(u'Cikknév', related='cikk_id.cikknev', readonly=True)
+
+  def init(self, cr):
+    tools.drop_view_if_exists(cr, self._table)
+    cr.execute(
+      """CREATE or REPLACE VIEW %s as (
+        SELECT
+          row_number() over() AS id,
+          state,
+          mozgasnem,
+          mozgasfej_id,
+          forrashely_id,
+          celallomas_id,
+          cikk_id,
+          bom_id,
+          mennyiseg,
+          datum
+        FROM (
+          SELECT fej.id AS mozgasfej_id, fej.forrashely_id, fej.celallomas_id, sor.cikk_id, sor.bom_id, sor.mennyiseg AS mennyiseg, fej.state, fej.mozgasnem, sor.create_date AS datum
+          FROM legrand_mozgassor AS sor
+          JOIN legrand_mozgasfej AS fej  ON fej.id  = sor.mozgasfej_id
+          WHERE cikk_id > 0
+          UNION ALL
+          SELECT fej.id AS mozgasfej_id, fej.forrashely_id, fej.celallomas_id, line.cikk_id, sor.bom_id, sor.mennyiseg*line.beepules AS mennyiseg, fej.state, fej.mozgasnem, sor.create_date
+          FROM legrand_mozgassor AS sor
+          JOIN legrand_mozgasfej AS fej  ON fej.id  = sor.mozgasfej_id
+          JOIN legrand_bom_line  AS line ON sor.bom_id = line.bom_id
+          WHERE sor.bom_id > 0
+        ) AS move
+        WHERE (forrashely_id = 1 OR celallomas_id = 1)
+      )"""
+      % (self._table)
+    )
+
 ############################################################################################################################  Anyagigénylés  ###
 class LegrandAnyagigeny(models.Model):
   _name               = 'legrand.anyagigeny'
