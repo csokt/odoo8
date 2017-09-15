@@ -1017,8 +1017,10 @@ class LegrandMuveletvegzes(models.Model):
 class LegrandFeljegyzes(models.Model):
   _name               = 'legrand.feljegyzes'
   _order              = 'id desc'
+  tema                = fields.Selection([('napi',u'Napi jelentés'),('egyeb',u'Egyéb')], u'Téma', default='napi', required=True)
+  hely_id             = fields.Many2one('legrand.hely', u'Üzem', domain=[('belso_szallitas_e', '=', True)], auto_join=True)
   gyartasi_lap_id     = fields.Many2one('legrand.gyartasi_lap',  u'Gyártási lap', auto_join=True)
-  cikk_id             = fields.Many2one('legrand.cikk',  u'Cikkszám', required=True, auto_join=True)
+  cikk_id             = fields.Many2one('legrand.cikk',  u'Cikkszám', auto_join=True)
   feljegyzes          = fields.Char(u'Feljegyzés', required=True)
   # virtual fields
   cikknev             = fields.Char(u'Cikknév', related='cikk_id.cikknev', readonly=True)
