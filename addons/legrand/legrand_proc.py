@@ -90,7 +90,7 @@ class LegrandParameter(models.Model):
       # cikk, bom, bom_line feltöltés #########################################
       cikk = Cikk.search([('cikkszam', 'ilike', termekkod)], limit=1)
       if not len(cikk):
-        cikk = Cikk.create({'cikkszam': termekkod, 'cikknev': fej['megnevezes'], 'alkatresz_e': False})
+        cikk = Cikk.create({'cikkszam': termekkod, 'cikknev': fej['megnevezes'], 'kesztermek_e': True})
       for alk in gylap['darabjegyzek']:
         cikkszam = alk['cikkszam']
         if cikkszam == 'referencia': continue
@@ -105,12 +105,14 @@ class LegrandParameter(models.Model):
           for muv in gylap['muveleti_utasitas']:
             if muv['muveleti_szam'] == 'msz': continue
             muv_row = {
-              'cikk_id'         : cikk.id,
-              'muveletszam'     : muv['muveleti_szam'],
-              'muveletnev'      : muv['megnevezes'],
-              'fajlagos_db'     : 1,
-              'normaora'        : muv['ossz_ido'] / fej['rendelt_db'],
-              'beall_ido'       : muv['beall_ido'],
+              'cikk_id'           : cikk.id,
+              'muveletszam'       : muv['muveleti_szam'],
+              'muveletnev'        : muv['megnevezes'],
+              'fajlagos_db'       : 1,
+              'normaora'          : muv['ossz_ido'] / fej['rendelt_db'],
+              'beall_ido'         : muv['beall_ido'],
+              'legrand_normaora'  : muv['ossz_ido'] / fej['rendelt_db'],
+              'legrand_beall_ido' : muv['beall_ido'],
             }
             Muvelet.create(muv_row)
 
@@ -200,12 +202,14 @@ class LegrandParameter(models.Model):
         for muv in gylap['muveleti_utasitas']:
           if muv['muveleti_szam'] == 'msz': continue
           muv_row = {
-            'gyartasi_lap_id' : gyartlap.id,
-            'muveletszam'     : muv['muveleti_szam'],
-            'muveletnev'      : muv['megnevezes'],
-            'fajlagos_db'     : 1,
-            'normaora'        : muv['ossz_ido'] / fej['rendelt_db'],
-            'beall_ido'       : muv['beall_ido'],
+            'gyartasi_lap_id'   : gyartlap.id,
+            'muveletszam'       : muv['muveleti_szam'],
+            'muveletnev'        : muv['megnevezes'],
+            'fajlagos_db'       : 1,
+            'normaora'          : muv['ossz_ido'] / fej['rendelt_db'],
+            'beall_ido'         : muv['beall_ido'],
+            'legrand_normaora'  : muv['ossz_ido'] / fej['rendelt_db'],
+            'legrand_beall_ido' : muv['beall_ido'],
           }
           SzMuvelet.create(muv_row)
       doc.imported = True
@@ -245,6 +249,7 @@ class LegrandParameter(models.Model):
   def gylap_ellenorzes(self):
     Impex = self.env['legrand.impex']
     Impex.search([]).unlink()
+
     for gylap in self.env['legrand.gyartasi_lap'].search([('state', '!=', 'kesz')]):
       megjegyzes = ''
       if gylap.teljesitett_db > 0 and gylap.state in ('mterv', 'uj'): megjegyzes = 'Teljesítés történt, a gyártást el kell elindítani.'
@@ -257,18 +262,33 @@ class LegrandParameter(models.Model):
           'megjegyzes'    : megjegyzes,
         }
         Impex.create(impex_row)
+
     datum = fields.Datetime.to_string(datetime.datetime.combine(datetime.date.today(), datetime.time(0)) - datetime.timedelta(days=0))
     for fej in self.env['legrand.mozgasfej'].search([('mozgasnem','=','belso'), ('state','!=','konyvelt'), ('write_date','<',datum)]):
-#    for fej in self.env['legrand.mozgasfej'].search([('state','!=','konyvelt')]):
-      if fej.state   == 'terv':     megjegyzes = 'A szállítólevelet véglegesíteni kell.'
-      elif fej.state == 'szallit':  megjegyzes = 'A szállítólevél átvételét rögzíteni kell.'
-      else:                         megjegyzes = 'A szállítólevél másodpéldányát be kell küldeni könyvelésre.'
+      if fej.state   == 'terv':
+        hely_id    = fej.forrashely_id.id
+        megjegyzes = 'A szállítólevelet véglegesíteni kell.'
+      elif fej.state == 'szallit':
+        hely_id    = fej.celallomas_id.id
+        megjegyzes = 'A szállítólevél átvételét rögzíteni kell.'
+      else:
+        hely_id    = False
+        megjegyzes = 'A szállítólevél nincs könyvelve.'
       impex_row = {
         'sorszam'     : fej.id,
-        'hely_id'     : fej.forrashely_id.id if fej.state == 'terv' else fej.celallomas_id.id,
+        'hely_id'     : hely_id,
         'megjegyzes'  : megjegyzes,
       }
       Impex.create(impex_row)
+
+    for cikk in self.env['legrand.vall_keszlet'].search([('szefo_keszlet', '<', 0.0)], order='szefo_keszlet'):
+      impex_row = {
+        'cikk_id'     : cikk.cikk_id.id,
+        'mennyiseg'   : cikk.szefo_keszlet,
+        'megjegyzes'  : 'Vállalati készlet negatív',
+      }
+      Impex.create(impex_row)
+
     return True
 
   @api.one

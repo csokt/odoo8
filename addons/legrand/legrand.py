@@ -612,8 +612,10 @@ class LegrandMuvelet(models.Model):
   muveletszam         = fields.Integer(u'Műveletszám', required=True)
   muveletnev          = fields.Char(u'Műveletnév', required=True)
   fajlagos_db         = fields.Integer(u'Fajlagos db', default = 1, required=True)
-  normaora            = fields.Float(u'Normaóra', digits=(16, 8), required=True)
-  beall_ido           = fields.Float(u'Beállítási idő', digits=(16, 5), required=True)
+  normaora            = fields.Float(u'SZEFO normaóra', digits=(16, 8))
+  beall_ido           = fields.Float(u'SZEFO beállítási idő', digits=(16, 5))
+  legrand_normaora    = fields.Float(u'Legrand normaóra', digits=(16, 8))
+  legrand_beall_ido   = fields.Float(u'Legrand beállítási idő', digits=(16, 5))
   # virtual fields
 
   @api.one

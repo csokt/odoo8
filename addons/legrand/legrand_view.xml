@@ -92,6 +92,7 @@
               <field name="beepulok_ids"          attrs="{'invisible': [('kesztermek_e','=',False)]}" widget="many2many_tags" options="{'no_create': True}"/>
             </group>
             <field name="muvelet_ids"             attrs="{'invisible': [('kesztermek_e','=',False)]}"/>
+            <div>&#x2063;</div>
             <field name="lezer_tampon_ids"        attrs="{'invisible': [('kesztermek_e','=',False)]}"/>
             <field name="feljegyzes_ids">
               <tree editable="top">
@@ -593,8 +594,10 @@
           <field name="muveletszam"/>
           <field name="muveletnev"/>
           <field name="fajlagos_db"/>
-          <field name="normaora"/>
-          <field name="beall_ido"/>
+          <field name="legrand_normaora"    sum="legrand"/>
+          <field name="legrand_beall_ido"   sum="legrand"/>
+          <field name="normaora"            sum="szefo"/>
+          <field name="beall_ido"           sum="szefo"/>
         </tree>
       </field>
     </record>
@@ -661,6 +664,7 @@
           <sheet>
             <button name="update_gylap_szefo_muvelet" type="object" string="Műveletek frissítése" attrs="{'invisible': ['|',('javitas_e','=',True),('state','!=','uj')]}"/>
             <field name="szefo_muvelet_ids"   />
+            <div>&#x2063;</div>
             <field name="lezer_tampon_ids"   />
             <field name="gylap_homogen_ids"   />
             <field name="gylap_dbjegyzek_ids" />
@@ -768,9 +772,9 @@
           <field name="muveletszam"/>
           <field name="muveletnev"/>
           <field name="fajlagos_db"/>
-          <field name="normaora"/>
-          <field name="beall_ido"/>
-          <field name="osszes_ido"/>
+          <field name="normaora"        sum="normaóra"/>
+          <field name="beall_ido"       sum="beáll.idő"/>
+          <field name="osszes_ido"      sum="összes idő"/>
           <field name="osszes_db"/>
           <field name="kesz_db"/>
           <field name="elter_db"/>
@@ -886,8 +890,8 @@
           <field name="muveleti_szam"/>
           <field name="homogen_id"/>
           <field name="megnevezes"/>
-          <field name="ossz_ido"/>
-          <field name="beall_ido"/>
+          <field name="ossz_ido"        sum="össz.idő"/>
+          <field name="beall_ido"       sum="beáll.idő"/>
         </tree>
       </field>
     </record>
