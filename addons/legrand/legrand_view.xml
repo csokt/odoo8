@@ -692,6 +692,7 @@
           <field name="teljesitett_ora"       sum="teljesített óra"/>
           <field name="szamlazott_ora"        sum="számlázott óra"/>
           <field name="utolso_feljegyzes"/>
+          <field name="feljegyzes_ideje"/>
           <field name="state"/>
         </tree>
       </field>

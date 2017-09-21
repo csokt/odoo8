@@ -662,6 +662,7 @@ class LegrandGyartasiLap(models.Model):
   teljesitett_ora     = fields.Float(u'Teljesített óra',  digits=(16, 2), compute='_compute_teljesitett_ora')
   szamlazott_ora      = fields.Float(u'Számlázott óra',   digits=(16, 2), compute='_compute_szamlazott_ora')
   utolso_feljegyzes   = fields.Char(u'Utolsó feljegyzés', compute='_compute_utolso_feljegyzes')
+  feljegyzes_ideje    = fields.Char(u'Feljegyzés ideje',  compute='_compute_utolso_feljegyzes')
   check_cikkek_uid    = fields.Char(u'Ellenőrzés', compute='_compute_check_cikkek_uid')
   cikkhiany           = fields.Char(u'Cikkhiány', compute='_compute_cikkhiany')
   cikkhiany_count     = fields.Integer(u'Cikkhiány db', compute='_compute_cikkhiany')
@@ -710,7 +711,9 @@ class LegrandGyartasiLap(models.Model):
   @api.one
   @api.depends('cikk_id')
   def _compute_utolso_feljegyzes(self):
-    self.utolso_feljegyzes = self.env['legrand.feljegyzes'].search([('gyartasi_lap_id', '=', self.id)], limit=1, order='id desc').feljegyzes
+    utolso = self.env['legrand.feljegyzes'].search([('gyartasi_lap_id', '=', self.id)], limit=1, order='id desc')
+    self.utolso_feljegyzes = utolso.feljegyzes
+    self.feljegyzes_ideje  = utolso.create_date
 
   @api.one
   @api.depends('bom_id')
