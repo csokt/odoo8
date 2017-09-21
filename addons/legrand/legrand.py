@@ -102,7 +102,7 @@ class LegrandBom(models.Model):
       sor_row = {
         'bom_id'            : self.id,
         'cikk_id'           : impex.cikk_id.id,
-        'beepules'          : impex.ertek,
+        'beepules'          : impex.beepules,
       }
       self.env['legrand.bom_line'].create(sor_row)
     return True
@@ -113,7 +113,7 @@ class LegrandBom(models.Model):
     for alk in self.bom_line_ids:
       impex_row = {
         'cikk_id'         : alk.cikk_id.id,
-        'ertek'           : alk.beepules,
+        'beepules'        : alk.beepules,
       }
       self.env['legrand.impex'].create(impex_row)
     return True
@@ -1191,6 +1191,7 @@ class LegrandImpex(models.Model):
   mennyiseg           = fields.Float(u'Mennyiség', digits=(16, 2))
   ertek               = fields.Float(u'Érték', digits=(16, 2))
   datum               = fields.Datetime(u'Dátum')
+  beepules            = fields.Float(u'Beépülés', digits=(16, 8))
   megjegyzes          = fields.Char(u'Megjegyzés')
   gyartasi_lap_id     = fields.Many2one('legrand.gyartasi_lap',  u'Gyártási_lap id', auto_join=True)
   cikk_id             = fields.Many2one('legrand.cikk',  u'Cikk id', auto_join=True)

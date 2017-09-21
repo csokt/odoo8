@@ -141,7 +141,7 @@
       <field  name="priority" eval="15"/>
       <field  name="arch" type="xml">
         <form>
-            <button name="import_impex"   type="object"   string="Impexből import"
+            <button name="import_impex"   type="object"   string="Impexből import"      attrs="{'invisible': [('admin_e', '=', False), ('count_mozgassor_ids','>',0)]}"
                                           confirm="Adatok importálása az impex adattáblából."/>
             <button name="export_impex"   type="object"   string="Impexbe export"
                                           confirm="Adatok exportálása az impex adattáblába."/>
@@ -1080,6 +1080,7 @@
           <field name="ertek"/>
           <field name="ora"                 sum="db összesen"/>
           <field name="datum"/>
+          <field name="beepules"/>
           <field name="homogen_id"/>
           <field name="hely_id"/>
           <field name="hibakod_id"/>
