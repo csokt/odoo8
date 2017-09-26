@@ -666,7 +666,7 @@ class LegrandGyartasiLap(models.Model):
   check_cikkek_uid    = fields.Char(u'Ellenőrzés', compute='_compute_check_cikkek_uid')
   cikkhiany           = fields.Char(u'Cikkhiány', compute='_compute_cikkhiany')
   cikkhiany_count     = fields.Integer(u'Cikkhiány db', compute='_compute_cikkhiany')
-  depo_db             = fields.Integer(u'Depó db', compute='_compute_depo_db')
+#  depo_db             = fields.Integer(u'Depó db', compute='_compute_depo_db')
   szefo_muvelet_ids   = fields.One2many('legrand.gylap_szefo_muvelet',  'gyartasi_lap_id', u'Szefo műveletek',      readonly=True,  states={'uj': [('readonly', False)]}, auto_join=True)
   lezer_tampon_ids    = fields.One2many('legrand.lezer_tampon',         'termek_id',       u'Lézer, tampon',        readonly=True,  related='cikk_id.lezer_tampon_ids', auto_join=True)
   gylap_homogen_ids   = fields.One2many('legrand.gylap_homogen',        'gyartasi_lap_id', u'Homogén',              states={'kesz': [('readonly', True)]}, auto_join=True)
@@ -751,11 +751,11 @@ class LegrandGyartasiLap(models.Model):
     self.cikkhiany = hiany
     self.cikkhiany_count = count
 
-  @api.one
-  @api.depends()
-  def _compute_depo_db(self):
-    hely_id = self.env['legrand.hely'].search([('azonosito','=','depo')]).id
-    self.depo_db = self.env['legrand.anyagjegyzek_keszlet'].search([('bom_id', '=', self.bom_id.id),('hely_id','=',hely_id)]).raktaron
+#  @api.one
+#  @api.depends()
+#  def _compute_depo_db(self):
+#    hely_id = self.env['legrand.hely'].search([('azonosito','=','depo')]).id
+#    self.depo_db = self.env['legrand.anyagjegyzek_keszlet'].search([('bom_id', '=', self.bom_id.id),('hely_id','=',hely_id)]).raktaron
 
   @api.one
   def state2uj(self):

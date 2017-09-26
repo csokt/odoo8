@@ -685,7 +685,6 @@
           <field name="hatarido"/>
           <field name="carnet_e"/>
           <field name="gyartasi_hely_ids"/>
-          <field name="depo_db"/>
           <field name="modositott_db"         string="Rendelt db"/>
           <field name="teljesitett_db"/>
           <field name="rendelt_ora"           sum="rendelt óra"/>
