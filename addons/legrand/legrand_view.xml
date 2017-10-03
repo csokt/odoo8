@@ -1010,6 +1010,50 @@
       </field>
     </record>
 
+    <!--####################################################################################################################  Legrand jegyzőkönyv  -->
+    <record id="view_form_lgr_jegyzokonyv"    model="ir.ui.view">
+      <field name="name">Legrand jegyzőkönyv Form</field>
+      <field name="model">legrand.lgr_jegyzokonyv</field>
+      <field name="arch" type="xml">
+        <form>
+          <sheet>
+          <group col="4">
+            <field name="jegyzokonyv_szama"/>
+            <field name="hely_id"/>
+            <field name="gyartasi_lap_id"/>
+            <field name="termeknev"/>
+            <field name="sorozat"/>
+            <field name="normaora"/>
+            <field name="kelt"/>
+          </group>
+          <group col="2">
+            <field name="vizsgalatok"/>
+            <field name="eszrevetelek"/>
+            <field name="megjegyzes"/>
+          </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_tree_lgr_jegyzokonyv"    model="ir.ui.view">
+      <field  name="name">Legrand jegyzőkönyv Tree</field>
+      <field  name="model">legrand.lgr_jegyzokonyv</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <tree>
+          <field name="jegyzokonyv_szama"/>
+          <field name="hely_id"/>
+          <field name="gyartasi_lap_id"/>
+          <field name="termeknev"/>
+          <field name="sorozat"/>
+          <field name="normaora"            sum="normaóra"/>
+          <field name="vizsgalatok"/>
+          <field name="kelt"/>
+        </tree>
+      </field>
+    </record>
+
     <!--####################################################################################################################  Lézer, tampon  -->
     <record id="view_tree_lezer_tampon"   model="ir.ui.view">
       <field  name="name">Lézer tampon default Tree</field>
@@ -1157,6 +1201,7 @@
 
     <act_window id="lezer_tampon"       name="Lézer, tampon"        res_model="legrand.lezer_tampon"      view_id='view_tree_lezer_tampon_edit'       view_mode="tree"/>
     <act_window id="meo_jegyzokonyv"    name="MEO jegyzőkönyv"      res_model="legrand.meo_jegyzokonyv"                                               view_mode="tree,form"/>
+    <act_window id="lgr_jegyzokonyv"    name="Legrand jegyzőkönyv"  res_model="legrand.lgr_jegyzokonyv"                                               view_mode="tree,form"/>
 
     <act_window id="homogen"            name="Homogén"              res_model="legrand.homogen"                                                       view_mode="tree,form"/>
     <act_window id="hely"               name="Hely"                 res_model="legrand.hely"                                                          view_mode="tree,form"/>
@@ -1209,6 +1254,7 @@
     <menuitem id="menu_egyeb"             name="Egyéb"                        parent="menu_root"                  sequence="80"                         />
       <menuitem id="menu_lezer_tampon"    name="Lézer, tampon minta"          parent="menu_egyeb"                 sequence="10" action="lezer_tampon"/>
       <menuitem id="menu_meo_jkonyv"      name="Vizsgálati jegyzőkönyv"       parent="menu_egyeb"                 sequence="20" action="meo_jegyzokonyv"/>
+      <menuitem id="menu_lgr_jkonyv"      name="Legrand jegyzőkönyv"          parent="menu_egyeb"                 sequence="30" action="lgr_jegyzokonyv"/>
 
     <menuitem id="menu_administrator"     name="Administrator"                parent="menu_root"                  sequence="900"                                groups="group_legrand_admin" />
       <menuitem id="menu_homogen"         name="Homogén"                      parent="menu_administrator"         sequence="50" action="homogen" />

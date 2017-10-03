@@ -1088,6 +1088,24 @@ class LegrandMeoJkvSelejt(models.Model):
   def _compute_ertek(self):
     self.ertek = self.selejtezett_db*self.bekerulesi_ar
 
+############################################################################################################################  Legrand jegyzőkönyv  ###
+class LegrandLgrJegyzokonyv(models.Model):
+  _name               = 'legrand.lgr_jegyzokonyv'
+  _order              = 'id desc'
+  _rec_name           = 'jegyzokonyv_szama'
+  jegyzokonyv_szama   = fields.Char(u'Jegyzőkönyv száma', required=True)
+  hely_id             = fields.Many2one('legrand.hely', string=u'Gyártási hely', domain=[('szefo_e', '=', True)], required=True, auto_join=True)
+  gyartasi_lap_id     = fields.Many2one('legrand.gyartasi_lap',  u'Gyártási lap', required=True, auto_join=True)
+  sorozat             = fields.Integer(u'Sorozat', required=True)
+#  name                = fields.Char(u'Művelet', readonly=True)
+  normaora            = fields.Float(u'Normaóra', digits=(16, 2))
+  vizsgalatok         = fields.Char(u'Vizsgálatok', required=True)
+  eszrevetelek        = fields.Char(u'Észrevételek')
+  megjegyzes          = fields.Char(u'Megjegyzés')
+  kelt                = fields.Date(u'Kelt')
+  # virtual fields
+  termeknev           = fields.Char(u'Termék megnevezés', related='gyartasi_lap_id.cikk_id.cikknev', readonly=True)
+
 ############################################################################################################################  Lézer, tampon  ###
 class LegrandLezerTampon(models.Model):
   _name               = 'legrand.lezer_tampon'

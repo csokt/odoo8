@@ -79,3 +79,6 @@ access_legrand_meo_jegyzokonyv_group_manager,legrand.meo_jegyzokonyv.manager,mod
 
 access_legrand_meo_jkv_selejt_group_viewer,legrand.meo_jkv_selejt.viewer,model_legrand_meo_jkv_selejt,group_legrand_viewer,1,0,0,0
 access_legrand_meo_jkv_selejt_group_manager,legrand.meo_jkv_selejt.manager,model_legrand_meo_jkv_selejt,group_legrand_manager,1,1,1,1
+
+access_legrand_lgr_jegyzokonyv_group_viewer,legrand.lgr_jegyzokonyv.viewer,model_legrand_lgr_jegyzokonyv,group_legrand_viewer,1,0,0,0
+access_legrand_lgr_jegyzokonyv_group_manager,legrand.lgr_jegyzokonyv.manager,model_legrand_lgr_jegyzokonyv,group_legrand_manager,1,1,1,0
