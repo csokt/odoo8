@@ -992,6 +992,7 @@ class LegrandMuveletvegzes(models.Model):
   teljesitett_ora     = fields.Float(u'Teljesített óra', digits=(16, 5), compute='_compute_teljesitett_ora', store=True)
   megjegyzes          = fields.Char(u'Megjegyzés')
   nexon_azon          = fields.Integer(u'Személy Id')
+  felvette_id         = fields.Many2one('res.users', u'Felvette', readonly=True, auto_join=True)
   # virtual fields
   gyartasi_lap_id     = fields.Many2one('legrand.gyartasi_lap',  u'Gyártási lap', related='szefo_muvelet_id.gyartasi_lap_id', readonly=True, auto_join=True)
   muveletnev          = fields.Char(u'Műveletnév',   related='szefo_muvelet_id.muveletnev', readonly=True)
@@ -1001,6 +1002,8 @@ class LegrandMuveletvegzes(models.Model):
   @api.model
   def create(self, vals):
     vals['nexon_azon'] = self.env['nexon.szemely'].search([('id', '=', vals['szemely_id'])]).SzemelyId
+    if 'felvette_id' not in vals:
+      vals['felvette_id'] = self.env.user.id
     return super(LegrandMuveletvegzes, self).create(vals)
 
   @api.multi
@@ -1043,12 +1046,12 @@ class LegrandMeoJegyzokonyv(models.Model):
   gyartasi_lap_id     = fields.Many2one('legrand.gyartasi_lap',  u'Gyártási lap', required=True, auto_join=True)
 #  name                = fields.Char(u'Művelet', readonly=True)
   visszaadott_db      = fields.Integer(u'Visszaadott darabszám')
-  ellenorizte_id      = fields.Many2one('nexon.szemely', u'Ellenőrizte', required=True, auto_join=True)
+  ellenorizte_id      = fields.Many2one('nexon.szemely', u'Ellenőrizte', auto_join=True)
   hiba_leirasa        = fields.Char(u'Hiba leírása', required=True)
-  dolgozo_id          = fields.Many2one('nexon.szemely', u'Dolgozó', required=True, auto_join=True)
+  dolgozo_id          = fields.Many2one('nexon.szemely', u'Dolgozó', auto_join=True)
   gylap_szefo_muv_id1 = fields.Many2one('legrand.gylap_szefo_muvelet', u'Művelet', required=True, domain="[('gyartasi_lap_id', '=', gyartasi_lap_id)]", auto_join=True)
   gylap_szefo_muv_id2 = fields.Many2one('legrand.gylap_szefo_muvelet', u'2. Művelet', domain="[('gyartasi_lap_id', '=', gyartasi_lap_id)]", auto_join=True)
-  intezkedesek        = fields.Char(u'Intézkedések', required=True)
+  intezkedesek        = fields.Char(u'Intézkedések')
   javitasi_ido        = fields.Float(u'Javításra fordított idő', digits=(16, 2))
   dolgozo_megjegyzese = fields.Char(u'Dolgozó megjegyzése')
   megjegyzes          = fields.Char(u'Megjegyzés')

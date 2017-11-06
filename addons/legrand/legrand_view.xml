@@ -564,7 +564,7 @@
           <field name="mennyiseg"/>
           <field name="teljesitett_ora"/>
           <field name="megjegyzes"/>
-          <field name="create_uid"          readonly="1"    string="Felvette"/>
+          <field name="felvette_id"/>
           <field name="create_date"         readonly="1"    string="Létrehozás ideje"/>
         </tree>
       </field>
@@ -840,9 +840,6 @@
           <field name="rendelesszam"/>
           <field name="termekkod"/>
           <field name="szamlazhato_db"/>
-          <field name="rendelt_ora"/>
-          <field name="teljesitett_ora"/>
-          <field name="szamlazott_ora"/>
           <field name="szamlazhato_ora"       string="Óra"  sum="munkaóra + beáll.idő összesen"/>
           <field name="homogen_id"/>
           <field name="termekcsalad"/>
