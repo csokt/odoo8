@@ -167,6 +167,7 @@
           <field name="felhasznalo_id"/>
           <field name="jogosultsag_csoport"/>
           <field name="jogosultsagnev_id"/>
+          <filter name="filter_enged"     string="Aktív jogosultság"      domain="[('allapot','=','enged')]"/>
         </search>
       </field>
     </record>
@@ -174,7 +175,7 @@
     <!--  Actions  -->
     <act_window id="szefo_telephely" name="Telephely" res_model="szefo.telephely" view_mode="tree,form" />
     <act_window id="nexon_szemely" name="Nexon személy" res_model="nexon.szemely" view_mode="tree,form" />
-    <act_window id="szefo_jogosultsag" name="Jogosultság" res_model="szefo.jogosultsag" view_mode="tree,form" />
+    <act_window id="szefo_jogosultsag" name="Jogosultság" res_model="szefo.jogosultsag" view_mode="tree,form" context="{'search_default_filter_enged': 1}" />
     <act_window id="szefo_jogosultsag_masol" name="Jogosultság másol" res_model="szefo.jogosultsag_masol" view_mode="tree,form" />
     <act_window id="szefo_log" name="Log" res_model="szefo.log" view_mode="tree" />
     <act_window id="szefo_admin_import" name="Import" res_model="szefo.parameter" view_mode="tree" view_id="view_tree_szefo_admin_import"/>
