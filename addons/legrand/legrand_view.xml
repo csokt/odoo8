@@ -938,6 +938,82 @@
       </field>
     </record>
 
+    <!--####################################################################################################################  Dolgozó  -->
+    <record id="view_tree_dolgozo"    model="ir.ui.view">
+      <field  name="name">Dolgozó Tree</field>
+      <field  name="model">nexon.szemely</field>
+      <field  name="arch" type="xml">
+        <tree editable="top" create="false">
+          <field  name="name"/>
+          <field  name="telephely_id"           options="{'no_create': True, 'no_open': True}"/>
+        </tree>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Jelenlét fej  -->
+    <record id="view_form_jelenletfej"    model="ir.ui.view">
+      <field name="name">Jelenlét fej Form</field>
+      <field name="model">legrand.jelenletfej</field>
+      <field name="arch" type="xml">
+        <form>
+          <sheet>
+          <group col="2">
+            <field  name="telephely_id"         options="{'no_create': True, 'no_open': True}"/>
+            <field name="ev"/>
+            <field name="ho"/>
+            <field name="nap"/>
+          </group>
+            <field name="jelenlet_ids" />
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_tree_jelenletfej"    model="ir.ui.view">
+      <field name="name">Jelenlét fej Tree</field>
+      <field name="model">legrand.jelenletfej</field>
+      <field name="arch" type="xml">
+        <tree>
+          <field  name="telephely_id"           options="{'no_create': True, 'no_open': True}"/>
+          <field name="ev"/>
+          <field name="ho"/>
+          <field name="nap"/>
+        </tree>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Jelenlét  -->
+    <record id="view_tree_jelenlet_default"    model="ir.ui.view">
+      <field  name="name">Jelenlét Tree</field>
+      <field  name="model">legrand.jelenlet</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <tree editable="bottom">
+          <field name="jelenletfej_id"          invisible="1"/>
+          <field name="telephely_id"            invisible="1"/>
+          <field name="dolgozo_id"              options="{'no_create': True, 'no_open': True}"/>
+          <field name="ora"/>
+          <field name="jogcim"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_tree_jelenlet"    model="ir.ui.view">
+      <field  name="name">Jelenlét Tree</field>
+      <field  name="model">legrand.jelenlet</field>
+      <field  name="arch" type="xml">
+        <tree>
+          <field name="telephely_id"/>
+          <field name="ev"/>
+          <field name="ho"/>
+          <field name="nap"/>
+          <field name="dolgozo_id"/>
+          <field name="ora"/>
+          <field name="jogcim"/>
+        </tree>
+      </field>
+    </record>
+
     <!--####################################################################################################################  MEO jegyzőkönyv  -->
     <record id="view_form_meo_jegyzokonyv"    model="ir.ui.view">
       <field name="name">MEO jegyzőkönyv Form</field>
@@ -1196,6 +1272,10 @@
     <act_window id="impex"              name="Impex"                res_model="legrand.impex"                                                         view_mode="tree,form"/>
     <act_window id="impex_muvelet"      name="Impex művelet"        res_model="legrand.parameter"         view_id="view_tree_impex_muvelet"           view_mode="tree"/>
 
+    <act_window id="dolgozo"            name="Dolgozók"             res_model="nexon.szemely"             view_id="view_tree_dolgozo"                 view_mode="tree,form" />
+    <act_window id="jelenleti_iv"       name="Jelenléti ív"         res_model="legrand.jelenletfej"                                                   view_mode="tree,form"/>
+    <act_window id="jelenletek"         name="Jelenlétek"           res_model="legrand.jelenlet"          view_id="view_tree_jelenlet"                view_mode="tree"/>
+
     <act_window id="lezer_tampon"       name="Lézer, tampon"        res_model="legrand.lezer_tampon"      view_id='view_tree_lezer_tampon_edit'       view_mode="tree"/>
     <act_window id="meo_jegyzokonyv"    name="MEO jegyzőkönyv"      res_model="legrand.meo_jegyzokonyv"                                               view_mode="tree,form"/>
     <act_window id="lgr_jegyzokonyv"    name="Legrand jegyzőkönyv"  res_model="legrand.lgr_jegyzokonyv"                                               view_mode="tree,form"/>
@@ -1247,6 +1327,11 @@
     <menuitem id="menu_segedlet"          name="Segédeszközök"                parent="menu_root"                  sequence="70"                                 groups="group_legrand_user"/>
       <menuitem id="menu_impex"           name="Impex"                        parent="menu_segedlet"              sequence="10" action="impex"          />
       <menuitem id="menu_impex_muvelet"   name="Impex műveletek"              parent="menu_segedlet"              sequence="20" action="impex_muvelet"  />
+
+    <menuitem id="menu_munkaido"          name="Munkaidő nyilvántartás"       parent="menu_root"                  sequence="75"                         />
+      <menuitem id="menu_dolgozo"         name="Dolgozók"                     parent="menu_munkaido"              sequence="10" action="dolgozo"/>
+      <menuitem id="menu_jelenleti_iv"    name="Jelenléti ív"                 parent="menu_munkaido"              sequence="20" action="jelenleti_iv"/>
+      <menuitem id="menu_jelenletek"      name="Jelenlétek"                   parent="menu_munkaido"              sequence="30" action="jelenletek"/>
 
     <menuitem id="menu_egyeb"             name="Egyéb"                        parent="menu_root"                  sequence="80"                         />
       <menuitem id="menu_lezer_tampon"    name="Lézer, tampon minta"          parent="menu_egyeb"                 sequence="10" action="lezer_tampon"/>

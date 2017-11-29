@@ -104,11 +104,11 @@
             <field name="leltari_szam"          readonly="1"/>
             <field name="megnevezes"            readonly="1"/>
             <field name="name"                  readonly="1"/>
-            <field name="leltarcsoport_id"      readonly="1"/>
+            <field name="leltarcsoport_id"      readonly="0"    options="{'no_create': True}"/>
             <field name="akt_leltarkorzet_id"   readonly="1"/>
             <field name="akt_hasznalo_id"       readonly="1"/>
             <field name="tulajdonsag_ids"       widget="many2many_tags"/>
-            <field name="csoportkod"            readonly="1"/>
+            <field name="csoportkod"            readonly="0"/>
             <field name="szett_id"              options="{'no_create': True}"/>
             <field name="netto_ertek"           readonly="1"/>
             <field name="megjegyzes"/>

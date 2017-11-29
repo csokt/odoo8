@@ -45,19 +45,21 @@ class SzefoLog(models.Model):
   rowid   = fields.Integer(u'Row Id')
 
 class SzefoTelephely(models.Model):
-  _name   = 'szefo.telephely'
-  name    = fields.Char(u'Telephely', compute='_compute_name', store=True)
-  kod     = fields.Char(u'Kód',  required=True)
-  helyseg = fields.Char(u'Helység',  required=True)
-  cim     = fields.Char(u'Cím',  required=True)
-  irszam  = fields.Char(u'Irányítószám',  required=True)
-  ge_kod  = fields.Char(u'ge kód',  required=False)
-  active  = fields.Boolean(u'Aktív?', default=True)
+  _name       = 'szefo.telephely'
+  name        = fields.Char(u'Telephely', compute='_compute_name', store=True)
+  kod         = fields.Char(u'Kód',           required=True)
+  helyseg     = fields.Char(u'Helység',       required=True)
+  cim         = fields.Char(u'Cím',           required=True)
+  irszam      = fields.Char(u'Irányítószám',  required=True)
+  ge_kod      = fields.Char(u'ge kód',        required=False)
+  legrand_e   = fields.Boolean(u'Legrand?',   default=False)
+  active      = fields.Boolean(u'Aktív?',     default=True)
 
   @api.one
   @api.depends('helyseg', 'cim')
   def _compute_name(self):
-    self.name = self.helyseg+', '+self.cim
+    if self.helyseg and self.cim:
+      self.name = self.helyseg+', '+self.cim
 
 class NexonSzemely(models.Model):
   _name         = 'nexon.szemely'
@@ -69,6 +71,7 @@ class NexonSzemely(models.Model):
   AktNevAzon    = fields.Char(u'AktNevAzon')
   SzulIdo       = fields.Date('Születési dátum')
   employee_id   = fields.Many2one('hr.employee',  u'VIR alkalmazott')
+  telephely_id  = fields.Many2one('szefo.telephely',  u'Telephely')
   active        = fields.Boolean(u'Aktív?', default=True)
 
   @api.one

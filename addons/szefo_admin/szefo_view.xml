@@ -53,12 +53,14 @@
     <record id="view_tree_nexon_szemely"    model="ir.ui.view">
       <field  name="name">Nexon Szemely Tree</field>
       <field  name="model">nexon.szemely</field>
+      <field  name="priority" eval="15"/>
       <field  name="arch" type="xml">
         <tree>
           <field  name="name"/>
           <field  name="SzulIdo"/>
           <button name="copy_szemely" type="object" string="Átvétel a VIR alkalmazottak közé" class="oe_highlight" />
           <field  name="employee_id"/>
+          <field  name="telephely_id"/>
         </tree>
       </field>
     </record>

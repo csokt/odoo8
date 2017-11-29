@@ -1037,6 +1037,32 @@ class LegrandFeljegyzes(models.Model):
   def onchange_gyartasi_lap_id(self):
     self.cikk_id = self.gyartasi_lap_id.cikk_id.id
 
+############################################################################################################################  Jelenléti ív fej ###
+class LegrandJelenletFej(models.Model):
+  _name               = 'legrand.jelenletfej'
+  _order              = 'id desc'
+  telephely_id        = fields.Many2one('szefo.telephely',  u'Telephely', required=True, domain=[('legrand_e', '=', True)])
+  ev                  = fields.Char(u'Év', default='2018')
+  ho                  = fields.Integer(u'Hónap')
+  nap                 = fields.Integer(u'Nap')
+  # virtual fields
+  jelenlet_ids        = fields.One2many('legrand.jelenlet',  'jelenletfej_id', u'Jelenlét', auto_join=True)
+
+############################################################################################################################  Jelenléti ív  ###
+class LegrandJelenlet(models.Model):
+  _name               = 'legrand.jelenlet'
+  _order              = 'id desc'
+  jelenletfej_id      = fields.Many2one('legrand.jelenletfej',  u'Jelenlét fej', index=True, auto_join=True)
+  telephely_id        = fields.Many2one('szefo.telephely',  u'Telephely', related='jelenletfej_id.telephely_id', readonly=True, store=True, auto_join=True)
+  ev                  = fields.Char(u'Év',        related='jelenletfej_id.ev',  readonly=True, store=True)
+  ho                  = fields.Integer(u'Hónap',  related='jelenletfej_id.ho',  readonly=True, store=True)
+  nap                 = fields.Integer(u'Nap',    related='jelenletfej_id.nap', readonly=True, store=True)
+  dolgozo_id          = fields.Many2one('nexon.szemely', u'Dolgozó', required=True, domain="[('telephely_id', '=', telephely_id)]", auto_join=True)
+  ora                 = fields.Float(u'Óra', digits=(16, 2))
+  jogcim              = fields.Selection([('ledolgozott',u'Ledolgozott idő'),('szabadsag',u'Szabadság'),('rendkivuli',u'Rendkívüli szabadság'),('fizetesnelkuli',u'Fizetésnélküli szabadság'),('verado',u'Véradó szabadság'),
+                                        ('betegseg',u'Betegség'),('igazolt',u'Igazolt távollét'),('igazolatlan',u'Igazolatlan távollét'),('pihenonap',u'Pihenőnap'),('keszenlet',u'Készenlét')],
+                                        u'Jogcím', default='ledolgozott', required=True)
+
 ############################################################################################################################  MEO jegyzőkönyv  ###
 class LegrandMeoJegyzokonyv(models.Model):
   _name               = 'legrand.meo_jegyzokonyv'
