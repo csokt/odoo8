@@ -69,10 +69,13 @@ access_legrand_dolgozo_group_viewer,legrand.dolgozo.viewer,szefo_admin.model_nex
 access_legrand_dolgozo_group_manager,legrand.dolgozo.manager,szefo_admin.model_nexon_szemely,group_legrand_manager,1,1,0,0
 
 access_legrand_jelenletfej_group_viewer,legrand.jelenletfej.viewer,model_legrand_jelenletfej,group_legrand_viewer,1,0,0,0
+access_legrand_jelenletfej_group_user,legrand.jelenletfej.user,model_legrand_jelenletfej,group_legrand_user,1,1,0,0
 access_legrand_jelenletfej_group_manager,legrand.jelenletfej.manager,model_legrand_jelenletfej,group_legrand_manager,1,1,1,0
 
 access_legrand_jelenlet_group_viewer,legrand.jelenlet.viewer,model_legrand_jelenlet,group_legrand_viewer,1,0,0,0
+access_legrand_jelenlet_group_user,legrand.jelenlet.user,model_legrand_jelenlet,group_legrand_user,1,1,0,0
 access_legrand_jelenlet_group_manager,legrand.jelenlet.manager,model_legrand_jelenlet,group_legrand_manager,1,1,1,0
+access_legrand_jelenlet_group_director,legrand.jelenlet.director,model_legrand_jelenlet,group_legrand_director,1,1,1,1
 
 access_legrand_feljegyzes_group_viewer,legrand.feljegyzes.viewer,model_legrand_feljegyzes,group_legrand_viewer,1,0,0,0
 access_legrand_feljegyzes_group_user,legrand.feljegyzes.user,model_legrand_feljegyzes,group_legrand_user,1,0,1,0

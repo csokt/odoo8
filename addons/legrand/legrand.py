@@ -1040,28 +1040,52 @@ class LegrandFeljegyzes(models.Model):
 ############################################################################################################################  Jelenléti ív fej ###
 class LegrandJelenletFej(models.Model):
   _name               = 'legrand.jelenletfej'
-  _order              = 'id desc'
+  _order              = 'ev desc, ho desc, nap desc, telephely_id'
   telephely_id        = fields.Many2one('szefo.telephely',  u'Telephely', required=True, domain=[('legrand_e', '=', True)])
-  ev                  = fields.Char(u'Év', default='2018')
-  ho                  = fields.Integer(u'Hónap')
-  nap                 = fields.Integer(u'Nap')
+  ev                  = fields.Char(u'Év')
+  ho                  = fields.Char(u'Hónap')
+  nap                 = fields.Char(u'Nap')
+  megjegyzes          = fields.Char(u'Megjegyzés')
   # virtual fields
   jelenlet_ids        = fields.One2many('legrand.jelenlet',  'jelenletfej_id', u'Jelenlét', auto_join=True)
+  count_jelenlet_ids  = fields.Integer(u'Jelenlét sorok db', compute='_compute_count_jelenlet_ids')
+  director_e          = fields.Boolean(u'Director?', compute='_check_user_group')
+
+  @api.model
+  def create(self, vals):
+    fej = super(LegrandJelenletFej, self).create(vals)
+    for dolgozo in self.env['nexon.szemely'].search([('telephely_id', '=', fej.telephely_id.id)]):
+      jelenlet_row = {
+        'jelenletfej_id'    : fej.id,
+        'dolgozo_id'        : dolgozo.id,
+      }
+      self.env['legrand.jelenlet'].create(jelenlet_row)
+    return fej
+
+  @api.one
+  @api.depends('jelenlet_ids')
+  def _compute_count_jelenlet_ids(self):
+    self.count_jelenlet_ids = len(self.jelenlet_ids)
+
+  @api.one
+  def _check_user_group(self):
+    self.director_e = self.env.user.has_group('legrand.group_legrand_director')
 
 ############################################################################################################################  Jelenléti ív  ###
 class LegrandJelenlet(models.Model):
   _name               = 'legrand.jelenlet'
-  _order              = 'id desc'
+  _order              = 'id'
   jelenletfej_id      = fields.Many2one('legrand.jelenletfej',  u'Jelenlét fej', index=True, auto_join=True)
   telephely_id        = fields.Many2one('szefo.telephely',  u'Telephely', related='jelenletfej_id.telephely_id', readonly=True, store=True, auto_join=True)
-  ev                  = fields.Char(u'Év',        related='jelenletfej_id.ev',  readonly=True, store=True)
-  ho                  = fields.Integer(u'Hónap',  related='jelenletfej_id.ho',  readonly=True, store=True)
-  nap                 = fields.Integer(u'Nap',    related='jelenletfej_id.nap', readonly=True, store=True)
+  ev                  = fields.Char(u'Év',    related='jelenletfej_id.ev',  readonly=True, store=True)
+  ho                  = fields.Char(u'Hónap', related='jelenletfej_id.ho',  readonly=True, store=True)
+  nap                 = fields.Char(u'Nap',   related='jelenletfej_id.nap', readonly=True, store=True)
   dolgozo_id          = fields.Many2one('nexon.szemely', u'Dolgozó', required=True, domain="[('telephely_id', '=', telephely_id)]", auto_join=True)
   ora                 = fields.Float(u'Óra', digits=(16, 2))
   jogcim              = fields.Selection([('ledolgozott',u'Ledolgozott idő'),('szabadsag',u'Szabadság'),('rendkivuli',u'Rendkívüli szabadság'),('fizetesnelkuli',u'Fizetésnélküli szabadság'),('verado',u'Véradó szabadság'),
                                         ('betegseg',u'Betegség'),('igazolt',u'Igazolt távollét'),('igazolatlan',u'Igazolatlan távollét'),('pihenonap',u'Pihenőnap'),('keszenlet',u'Készenlét')],
                                         u'Jogcím', default='ledolgozott', required=True)
+  megjegyzes          = fields.Char(u'Megjegyzés')
 
 ############################################################################################################################  MEO jegyzőkönyv  ###
 class LegrandMeoJegyzokonyv(models.Model):

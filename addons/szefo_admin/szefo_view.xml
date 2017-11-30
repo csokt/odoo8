@@ -65,6 +65,17 @@
       </field>
     </record>
 
+    <record id="view_filter_nexon_szemely"    model="ir.ui.view">
+      <field  name="name">Nexon Szemely Filter</field>
+      <field  name="model">nexon.szemely</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field  name="name"/>
+          <field  name="telephely_id"/>
+        </search>
+      </field>
+    </record>
+
     <!--  Odoo users  -->
     <record id="view_tree_szefo_user"    model="ir.ui.view">
       <field  name="name">Odoo User Tree</field>

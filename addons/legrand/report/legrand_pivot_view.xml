@@ -44,6 +44,22 @@
      </field>
     </record>
 
+    <!--####################################################################################################################  Jelenlét  -->
+    <record id="view_graph_jelenlet_ertekel" model="ir.ui.view">
+     <field name="name">legrand.jelenlet_ertekel.graph</field>
+     <field name="model">legrand.jelenlet</field>
+     <field name="arch" type="xml">
+       <graph string="Jelenlét értékelés" type="pivot">
+         <field name="ev"                 type="row"/>
+         <field name="ho"                 type="row"/>
+         <field name="telephely_id"       type="row"/>
+         <field name="dolgozo_id"         type="row"/>
+         <field name="jogcim"             type="col"/>
+         <field name="ora"                type="measure"/>
+       </graph>
+     </field>
+    </record>
+
     <!--####################################################################################################################  Actions  -->
     <act_window id="gylap_ertekel"              name="Gyártási lap értékelés"       res_model="legrand.gyartasi_lap"    view_id="view_graph_gylap_ertekel"          view_mode="graph"
                 context="{'search_default_szamlazhato':1}"/>
@@ -52,6 +68,8 @@
 
     <act_window id="homogen_ertekel"            name="Homogén értékelés"            res_model="legrand.gylap_homogen"   view_id="view_graph_homogen_ertekel"        view_mode="graph"
                 domain="[('sajat','=',True)]"   context="{'search_default_szamlazhato':1}"/>
+
+    <act_window id="jelenlet_ertekel"           name="Jelenlét értékelés"           res_model="legrand.jelenlet"        view_id="view_graph_jelenlet_ertekel"       view_mode="graph" />
 
     <!--####################################################################################################################  Menu  items  -->
     <menuitem id="menu_kimutatas"               name="Kimutatások"                  parent="menu_root"                  sequence="110"                         />
