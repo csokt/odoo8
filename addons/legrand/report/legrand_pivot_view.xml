@@ -77,5 +77,6 @@
       <menuitem id="menu_muveletvegzes_ertekel" name="Műveletvégzés értékelés"      parent="menu_kimutatas"             sequence="20"   action="muveletvegzes_ertekel" />
       <menuitem id="menu_homogen_ertekel"       name="Homogén értékelés"            parent="menu_kimutatas"             sequence="30"   action="homogen_ertekel" />
       <menuitem id="menu_gylap_ertekel"         name="Gyártási lap értékelés"       parent="menu_kimutatas"             sequence="40"   action="gylap_ertekel" />
+      <menuitem id="menu_jelenlet_ertekel"      name="Jelenlét értékelés"           parent="menu_kimutatas"             sequence="50"   action="jelenlet_ertekel" />
   </data>
 </openerp>

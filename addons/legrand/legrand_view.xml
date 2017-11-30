@@ -1354,7 +1354,6 @@
       <menuitem id="menu_dolgozo"         name="Dolgozók"                     parent="menu_munkaido"              sequence="10" action="dolgozo"/>
       <menuitem id="menu_jelenleti_iv"    name="Jelenléti ív"                 parent="menu_munkaido"              sequence="20" action="jelenleti_iv"/>
       <menuitem id="menu_jelenletek"      name="Jelenlétek"                   parent="menu_munkaido"              sequence="30" action="jelenletek"/>
-      <menuitem id="menu_jelenlet_ertek"  name="Jelenlét értékelés"           parent="menu_munkaido"              sequence="40" action="jelenlet_ertekel" />
 
     <menuitem id="menu_egyeb"             name="Egyéb"                        parent="menu_root"                  sequence="80"                         />
       <menuitem id="menu_lezer_tampon"    name="Lézer, tampon minta"          parent="menu_egyeb"                 sequence="10" action="lezer_tampon"/>
