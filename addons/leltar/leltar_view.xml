@@ -33,6 +33,8 @@
         <tree>
           <field  name="name"/>
           <field  name="leltarfelelos_id"/>
+          <field  name="zarolva"/>
+          <button name="zarolva_valt"         string="Nyit/Zár"         type="object" class="oe_highlight"      groups="leltar.group_leltar_manager"/>
         </tree>
       </field>
     </record>
@@ -119,7 +121,8 @@
             <field name="ds_leltarfelelos"      readonly="1"/>
             <field name="selejtezni"            readonly="1"    string=""/>
             <field name="selejt_ok"             readonly="1"/>
-            <field name="active"/>
+            <field name="zarolva"               groups="leltar.group_leltar_manager"/>
+            <field name="active"                groups="leltar.group_leltar_manager"/>
           </group>
           <div>
             <field name="mozgas_ids"/>
@@ -142,6 +145,8 @@
           <field name="megjegyzes"/>
           <field name="tulajdonsag_ids"       widget="many2many_tags"/>
           <field name="selejtezni"/>
+          <field name="zarolva"/>
+          <button name="zarolva_valt"         string="Nyit/Zár"         type="object" class="oe_highlight"      groups="leltar.group_leltar_manager"/>
         </tree>
       </field>
     </record>
@@ -228,10 +233,10 @@
           <field  name="hova_leltarkorzet_id"/>
           <field  name="megjegyzes"/>
           <field  name="megerkezett"/>
-          <field  name="create_uid" string="Felvette"/>
-          <field  name="create_date" string="Felvétel ideje"/>
-          <field  name="write_uid" string="Módosította"/>
-          <field  name="write_date" string="Módosítás ideje"/>
+          <field  name="create_uid"             string="Felvette"/>
+          <field  name="create_date"            string="Felvétel ideje"/>
+          <field  name="write_uid"              string="Módosította"/>
+          <field  name="write_date"             string="Módosítás ideje"/>
         </tree>
       </field>
     </record>
@@ -242,14 +247,15 @@
       <field  name="arch" type="xml">
         <tree edit="false" editable="top">
           <field  name="id"/>
-          <field  name="eszkoz_id"/>
-          <field  name="hova_leltarkorzet_id"/>
+          <field  name="eszkoz_id"              options="{'no_create': True}"/>
+          <field  name="honnan_leltarkorzet_id"/>
+          <field  name="hova_leltarkorzet_id"   options="{'no_create': True}"/>
           <field  name="megjegyzes"/>
-          <field  name="megerkezett" readonly="1"/>
-          <field  name="create_uid" readonly="1" string="Felvette"/>
-          <field  name="create_date" readonly="1" string="Felvétel ideje"/>
-          <field  name="write_uid" readonly="1" string="Módosította"/>
-          <field  name="write_date" readonly="1" string="Módosítás ideje"/>
+          <field  name="megerkezett"            readonly="1"/>
+          <field  name="create_uid"             readonly="1" string="Felvette"/>
+          <field  name="create_date"            readonly="1" string="Felvétel ideje"/>
+          <field  name="write_uid"              readonly="1" string="Módosította"/>
+          <field  name="write_date"             readonly="1" string="Módosítás ideje"/>
         </tree>
       </field>
     </record>
@@ -262,10 +268,10 @@
           <field  name="eszkoz_id"/>
           <field  name="hova_leltarkorzet_id"/>
           <field  name="megjegyzes"/>
-          <field  name="megerkezett" string=""/>
-          <button name="megerkezett_valt" type="object" string="Megérkezett" class="oe_highlight" />
-          <field  name="write_uid" string="Módosította"/>
-          <field  name="write_date" string="Módosítás ideje"/>
+          <field  name="megerkezett"            string=""/>
+          <button name="megerkezett_valt"       string="Megérkezett"            type="object" class="oe_highlight" />
+          <field  name="write_uid"              string="Módosította"/>
+          <field  name="write_date"             string="Módosítás ideje"/>
         </tree>
       </field>
     </record>
@@ -278,10 +284,10 @@
           <field  name="eszkoz_id"/>
           <field  name="hova_leltarkorzet_id"/>
           <field  name="megjegyzes"/>
-          <field  name="megerkezett" string=""/>
-          <button name="sztorno" type="object" string="Sztornó" class="oe_highlight" />
-          <field  name="write_uid" string="Módosította"/>
-          <field  name="write_date" string="Módosítás ideje"/>
+          <field  name="megerkezett"            string=""/>
+          <button name="sztorno"                string="Sztornó"                type="object" class="oe_highlight" />
+          <field  name="write_uid"              string="Módosította"/>
+          <field  name="write_date"             string="Módosítás ideje"/>
         </tree>
       </field>
     </record>
@@ -292,6 +298,7 @@
       <field  name="arch" type="xml">
         <search>
           <field  name="eszkoz_id"/>
+          <field  name="honnan_leltarkorzet_id"/>
           <field  name="hova_leltarkorzet_id"/>
           <field  name="megjegyzes"/>
         </search>

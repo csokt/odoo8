@@ -185,6 +185,7 @@ class LeltarKorzet(models.Model):
   telephely_id        = fields.Many2one('szefo.telephely',  u'Telephely',  required=True,  auto_join=True)
   szobaszam           = fields.Char(u'Szobaszám',   required=True)
   megnevezes          = fields.Char(u'Leltárkörzet név',   required=True)
+  zarolva             = fields.Boolean(u'Zárolva?', default=False)
   ds_leltarkorzet     = fields.Char(u'DS Leltárkörzet',  required=True)
   ds_korzet_vonalkod  = fields.Char(u'DS Leltárkörzet vonalkód',   required=True)
   active              = fields.Boolean(u'Aktív?', default=True)
@@ -194,7 +195,13 @@ class LeltarKorzet(models.Model):
   @api.one
   @api.depends('leltarkorzet_kod', 'telephely_id', 'szobaszam', 'megnevezes')
   def _compute_name(self):
-    self.name = self.leltarkorzet_kod+' - '+self.telephely_id.name+', '+self.szobaszam+': '+self.megnevezes
+    if self.leltarkorzet_kod and self.telephely_id and self.szobaszam and self.megnevezes:
+      self.name = self.leltarkorzet_kod+' - '+self.telephely_id.name+', '+self.szobaszam+': '+self.megnevezes
+
+  @api.one
+  def zarolva_valt(self):
+    self.zarolva = not self.zarolva
+    return True
 
 class LeltarSzett(models.Model):
   _name                 = 'leltar.szett'
@@ -249,6 +256,7 @@ class LeltarEszkoz(models.Model):
   netto_ertek           = fields.Integer(u'Nettó érték')
   selejt_ok             = fields.Char(u'Selejtezés oka')
   selejtezni            = fields.Boolean(u'Selejtezni', default=False)
+  zarolva               = fields.Boolean(u'Zárolva?', default=False)
   active                = fields.Boolean(u'Aktív?',  default=True)
   # virtual fields
   not_active            = fields.Boolean(u'Nem aktív?', compute='_compute_not_active')
@@ -285,6 +293,11 @@ class LeltarEszkoz(models.Model):
     return True
 
   @api.one
+  def zarolva_valt(self):
+    self.zarolva = not self.zarolva
+    return True
+
+  @api.one
   def do_toggle_active(self):
     self.active = not self.active
     return True
@@ -293,8 +306,8 @@ class LeltarEszkozmozgas(models.Model):
   _name                 = 'leltar.eszkozmozgas'
   _order                = 'id desc'
   eszkoz_id             = fields.Many2one('leltar.eszkoz', u'Eszköz',  required=True, auto_join=True)
-  honnan_leltarkorzet_id= fields.Many2one('leltar.korzet', u'Honnan leltárkörzet')
-  hova_leltarkorzet_id  = fields.Many2one('leltar.korzet', u'Hova leltárkörzet',  required=True)
+  honnan_leltarkorzet_id= fields.Many2one('leltar.korzet', u'Honnan leltárkörzet', readonly=True)
+  hova_leltarkorzet_id  = fields.Many2one('leltar.korzet', u'Hova leltárkörzet',   required=True)
   megerkezett           = fields.Boolean(u'Megérkezett', default=False)
   megjegyzes            = fields.Char(u'Megjegyzés')
   # virtual fields
@@ -303,10 +316,21 @@ class LeltarEszkozmozgas(models.Model):
   @api.model
   def create(self, vals):
     eszkoz_id = vals['eszkoz_id']
-    Eszkoz = self.env['leltar.eszkoz']
-    honnan_id = Eszkoz.search([('id', '=', eszkoz_id)])[0].akt_leltarkorzet_id.id
+    eszkoz    = self.env['leltar.eszkoz'].search([('id', '=', eszkoz_id)])[0]
+    honnan_id = eszkoz.akt_leltarkorzet_id.id
+    hova_id   = vals['hova_leltarkorzet_id']
+    honnan    = self.env['leltar.korzet'].search([('id', '=', honnan_id)])[0]
+    hova      = self.env['leltar.korzet'].search([('id', '=', hova_id)])[0]
+    if honnan_id == hova_id:
+      raise exceptions.Warning(u'A hova és honnan leltárkörzet megegyezik!')
+    if eszkoz.zarolva:
+      raise exceptions.Warning(u'Eszköz zárolva!')
+    if honnan.zarolva:
+      raise exceptions.Warning(u'Honnan leltárkörzet ('+ honnan.name + u') zárolva!')
+    if hova.zarolva:
+      raise exceptions.Warning(u'Hova leltárkörzet zárolva!')
     vals['honnan_leltarkorzet_id'] = honnan_id
-    vals['akt_leltarkorzet_id'] = vals['hova_leltarkorzet_id']
+    vals['akt_leltarkorzet_id'] = hova_id
     return super(LeltarEszkozmozgas, self).create(vals)
 
   @api.multi
