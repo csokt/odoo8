@@ -316,11 +316,11 @@ class LeltarEszkozmozgas(models.Model):
   @api.model
   def create(self, vals):
     eszkoz_id = vals['eszkoz_id']
-    eszkoz    = self.env['leltar.eszkoz'].search([('id', '=', eszkoz_id)])[0]
+    eszkoz    = self.env['leltar.eszkoz'].search([('id', '=', eszkoz_id)])
     honnan_id = eszkoz.akt_leltarkorzet_id.id
     hova_id   = vals['hova_leltarkorzet_id']
-    honnan    = self.env['leltar.korzet'].search([('id', '=', honnan_id)])[0]
-    hova      = self.env['leltar.korzet'].search([('id', '=', hova_id)])[0]
+    honnan    = self.env['leltar.korzet'].search([('id', '=', honnan_id)])
+    hova      = self.env['leltar.korzet'].search([('id', '=', hova_id)])
     if honnan_id == hova_id:
       raise exceptions.Warning(u'A hova és honnan leltárkörzet megegyezik!')
     if eszkoz.zarolva:
