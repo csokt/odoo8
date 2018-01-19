@@ -9,7 +9,7 @@
         <tree create="false" >
           <button name="import_netto_ertek"   type="object" string="Nettó érték import"       class="oe_highlight" confirm="Könyv szerinti nettó érték importja DominoSoftból" />
           <button name="import_eszkoz"        type="object" string="Eszközök import"          class="oe_highlight" confirm="Tárgyi eszközök importja DominoSoftból" />
-          <button name="import_felmeres"      type="object" string="Felmérés import"          class="oe_highlight" confirm="Leltár felmérés import DominoSoftból" />
+          <button name="import_gyartasi_szam" type="object" string="Gyártási szám import"     class="oe_highlight" confirm="Gyártási szám import DominoSoftból" />
         </tree>
       </field>
     </record>
@@ -112,14 +112,15 @@
             <field name="tulajdonsag_ids"       widget="many2many_tags"/>
             <field name="csoportkod"            readonly="0"/>
             <field name="szett_id"              options="{'no_create': True}"/>
-            <field name="netto_ertek"           readonly="1"/>
+            <field name="hivszam"               readonly="1"/>
             <field name="megjegyzes"/>
             <field name="leltari_szam_vonalkod" readonly="1"/>
+            <field name="gyartasi_szam"         readonly="1"/>
             <field name="leltarkorzet_kod"      readonly="1"/>
-            <field name="hivszam"               readonly="1"/>
+            <field name="netto_ertek"           readonly="1"/>
             <field name="ds_leltarkorzet"       readonly="1"/>
-            <field name="ds_leltarfelelos"      readonly="1"/>
             <field name="selejtezni"            readonly="1"    string=""/>
+            <field name="ds_leltarfelelos"      readonly="1"/>
             <field name="selejt_ok"             readonly="1"/>
             <field name="zarolva"               groups="leltar.group_leltar_manager"/>
             <field name="active"                groups="leltar.group_leltar_manager"/>
@@ -139,6 +140,7 @@
         <tree create="false">
           <field name="leltari_szam"/>
           <field name="megnevezes"/>
+          <field name="gyartasi_szam"/>
           <field name="leltarcsoport_id"/>
           <field name="akt_leltarkorzet_id"/>
           <field name="akt_hasznalo_id"/>
@@ -158,6 +160,7 @@
         <tree editable="top">
           <field name="leltari_szam"          readonly="1"/>
           <field name="megnevezes"            readonly="1"/>
+          <field name="gyartasi_szam"         readonly="1"/>
           <field name="leltarcsoport_id"      readonly="1"/>
           <field name="akt_leltarkorzet_id"   readonly="1"/>
           <field name="megjegyzes"            readonly="1"/>
@@ -177,6 +180,7 @@
         <tree editable="top">
           <field name="leltari_szam"          readonly="1"/>
           <field name="megnevezes"            readonly="1"/>
+          <field name="gyartasi_szam"         readonly="1"/>
           <field name="leltarcsoport_id"      readonly="1"/>
           <field name="akt_leltarkorzet_id"   readonly="1"/>
           <field name="megjegyzes"            readonly="1"/>
@@ -196,6 +200,7 @@
         <tree create="false">
           <field  name="leltari_szam"/>
           <field  name="megnevezes"/>
+          <field  name="gyartasi_szam"/>
           <field  name="leltarcsoport_id"/>
           <field  name="akt_leltarkorzet_id"/>
           <field  name="megjegyzes"/>

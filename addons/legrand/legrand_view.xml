@@ -652,11 +652,13 @@
             <field name="javitas_e"           />
             <field name="muveletek_elvegezve" />
             <field name="carnet_e"            />
+            <field name="csokkentve_e"        />
             <field name="active"              groups="legrand.group_legrand_director"/>
           </group>
           <group col="4">
-            <field name="gyartasi_hely_ids"   widget="many2many_tags"/>
+            <field name="cikknev"/>
             <field name="jegyzet"/>
+            <field name="gyartasi_hely_ids"   widget="many2many_tags"/>
             <field name="utolso_feljegyzes"/>
             <field name="cikkhiany"           attrs="{'invisible': [('state', '!=', 'mterv')]}"/>
           </group>
@@ -687,9 +689,9 @@
           <field name="gyartasi_hely_ids"/>
           <field name="modositott_db"         string="Rendelt db"/>
           <field name="teljesitett_db"/>
+          <field name="hatralek_db"/>
           <field name="rendelt_ora"           sum="rendelt óra"/>
           <field name="teljesitett_ora"       sum="teljesített óra"/>
-          <field name="szamlazott_ora"        sum="számlázott óra"/>
           <field name="utolso_feljegyzes"/>
           <field name="feljegyzes_ideje"/>
           <field name="state"/>
@@ -709,6 +711,7 @@
           <field name="modositott_db"         string="Rendelt db"/>
           <field name="bom_id"/>
           <field name="check_cikkek_uid"/>
+          <field name="state"                 invisible="1"/>
         </tree>
       </field>
     </record>
@@ -725,6 +728,7 @@
           <field name="jegyzet"/>
           <field name="modositott_db"         string="Rendelt db"/>
           <field name="cikkhiany_count"/>
+          <field name="state"                 invisible="1"/>
         </tree>
       </field>
     </record>
@@ -734,29 +738,31 @@
       <field  name="model">legrand.gyartasi_lap</field>
       <field  name="arch" type="xml">
         <search>
-          <field  name="id"               string="Sorszám"/>
           <field  name="name"/>
-          <filter name="filter_szentes"   string="Szentes"              domain="[('gyartasi_hely_ids.azonosito','=','szentes')]"/>
-          <filter name="filter_hmvhely"   string="Hódmezővásárhely"     domain="[('gyartasi_hely_ids.azonosito','=','hmvhely')]"/>
-          <filter name="filter_berkert"   string="Bérkert"              domain="[('gyartasi_hely_ids.azonosito','=','berkert')]"/>
-          <filter name="filter_mako"      string="Makó"                 domain="[('gyartasi_hely_ids.azonosito','=','mako')]"/>
-          <filter name="filter_oroshaza"  string="Orosháza"             domain="[('gyartasi_hely_ids.azonosito','=','oroshaza')]"/>
-          <filter name="filter_apatfalva" string="Apátfalva"            domain="[('gyartasi_hely_ids.azonosito','=','apatfalva')]"/>
+          <field  name="id"                 string="Sorszám"/>
+          <field  name="cikknev"/>
+          <filter name="filter_szentes"     string="Szentes"                domain="[('gyartasi_hely_ids.azonosito','=','szentes')]"/>
+          <filter name="filter_hmvhely"     string="Hódmezővásárhely"       domain="[('gyartasi_hely_ids.azonosito','=','hmvhely')]"/>
+          <filter name="filter_berkert"     string="Bérkert"                domain="[('gyartasi_hely_ids.azonosito','=','berkert')]"/>
+          <filter name="filter_mako"        string="Makó"                   domain="[('gyartasi_hely_ids.azonosito','=','mako')]"/>
+          <filter name="filter_oroshaza"    string="Orosháza"               domain="[('gyartasi_hely_ids.azonosito','=','oroshaza')]"/>
+          <filter name="filter_apatfalva"   string="Apátfalva"              domain="[('gyartasi_hely_ids.azonosito','=','apatfalva')]"/>
           <separator/>
-          <filter name="filter_mterv"     string="Műveletterv"          domain="[('state','=','mterv')]"/>
-          <filter name="filter_gyartas"   string="Gyártás"              domain="[('state','=','gyartas')]"/>
-          <filter name="filter_gykesz"    string="Gyártás kész"         domain="[('state','=','gykesz')]"/>
-          <filter name="filter_kesz"      string="Rendelés teljesítve"  domain="[('state','=','kesz')]"/>
-          <filter name="szamlazhato"      string="Számlázható"          domain="[('szamlazhato_db','>',0)]"/>
+          <filter name="filter_mterv"       string="Műveletterv"            domain="[('state','=','mterv')]"/>
+          <filter name="filter_gyartas"     string="Gyártás"                domain="[('state','=','gyartas')]"/>
+          <filter name="filter_gykesz"      string="Gyártás kész"           domain="[('state','=','gykesz')]"/>
+          <filter name="filter_kesz"        string="Rendelés teljesítve"    domain="[('state','=','kesz')]"/>
+          <filter name="szamlazhato"        string="Számlázható"            domain="[('szamlazhato_db','>',0)]"/>
           <separator/>
-          <filter name="filter_fuggo_muv" string="Befejezetlen műveletek"  domain="[('muveletek_elvegezve','=',False)]"/>
+          <filter name="filter_fuggo_muv"   string="Befejezetlen műveletek" domain="[('muveletek_elvegezve','=',False)]"/>
           <separator/>
-          <filter name="filter_lezer"     string="Lézer"                domain="[('lezer_tampon_ids','like','lézer')]"/>
-          <filter name="filter_tampon"    string="Tampon"               domain="[('lezer_tampon_ids','like','tampon')]"/>
+          <filter name="filter_lezer"       string="Lézer"                  domain="[('lezer_tampon_ids','like','lézer')]"/>
+          <filter name="filter_tampon"      string="Tampon"                 domain="[('lezer_tampon_ids','like','tampon')]"/>
           <separator/>
-          <filter name="filter_carnet"    string="Carnet"               domain="[('carnet_e','=',True)]"/>
+          <filter name="filter_carnet"      string="Carnet"                 domain="[('carnet_e','=',True)]"/>
+          <filter name="filter_csokkentve"  string="Csökkentve/Visszavonva" domain="[('csokkentve_e','=',True)]"/>
           <group expand="0" string="Csoportosítás">
-            <filter name="group_termek"   string="Termék"               context="{'group_by': 'termekkod'}"/>
+            <filter name="group_termek"     string="Termék"                 context="{'group_by': 'termekkod'}"/>
           </group>
         </search>
       </field>

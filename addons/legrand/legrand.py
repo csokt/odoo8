@@ -637,27 +637,29 @@ class LegrandGyartasiLap(models.Model):
   termekcsalad        = fields.Char(u'Termékcsalád', readonly=True)
   termekkod           = fields.Char(u'Termékkód', required=True, readonly=True)
   rendelt_db          = fields.Integer(u'Rendelt db', required=True, readonly=True)
-  modositott_db       = fields.Integer(u'Módosított rendelés')
+  modositott_db       = fields.Integer(u'Módosított rendelés', states={'kesz': [('readonly', True)]})
   kiadas_ideje        = fields.Char(u'Kiadás ideje', readonly=True)
   hatarido_str        = fields.Char(u'Határidő (eredeti)', required=True, readonly=True)
-  hatarido            = fields.Date(u'Határidő')
-  teljesitett_db      = fields.Integer(u'Teljesített db', default=0)
-  szamlazott_db       = fields.Integer(u'Számlázott db', default=0)
+  hatarido            = fields.Date(u'Határidő', states={'kesz': [('readonly', True)]})
+  teljesitett_db      = fields.Integer(u'Teljesített db', default=0, states={'kesz': [('readonly', True)]})
+  szamlazott_db       = fields.Integer(u'Számlázott db',  default=0, states={'kesz': [('readonly', True)]})
   szamlazhato_db      = fields.Integer(u'Számlázható db', compute='_compute_szamlazhato_db', store=True)
   hatralek_db         = fields.Integer(u'Hátralék db', compute='_compute_hatralek_db', store=True)
   cikk_id             = fields.Many2one('legrand.cikk',  u'Termék', required=True, readonly=True, auto_join=True)
-  bom_id              = fields.Many2one('legrand.bom',  u'Anyagjegyzék', required=False, domain="[('cikk_id', '=', cikk_id)]", auto_join=True)
+  bom_id              = fields.Many2one('legrand.bom',  u'Anyagjegyzék', required=False, domain="[('cikk_id', '=', cikk_id)]", auto_join=True, states={'kesz': [('readonly', True)]})
   cikkek_uid          = fields.Char(u'Összes cikk uid', readonly=False)
-  gyartasi_hely_ids   = fields.Many2many('legrand.hely', string=u'Fő gyártási helyek', domain=[('szefo_e', '=', True)])
-  javitas_e           = fields.Boolean(u'Javítás?', default=False)
+  gyartasi_hely_ids   = fields.Many2many('legrand.hely', string=u'Fő gyártási helyek', domain=[('szefo_e', '=', True)], states={'kesz': [('readonly', True)]})
+  javitas_e           = fields.Boolean(u'Javítás?', default=False, states={'kesz': [('readonly', True)]})
   raklap              = fields.Char(u'Raklap',      readonly=True)
   raklap_min          = fields.Char(u'Raklap min',  readonly=True)
   raklap_max          = fields.Char(u'Raklap max',  readonly=True)
   rakat_tipus         = fields.Char(u'Rakat tipus', readonly=True)
   muveletek_elvegezve = fields.Boolean(u'Műveletek elvégezve?', compute='_compute_muveletek_elvegezve', store=True)
-  carnet_e            = fields.Boolean(u'Carnet?', default=False)
+  carnet_e            = fields.Boolean(u'Carnet?', default=False, states={'kesz': [('readonly', True)]})
+  csokkentve_e        = fields.Boolean(u'Csökkentve/Visszavonva', default=False, states={'kesz': [('readonly', True)]})
   active              = fields.Boolean(u'Aktív?', default=True)
   # virtual fields
+  cikknev             = fields.Char(u'Terméknév', related='cikk_id.cikknev', readonly=True)
   rendelt_ora         = fields.Float(u'Rendelt óra',      digits=(16, 2), compute='_compute_rendelt_ora')
   teljesitett_ora     = fields.Float(u'Teljesített óra',  digits=(16, 2), compute='_compute_teljesitett_ora')
   szamlazott_ora      = fields.Float(u'Számlázott óra',   digits=(16, 2), compute='_compute_szamlazott_ora')
@@ -974,7 +976,10 @@ class LegrandSzefoMuvelet(models.Model):
   @api.one
   @api.depends('osszes_ora', 'osszes_db', 'kesz_db')
   def _compute_kesz_ora(self):
-    self.kesz_ora = self.osszes_ora * self.kesz_db / self.osszes_db
+    if self.osszes_db:
+      self.kesz_ora = self.osszes_ora * self.kesz_db / self.osszes_db
+    else:
+      self.kesz_ora = 0
 
   @api.one
   @api.depends('kesz_ora', 'osszes_ora')
@@ -1018,7 +1023,7 @@ class LegrandMuveletvegzes(models.Model):
   @api.one
   @api.depends('mennyiseg', 'szefo_muvelet_id.osszes_db', 'szefo_muvelet_id.osszes_ido', 'szefo_muvelet_id.beall_ido')
   def _compute_teljesitett_ora(self):
-    if self.szefo_muvelet_id:
+    if self.szefo_muvelet_id and self.szefo_muvelet_id.osszes_db:
       self.teljesitett_ora = (self.szefo_muvelet_id.osszes_ido + self.szefo_muvelet_id.beall_ido) * self.mennyiseg / self.szefo_muvelet_id.osszes_db
 
 ############################################################################################################################  Feljegyzések  ###

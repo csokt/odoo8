@@ -15,6 +15,26 @@ class LeltarParameter(models.Model):
   _inherit  = 'szefo.parameter'
 
   @api.one
+  def import_gyartasi_szam(self):
+    import pymssql
+    mssql_conn = pymssql.connect(server='192.168.0.2\\PROLIANTML350', user='informix', password='informix', database='DominoSoft')
+    Eszkoz = self.env['leltar.eszkoz']
+    Log = self.env['szefo.log']
+    Log.create({'loglevel': 'info', 'name': u'Gyártási szám import', 'module': 'leltar'})
+
+    cursor = mssql_conn.cursor()
+    cursor.execute("""SELECT bf_lelt, bf_gyszam
+                      FROM DominoSoft.dbo.beftorzs WHERE targyev = 2017 AND status = 0 AND bf_kiido IS NULL AND bf_gyszam IS NOT NULL order by hivszam""")
+    row = cursor.fetchone()
+    while row:
+      leltari_szam, gyartasi_szam = trim(row)
+      eszkoz = Eszkoz.search([('leltari_szam', '=', leltari_szam)])
+      if eszkoz and not eszkoz.gyartasi_szam:
+        eszkoz.write({'gyartasi_szam': gyartasi_szam})
+      row = cursor.fetchone()
+    return True
+
+  @api.one
   def import_netto_ertek(self):
     import pymssql
     mssql_conn = pymssql.connect(server='192.168.0.2\\PROLIANTML350', user='informix', password='informix', database='DominoSoft')
@@ -31,49 +51,10 @@ class LeltarParameter(models.Model):
     while row:
       leltari_szam, netto_ertek = trim(row)
       eszkoz = Eszkoz.search([('leltari_szam', '=', leltari_szam)])
-      if eszkoz: eszkoz.write({'netto_ertek': netto_ertek})
+      if eszkoz:
+        eszkoz.write({'netto_ertek': netto_ertek})
       row = cursor.fetchone()
     return True
-
-#  @api.one
-#  def import_eszkoz(self):
-#    import pymssql
-#    mssql_conn = pymssql.connect(server='192.168.0.2\\PROLIANTML350', user='informix', password='informix', database='DominoSoft')
-#
-#    Eszkoz  = self.env['leltar.eszkoz']
-#    Csoport = self.env['leltar.csoport']
-#    Korzet  = self.env['leltar.korzet']
-#    Log     = self.env['szefo.log']
-#    Log.create({'loglevel': 'info', 'name': u'Eszköz import', 'module': 'leltar'})
-#
-#    ut_hivszam = Eszkoz.search([], limit=1, order='hivszam desc').hivszam
-#    if not ut_hivszam: ut_hivszam = 0
-#    cursor = mssql_conn.cursor()
-#    cursor.execute("""SELECT hivszam, bf_lelt, bf_megnev, bf_ltkorzet, bf_ltfelelos, bf_ltcsoport, bf_param, bf_vonalkod FROM DominoSoft.dbo.beftorzs
-#                      WHERE hivszam > %s AND targyev = 2015 AND bf_vonalkod > 0 AND status = 0 order by hivszam""" % ut_hivszam)
-#    row = cursor.fetchone()
-#    while row:
-#      leltarcsoport_id    = None
-#      leltarkorzet_kod    = None
-#      akt_hasznalo_id     = None
-#      akt_leltarkorzet_id = None
-#      hivszam, leltari_szam, megnevezes, ds_leltarkorzet, ds_leltarfelelos, csoportkod, megjegyzes, leltari_szam_vonalkod = trim(row)
-#
-#      csoport_ids = Csoport.search_read([('csoportkod', '=', csoportkod)])
-#      if csoport_ids: leltarcsoport_id = csoport_ids[0]['id']
-#
-#      korzet_ids = Korzet.search_read([('ds_leltarkorzet', '=', ds_leltarkorzet)])
-#      if len(korzet_ids) == 1:
-#        akt_leltarkorzet_id = korzet_ids[0]['id']
-#        leltarkorzet_kod    = korzet_ids[0]['leltarkorzet_kod']
-#
-#      Eszkoz.create({'name': leltari_szam+' - '+megnevezes, 'hivszam': hivszam, 'leltari_szam': leltari_szam, 'megnevezes': megnevezes,
-#        'leltarcsoport_id': leltarcsoport_id, 'akt_leltarkorzet_id': akt_leltarkorzet_id, 'akt_hasznalo_id': akt_hasznalo_id,
-#        'leltarkorzet_kod': leltarkorzet_kod, 'csoportkod': csoportkod, 'leltari_szam_vonalkod': leltari_szam_vonalkod, 'megjegyzes': megjegyzes,
-#        'ds_leltarkorzet': ds_leltarkorzet, 'ds_leltarfelelos': ds_leltarfelelos })
-#      row = cursor.fetchone()
-#
-#    return True
 
   @api.one
   def import_eszkoz(self):
@@ -87,7 +68,7 @@ class LeltarParameter(models.Model):
     Log.create({'loglevel': 'info', 'name': u'Eszköz import', 'module': 'leltar'})
 
     cursor = mssql_conn.cursor()
-    cursor.execute("""SELECT hivszam, bf_lelt, bf_megnev, bf_ltkorzet, bf_ltfelelos, bf_ltcsoport, bf_param, bf_vonalkod
+    cursor.execute("""SELECT hivszam, bf_lelt, bf_megnev, bf_ltkorzet, bf_ltfelelos, bf_ltcsoport, bf_gyszam, bf_param, bf_vonalkod
                       FROM DominoSoft.dbo.beftorzs WHERE targyev = 2017 AND status = 0 AND bf_kiido IS NULL order by hivszam""")
     row = cursor.fetchone()
     while row:
@@ -95,7 +76,7 @@ class LeltarParameter(models.Model):
       leltarkorzet_kod    = None
       akt_hasznalo_id     = None
       akt_leltarkorzet_id = None
-      hivszam, leltari_szam, megnevezes, ds_leltarkorzet, ds_leltarfelelos, csoportkod, megjegyzes, leltari_szam_vonalkod = trim(row)
+      hivszam, leltari_szam, megnevezes, ds_leltarkorzet, ds_leltarfelelos, csoportkod, gyartasi_szam, megjegyzes, leltari_szam_vonalkod = trim(row)
       if not Eszkoz.search_count(['|', ('active', '=', True), ('active', '=', False), ('leltari_szam', '=', leltari_szam)]):
 
         csoport_ids = Csoport.search_read([('csoportkod', '=', csoportkod)])
@@ -108,56 +89,56 @@ class LeltarParameter(models.Model):
 
         Eszkoz.create({'name': leltari_szam+' - '+megnevezes, 'hivszam': hivszam, 'leltari_szam': leltari_szam, 'megnevezes': megnevezes,
           'leltarcsoport_id': leltarcsoport_id, 'akt_leltarkorzet_id': akt_leltarkorzet_id, 'akt_hasznalo_id': akt_hasznalo_id,
-          'leltarkorzet_kod': leltarkorzet_kod, 'csoportkod': csoportkod, 'leltari_szam_vonalkod': leltari_szam_vonalkod, 'megjegyzes': megjegyzes,
-          'ds_leltarkorzet': ds_leltarkorzet, 'ds_leltarfelelos': ds_leltarfelelos })
+          'leltarkorzet_kod': leltarkorzet_kod, 'csoportkod': csoportkod, 'leltari_szam_vonalkod': leltari_szam_vonalkod, 'gyartasi_szam': gyartasi_szam,
+          'megjegyzes': megjegyzes, 'ds_leltarkorzet': ds_leltarkorzet, 'ds_leltarfelelos': ds_leltarfelelos })
       row = cursor.fetchone()
     return True
 
-  @api.one
-  def import_felmeres(self):
-    import pymssql
-    mssql_conn = pymssql.connect(server='192.168.0.2\\PROLIANTML350', user='informix', password='informix', database='DominoSoft')
-
-    Leltar = self.env['leltar.leltar']
-    Eszkoz = self.env['leltar.eszkoz']
-    Korzet = self.env['leltar.korzet']
-    Mozgas = self.env['leltar.eszkozmozgas']
-    Log = self.env['szefo.log']
-    Log.create({'loglevel': 'info', 'name': u'Leltár felmérés import', 'module': 'leltar'})
-
-    ut_hivszam = Leltar.search([], limit=1, order='hivszam desc').hivszam
-    if not ut_hivszam: ut_hivszam = 0
-    cursor = mssql_conn.cursor()
-    cursor.execute("""SELECT hsz, targyev, targyho, lt_bfvonalkod, lt_blvonalkod, lt_szobaszam, ervkezdet FROM DominoSoft.dbo.befleltar
-                      WHERE hsz > %s ORDER BY hsz""" % ut_hivszam)
-    row = cursor.fetchone()
-    while row:
-      eszkoz_id = None
-      leltarkorzet_id = None
-      hivszam, targyev, targyho, leltari_szam_vonalkod, leltarkorzet_vonalkod, szobaszam, ervenyesseg_kezdete = trim(row)
-      eszkoz_ids = Eszkoz.search_read([('leltari_szam_vonalkod', '=', leltari_szam_vonalkod)])
-      if eszkoz_ids:
-        eszkoz_id = eszkoz_ids[0]['id']
-        csoportkod = eszkoz_ids[0]['csoportkod']
-        akt_leltarkorzet = eszkoz_ids[0]['akt_leltarkorzet_id']
-        if akt_leltarkorzet:
-          akt_leltarkorzet_id = akt_leltarkorzet[0]
-        else:
-          akt_leltarkorzet_id = False
-      korzet_ids = Korzet.search_read([('leltarkorzet_kod', '=', leltarkorzet_vonalkod)])
-#      korzet_ids = Korzet.search_read([('leltarkorzet_kod', '=', leltarkorzet_vonalkod), ('szobaszam', '=', szobaszam)])
-      if korzet_ids: leltarkorzet_id = korzet_ids[0]['id']
-      if eszkoz_id and leltarkorzet_id:
-        Leltar.create({'eszkoz_id': eszkoz_id, 'leltarkorzet_id': leltarkorzet_id, 'hivszam': hivszam,
-          'targyev': targyev, 'targyho': targyho, 'leltari_szam_vonalkod': leltari_szam_vonalkod,
-          'leltarkorzet_vonalkod': leltarkorzet_vonalkod, 'szobaszam': szobaszam, 'ervenyesseg_kezdete': ervenyesseg_kezdete})
-        if akt_leltarkorzet_id != leltarkorzet_id and csoportkod != '005':
-          Mozgas.create({'eszkoz_id': eszkoz_id, 'honnan_leltarkorzet_id': akt_leltarkorzet_id,
-                        'hova_leltarkorzet_id': leltarkorzet_id, 'megerkezett': True, 'megjegyzes': 'leltár' })
-      else:
-        Log.create({'loglevel': 'error', 'name': u'Sikertelen import', 'module': 'DominoSoft', 'table': 'befleltar', 'rowid': hivszam})
-      row = cursor.fetchone()
-    return True
+#  @api.one
+#  def import_felmeres(self):
+#    import pymssql
+#    mssql_conn = pymssql.connect(server='192.168.0.2\\PROLIANTML350', user='informix', password='informix', database='DominoSoft')
+#
+#    Leltar = self.env['leltar.leltar']
+#    Eszkoz = self.env['leltar.eszkoz']
+#    Korzet = self.env['leltar.korzet']
+#    Mozgas = self.env['leltar.eszkozmozgas']
+#    Log = self.env['szefo.log']
+#    Log.create({'loglevel': 'info', 'name': u'Leltár felmérés import', 'module': 'leltar'})
+#
+#    ut_hivszam = Leltar.search([], limit=1, order='hivszam desc').hivszam
+#    if not ut_hivszam: ut_hivszam = 0
+#    cursor = mssql_conn.cursor()
+#    cursor.execute("""SELECT hsz, targyev, targyho, lt_bfvonalkod, lt_blvonalkod, lt_szobaszam, ervkezdet FROM DominoSoft.dbo.befleltar
+#                      WHERE hsz > %s ORDER BY hsz""" % ut_hivszam)
+#    row = cursor.fetchone()
+#    while row:
+#      eszkoz_id = None
+#      leltarkorzet_id = None
+#      hivszam, targyev, targyho, leltari_szam_vonalkod, leltarkorzet_vonalkod, szobaszam, ervenyesseg_kezdete = trim(row)
+#      eszkoz_ids = Eszkoz.search_read([('leltari_szam_vonalkod', '=', leltari_szam_vonalkod)])
+#      if eszkoz_ids:
+#        eszkoz_id = eszkoz_ids[0]['id']
+#        csoportkod = eszkoz_ids[0]['csoportkod']
+#        akt_leltarkorzet = eszkoz_ids[0]['akt_leltarkorzet_id']
+#        if akt_leltarkorzet:
+#          akt_leltarkorzet_id = akt_leltarkorzet[0]
+#        else:
+#          akt_leltarkorzet_id = False
+#      korzet_ids = Korzet.search_read([('leltarkorzet_kod', '=', leltarkorzet_vonalkod)])
+##      korzet_ids = Korzet.search_read([('leltarkorzet_kod', '=', leltarkorzet_vonalkod), ('szobaszam', '=', szobaszam)])
+#      if korzet_ids: leltarkorzet_id = korzet_ids[0]['id']
+#      if eszkoz_id and leltarkorzet_id:
+#        Leltar.create({'eszkoz_id': eszkoz_id, 'leltarkorzet_id': leltarkorzet_id, 'hivszam': hivszam,
+#          'targyev': targyev, 'targyho': targyho, 'leltari_szam_vonalkod': leltari_szam_vonalkod,
+#          'leltarkorzet_vonalkod': leltarkorzet_vonalkod, 'szobaszam': szobaszam, 'ervenyesseg_kezdete': ervenyesseg_kezdete})
+#        if akt_leltarkorzet_id != leltarkorzet_id and csoportkod != '005':
+#          Mozgas.create({'eszkoz_id': eszkoz_id, 'honnan_leltarkorzet_id': akt_leltarkorzet_id,
+#                        'hova_leltarkorzet_id': leltarkorzet_id, 'megerkezett': True, 'megjegyzes': 'leltár' })
+#      else:
+#        Log.create({'loglevel': 'error', 'name': u'Sikertelen import', 'module': 'DominoSoft', 'table': 'befleltar', 'rowid': hivszam})
+#      row = cursor.fetchone()
+#    return True
 
 class LeltarDsFelelos(models.Model):
   _name       = 'leltar.ds_felelos'
@@ -249,6 +230,7 @@ class LeltarEszkoz(models.Model):
   szett_id              = fields.Many2one('leltar.szett', u'Eszköz szett')
   csoportkod            = fields.Char(u'Leltárcsoport kód',  required=True)
   leltari_szam_vonalkod = fields.Char(u'Leltári szám vonalkód',   required=True)
+  gyartasi_szam         = fields.Char(u'Gyártási szám')
   megjegyzes            = fields.Char(u'Megjegyzés')
   leltarkorzet_kod      = fields.Char(u'DS <-> Leltárkörzet kód')
   ds_leltarkorzet       = fields.Char(u'DS Leltárkörzet',  required=True)
