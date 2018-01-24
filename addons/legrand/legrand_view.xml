@@ -1191,6 +1191,17 @@
       </field>
     </record>
 
+    <record id="view_filter_lezer_tampon"    model="ir.ui.view">
+      <field  name="name">Lézer tampon Filter</field>
+      <field  name="model">legrand.lezer_tampon</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field name="muvelet"/>
+          <field name="termek_id"/>
+        </search>
+      </field>
+    </record>
+
     <!--####################################################################################################################  LIR users  -->
     <record id="view_tree_lir_user"   model="ir.ui.view">
       <field  name="name">LIR users Tree</field>

@@ -10,11 +10,14 @@
      <field name="arch" type="xml">
        <graph string="Gyártási lap értékelés"  type="pivot" stacked="True">
          <field name="rendelesszam"       type="row"/>
-         <field name="rendelt_db"         type="measure"/>
+         <field name="modositott_db"      type="measure"/>
          <field name="teljesitett_db"     type="measure"/>
          <field name="hatralek_db"        type="measure"/>
-         <field name="szamlazott_db"      type="measure"/>
-         <field name="szamlazhato_db"     type="measure"/>
+         <field name="rendelt_ora"        type="measure"/>
+         <field name="teljesitett_ora"    type="measure"/>
+         <field name="hatralek_ora"       type="measure"/>
+         <field name="szamlazott_ora"     type="measure"/>
+         <field name="szamlazhato_ora"    type="measure"/>
        </graph>
      </field>
     </record>
@@ -25,7 +28,7 @@
      <field name="model">legrand.muveletvegzes</field>
      <field name="arch" type="xml">
        <graph string="Műveletvégzés értékelés"  type="pivot" stacked="True">
-         <field name="hely_id"         type="row"/>
+         <field name="hely_id"            type="row"/>
          <field name="teljesitett_ora"    type="measure"/>
        </graph>
      </field>

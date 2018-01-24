@@ -637,18 +637,19 @@ class LegrandGyartasiLap(models.Model):
   termekcsalad        = fields.Char(u'Termékcsalád', readonly=True)
   termekkod           = fields.Char(u'Termékkód', required=True, readonly=True)
   rendelt_db          = fields.Integer(u'Rendelt db', required=True, readonly=True)
-  modositott_db       = fields.Integer(u'Módosított rendelés', states={'kesz': [('readonly', True)]})
+  modositott_db       = fields.Integer(u'Módosított rendelt db', states={'kesz': [('readonly', True)]})
   kiadas_ideje        = fields.Char(u'Kiadás ideje', readonly=True)
   hatarido_str        = fields.Char(u'Határidő (eredeti)', required=True, readonly=True)
   hatarido            = fields.Date(u'Határidő', states={'kesz': [('readonly', True)]})
   teljesitett_db      = fields.Integer(u'Teljesített db', default=0, states={'kesz': [('readonly', True)]})
+  hatralek_db         = fields.Integer(u'Hátralék db', compute='_compute_hatralek_db', store=True)
   szamlazott_db       = fields.Integer(u'Számlázott db',  default=0, states={'kesz': [('readonly', True)]})
   szamlazhato_db      = fields.Integer(u'Számlázható db', compute='_compute_szamlazhato_db', store=True)
-  hatralek_db         = fields.Integer(u'Hátralék db', compute='_compute_hatralek_db', store=True)
   cikk_id             = fields.Many2one('legrand.cikk',  u'Termék', required=True, readonly=True, auto_join=True)
   bom_id              = fields.Many2one('legrand.bom',  u'Anyagjegyzék', required=False, domain="[('cikk_id', '=', cikk_id)]", auto_join=True, states={'kesz': [('readonly', True)]})
   cikkek_uid          = fields.Char(u'Összes cikk uid', readonly=False)
   gyartasi_hely_ids   = fields.Many2many('legrand.hely', string=u'Fő gyártási helyek', domain=[('szefo_e', '=', True)], states={'kesz': [('readonly', True)]})
+  gyartasi_hely_id    = fields.Many2one('legrand.hely',  u'Fő gyártási hely', compute='_compute_gyartasi_hely_id', store=True)
   javitas_e           = fields.Boolean(u'Javítás?', default=False, states={'kesz': [('readonly', True)]})
   raklap              = fields.Char(u'Raklap',      readonly=True)
   raklap_min          = fields.Char(u'Raklap min',  readonly=True)
@@ -657,12 +658,14 @@ class LegrandGyartasiLap(models.Model):
   muveletek_elvegezve = fields.Boolean(u'Műveletek elvégezve?', compute='_compute_muveletek_elvegezve', store=True)
   carnet_e            = fields.Boolean(u'Carnet?', default=False, states={'kesz': [('readonly', True)]})
   csokkentve_e        = fields.Boolean(u'Csökkentve/Visszavonva', default=False, states={'kesz': [('readonly', True)]})
+  rendelt_ora         = fields.Float(u'Rendelt óra',      digits=(16, 2), compute='_compute_rendelt_ora',     store=True)
+  teljesitett_ora     = fields.Float(u'Teljesített óra',  digits=(16, 2), compute='_compute_teljesitett_ora', store=True)
+  hatralek_ora        = fields.Float(u'Hátralék óra',     digits=(16, 2), compute='_compute_hatralek_ora',    store=True)
+  szamlazott_ora      = fields.Float(u'Számlázott óra',   digits=(16, 2), compute='_compute_szamlazott_ora',  store=True)
+  szamlazhato_ora     = fields.Float(u'Számlázható óra',  digits=(16, 2), compute='_compute_szamlazhato_ora', store=True)
   active              = fields.Boolean(u'Aktív?', default=True)
   # virtual fields
   cikknev             = fields.Char(u'Terméknév', related='cikk_id.cikknev', readonly=True)
-  rendelt_ora         = fields.Float(u'Rendelt óra',      digits=(16, 2), compute='_compute_rendelt_ora')
-  teljesitett_ora     = fields.Float(u'Teljesített óra',  digits=(16, 2), compute='_compute_teljesitett_ora')
-  szamlazott_ora      = fields.Float(u'Számlázott óra',   digits=(16, 2), compute='_compute_szamlazott_ora')
   utolso_feljegyzes   = fields.Char(u'Utolsó feljegyzés', compute='_compute_utolso_feljegyzes')
   feljegyzes_ideje    = fields.Char(u'Feljegyzés ideje',  compute='_compute_utolso_feljegyzes')
   check_cikkek_uid    = fields.Char(u'Ellenőrzés', compute='_compute_check_cikkek_uid')
@@ -686,6 +689,14 @@ class LegrandGyartasiLap(models.Model):
     self.name = str(self.id)+' '+self.rendelesszam+' -> '+self.cikk_id.cikkszam
 
   @api.one
+  @api.depends('gyartasi_hely_ids')
+  def _compute_gyartasi_hely_id(self):
+    if self.gyartasi_hely_ids:
+      self.gyartasi_hely_id = self.gyartasi_hely_ids[0].id
+    else:
+      self.gyartasi_hely_id = False
+
+  @api.one
   @api.depends('teljesitett_db', 'szamlazott_db')
   def _compute_szamlazhato_db(self):
     self.szamlazhato_db = self.teljesitett_db - self.szamlazott_db
@@ -696,19 +707,29 @@ class LegrandGyartasiLap(models.Model):
     self.hatralek_db = self.modositott_db - self.teljesitett_db
 
   @api.one
-  @api.depends('gylap_homogen_ids.rendelt_ora')
+  @api.depends('gylap_homogen_ids.sajat', 'gylap_homogen_ids.rendelt_ora')
   def _compute_rendelt_ora(self):
     self.rendelt_ora = sum(self.gylap_homogen_ids.filtered('sajat').mapped('rendelt_ora'))
 
   @api.one
-  @api.depends('gylap_homogen_ids.teljesitett_ora')
+  @api.depends('gylap_homogen_ids.sajat', 'gylap_homogen_ids.teljesitett_ora')
   def _compute_teljesitett_ora(self):
     self.teljesitett_ora = sum(self.gylap_homogen_ids.filtered('sajat').mapped('teljesitett_ora'))
 
   @api.one
-  @api.depends('gylap_homogen_ids.szamlazott_ora')
+  @api.depends('rendelt_ora', 'teljesitett_ora')
+  def _compute_hatralek_ora(self):
+    self.hatralek_ora = self.rendelt_ora - self.teljesitett_ora
+
+  @api.one
+  @api.depends('gylap_homogen_ids.sajat', 'gylap_homogen_ids.szamlazott_ora')
   def _compute_szamlazott_ora(self):
     self.szamlazott_ora = sum(self.gylap_homogen_ids.filtered('sajat').mapped('szamlazott_ora'))
+
+  @api.one
+  @api.depends('teljesitett_ora', 'szamlazott_ora')
+  def _compute_szamlazhato_ora(self):
+    self.szamlazhato_ora = self.teljesitett_ora - self.szamlazott_ora
 
   @api.one
   @api.depends('cikk_id')
@@ -873,9 +894,9 @@ class LegrandGylapHomogen(models.Model):
   teljesitett_ora     = fields.Float(u'Teljesített óra',  digits=(16, 5), compute='_compute_teljesitett_ora', store=True)
   szamlazott_ora      = fields.Float(u'Számlázott óra',   digits=(16, 5), compute='_compute_szamlazott_ora',  store=True)
   szamlazhato_ora     = fields.Float(u'Számlázható óra',  digits=(16, 5), compute='_compute_szamlazhato_ora', store=True)
-  # virtual fields
   state               = fields.Selection([('uj',u'Új'),('mterv',u'Műveletterv'),('gyartas',u'Gyártás'),('gykesz',u'Gyártás kész'),('kesz',u'Rendelés teljesítve')],
-                                        u'Gy.lap állapot', related='gyartasi_lap_id.state', readonly=True)
+                                        u'Gy.lap állapot', related='gyartasi_lap_id.state', readonly=True, store=True)
+  # virtual fields
   rendelesszam        = fields.Char(u'Rendelésszám', related='gyartasi_lap_id.rendelesszam', readonly=True)
   termekkod           = fields.Char(u'Tételkód', related='gyartasi_lap_id.termekkod', readonly=True)
   szamlazhato_db      = fields.Integer(u'Számlázható', related='gyartasi_lap_id.szamlazhato_db', readonly=True)
