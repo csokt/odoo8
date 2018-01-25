@@ -82,6 +82,7 @@
             <group col="4">
               <field name="cikkszam"/>
               <field name="cikknev"/>
+              <field name="termekcsoport"/>
               <field name="alkatresz_e"/>
               <field name="bekerulesi_ar"/>
               <field name="kesztermek_e"/>
@@ -740,6 +741,7 @@
         <search>
           <field  name="name"/>
           <field  name="id"                 string="Sorszám"/>
+          <field  name="termekcsoport"/>
           <field  name="cikknev"/>
           <filter name="filter_szentes"     string="Szentes"                domain="[('gyartasi_hely_ids.azonosito','=','szentes')]"/>
           <filter name="filter_hmvhely"     string="Hódmezővásárhely"       domain="[('gyartasi_hely_ids.azonosito','=','hmvhely')]"/>

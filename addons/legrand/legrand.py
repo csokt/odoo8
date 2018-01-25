@@ -31,6 +31,7 @@ class LegrandCikk(models.Model):
 #  name                = fields.Char(u'Név',      compute='_compute_name', store=True)
   cikkszam            = fields.Char(u'Cikkszám', required=True)
   cikknev             = fields.Char(u'Cikknév',  required=True)
+  termekcsoport       = fields.Char(u'Termékcsoport')
   alkatresz_e         = fields.Boolean(u'Alkatrész?',   default=False)
   kesztermek_e        = fields.Boolean(u'Késztermék?',  default=False)
   szefo_cikk_e        = fields.Boolean(u'SZEFO cikk?',  default=False)
@@ -663,6 +664,7 @@ class LegrandGyartasiLap(models.Model):
   hatralek_ora        = fields.Float(u'Hátralék óra',     digits=(16, 2), compute='_compute_hatralek_ora',    store=True)
   szamlazott_ora      = fields.Float(u'Számlázott óra',   digits=(16, 2), compute='_compute_szamlazott_ora',  store=True)
   szamlazhato_ora     = fields.Float(u'Számlázható óra',  digits=(16, 2), compute='_compute_szamlazhato_ora', store=True)
+  termekcsoport       = fields.Char(u'Termékcsoport',     related='cikk_id.termekcsoport',    readonly=True,  store=True)
   active              = fields.Boolean(u'Aktív?', default=True)
   # virtual fields
   cikknev             = fields.Char(u'Terméknév', related='cikk_id.cikknev', readonly=True)
