@@ -652,7 +652,7 @@
 
             <field name="javitas_e"           />
             <field name="muveletek_elvegezve" />
-            <field name="carnet_e"            />
+            <field name="carnet_db"           />
             <field name="csokkentve_e"        />
             <field name="active"              groups="legrand.group_legrand_director"/>
           </group>

@@ -657,7 +657,8 @@ class LegrandGyartasiLap(models.Model):
   raklap_max          = fields.Char(u'Raklap max',  readonly=True)
   rakat_tipus         = fields.Char(u'Rakat tipus', readonly=True)
   muveletek_elvegezve = fields.Boolean(u'Műveletek elvégezve?', compute='_compute_muveletek_elvegezve', store=True)
-  carnet_e            = fields.Boolean(u'Carnet?', default=False, states={'kesz': [('readonly', True)]})
+  carnet_db           = fields.Integer(u'Carnet db', states={'kesz': [('readonly', True)]})
+  carnet_e            = fields.Boolean(u'Carnet?', compute='_compute_carnet_e', store=True)
   csokkentve_e        = fields.Boolean(u'Csökkentve/Visszavonva', default=False, states={'kesz': [('readonly', True)]})
   rendelt_ora         = fields.Float(u'Rendelt óra',      digits=(16, 2), compute='_compute_rendelt_ora',     store=True)
   teljesitett_ora     = fields.Float(u'Teljesített óra',  digits=(16, 2), compute='_compute_teljesitett_ora', store=True)
@@ -697,6 +698,11 @@ class LegrandGyartasiLap(models.Model):
       self.gyartasi_hely_id = self.gyartasi_hely_ids[0].id
     else:
       self.gyartasi_hely_id = False
+
+  @api.one
+  @api.depends('teljesitett_db', 'carnet_db')
+  def _compute_carnet_e(self):
+    self.carnet_e = self.teljesitett_db < self.carnet_db
 
   @api.one
   @api.depends('teljesitett_db', 'szamlazott_db')
