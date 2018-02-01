@@ -200,7 +200,6 @@
       <field  name="priority" eval="15"/>
       <field  name="arch" type="xml">
         <tree editable="bottom">
-          <field name="vonalkod"/>
           <field name="cikk_id"                 options="{'no_create': True}"/>
           <field name="raktaron"                invisible="context.get('mozgasnem') not in ('elad','belso','rendel')"  readonly="1"/>
           <field name="mennyiseg"/>

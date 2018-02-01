@@ -37,6 +37,7 @@
             <field name="cim"/>
             <field name="sorrend"/>
             <field name="id"                    readonly="1"/>
+            <field name="gyartasi_hely_e"/>
             <field name="szefo_e"/>
             <field name="legrand_e"/>
             <field name="szefo_szallitas_e"/>
@@ -61,6 +62,7 @@
           <field name="telepules"/>
           <field name="cim"/>
           <field name="sorrend"/>
+          <field name="gyartasi_hely_e"/>
           <field name="szefo_e"/>
           <field name="legrand_e"/>
           <field name="szefo_szallitas_e"/>
@@ -316,6 +318,7 @@
           <field name="write_uid"               readonly="1"  string="Módosította"/>
           <field name="write_date"              readonly="1"  string="Módosítás ideje"/>
           <field name="state"                   invisible="1"/>
+          <field name="mozgasnem"               invisible="1"/>
           <field name="mozgasfej_id"            invisible="1"/>
           <field name="forrashely_id"           invisible="1"/>
         </tree>

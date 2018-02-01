@@ -14,6 +14,7 @@ class LegrandHely(models.Model):
   cim                 = fields.Char(u'Cím')
   azonosito           = fields.Char(u'Belső azonosító')
   sorrend             = fields.Integer(u'Sorrend')
+  gyartasi_hely_e     = fields.Boolean(u'Gyártási hely?')                 # Folyik-e termelés ezen a helyen?
   szefo_e             = fields.Boolean(u'SZEFO készletbe számít?')        # A SZEFO készletbe beszámít-e ez a hely?
   legrand_e           = fields.Boolean(u'Legrand készletbe számít?')      # A Legrand készletbe beszámít-e ez a hely?
   szefo_szallitas_e   = fields.Boolean(u'Legrand-SZEFO szállítás?')       # A Legrand és a SZEFO közötti a mozgás?
@@ -289,6 +290,8 @@ class LegrandMozgassor(models.Model):
   def create(self, vals):
     new = super(LegrandMozgassor, self).create(vals)
     new.mozgasfej_sorszam = new.mozgasfej_id.id
+    if new.mozgasnem == 'ki' and new.mennyiseg > new.forrashelyen:
+      raise exceptions.Warning(u'A kiszállítás nagyobb mint a hátralék!')
     return new
 
   @api.multi
@@ -332,9 +335,12 @@ class LegrandMozgassor(models.Model):
     self.cikk_id = False
 
   @api.one
-  @api.depends('cikk_id', 'forrashely_id')
+  @api.depends('cikk_id', 'forrashely_id', 'mozgasnem')
   def _compute_forrashelyen(self):
-    self.forrashelyen = self.env['legrand.keszlet'].search([('cikk_id', '=', self.cikk_id.id), ('hely_id', '=', self.forrashely_id.id)]).raktaron
+    if self.mozgasnem == 'ki':
+      self.forrashelyen = self.gyartasi_lap_id.hatralek_db
+    else:
+      self.forrashelyen = self.env['legrand.keszlet'].search([('cikk_id', '=', self.cikk_id.id), ('hely_id', '=', self.forrashely_id.id)]).raktaron
 
 ############################################################################################################################  Cikk mozgás  ###
 class LegrandCikkMozgas(models.Model):
