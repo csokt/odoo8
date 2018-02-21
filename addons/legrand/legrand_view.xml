@@ -788,7 +788,7 @@
           <field name="osszes_ido"      sum="összes idő"/>
           <field name="osszes_db"/>
           <field name="kesz_db"/>
-          <field name="elter_db"/>
+          <field name="hiany_db"/>
         </tree>
       </field>
     </record>
@@ -803,10 +803,10 @@
           <field name="muveletnev"/>
           <field name="osszes_db"/>
           <field name="kesz_db"/>
-          <field name="elter_db"/>
+          <field name="hiany_db"/>
           <field name="osszes_ora"        sum="összes óra"/>
           <field name="kesz_ora"          sum="kész óra"/>
-          <field name="elter_ora"         sum="eltér óra"/>
+          <field name="hiany_ora"         sum="hiány óra"/>
         </tree>
       </field>
     </record>
@@ -819,7 +819,7 @@
           <field name="gyartasi_lap_id"/>
           <field name="muveletszam"/>
           <field name="muveletnev"/>
-          <filter name="filter_tulgyartas" string="Túlgyártás" domain="[('elter_db','>',0)]"/>
+          <filter name="filter_tulgyartas" string="Túlgyártás" domain="[('hiany_db','&lt;',0)]"/>
         </search>
       </field>
     </record>

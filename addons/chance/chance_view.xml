@@ -288,7 +288,6 @@
        <graph string="Készlet értékelés"  type="pivot"      stacked="True">
          <field name="hely_id"            type="row"/>
          <field name="cikkszam"           type="row"/>
-         <field name="osztaly"            type="row"/>
          <field name="szin"               type="row"/>
          <field name="meret"              type="col"/>
          <field name="raktaron"           type="measure"/>
@@ -307,19 +306,25 @@
           <field name="meret"/>
           <field name="szin"/>
           <field name="megnevezes"/>
-          <filter name="filter_keszaru"     string="Készáru raktár"       domain="[('hely_id.azonosito','=','keszaru')]"/>
-          <filter name="filter_biatorbagy"  string="Biatorbágy üzlet"     domain="[('hely_id.azonosito','=','biatorbagy')]"/>
-          <filter name="filter_szeged"      string="Szeged Márkabolt"     domain="[('hely_id.azonosito','=','szeged')]"/>
-          <filter name="filter_heviz"       string="Hévíz Márkabolt"      domain="[('hely_id.azonosito','=','heviz')]"/>
+          <filter name="filter_keszaru"     string="Készáru raktár"           domain="[('hely_id.azonosito','in',('keszaru','keszaru2','keszaru3'))]"/>
+          <filter name="filter_minta"       string="Mintaraktár"              domain="[('hely_id.azonosito','in',('minta','minta2'))]"/>
+          <filter name="filter_biatorbagy"  string="Chance Brand Biatorbágy"  domain="[('hely_id.azonosito','=','biatorbagy')]"/>
+          <filter name="filter_szeged"      string="Szeged Márkabolt"         domain="[('hely_id.azonosito','=','szeged')]"/>
+          <filter name="filter_heviz"       string="Hévíz Márkabolt"          domain="[('hely_id.azonosito','=','heviz')]"/>
           <separator/>
-          <filter name="filter_szefo_e"     string="Szefo készlet"        domain="[('szefo_e','=',True)]"/>
+          <filter name="filter_elso"        string="1. osztály"               domain="[('osztaly','=','1')]"/>
+          <filter name="filter_masod"       string="2. osztály"               domain="[('osztaly','=','2')]"/>
+          <filter name="filter_otod"        string="5. osztály"               domain="[('osztaly','=','5')]"/>
+          <filter name="filter_n"           string="Nincs osztály"            domain="[('osztaly','=','N')]"/>
+          <separator/>
+          <filter name="filter_szefo_e"     string="Szefo készlet"            domain="[('szefo_e','=',True)]"/>
           <group expand="0" string="Csoportosítás">
-            <filter name="group_hely"       string="Hely"                 context="{'group_by': 'hely_id'}"/>
-            <filter name="group_cikk"       string="Cikkazonosito"        context="{'group_by': 'cikk_id'}"/>
-            <filter name="group_cikkszam"   string="Cikkszám"             context="{'group_by': 'cikkszam'}"/>
-            <filter name="group_osztaly"    string="Osztály"              context="{'group_by': 'osztaly'}"/>
-            <filter name="group_meret"      string="Méret"                context="{'group_by': 'meret'}"/>
-            <filter name="group_szin"       string="Szín"                 context="{'group_by': 'szin'}"/>
+            <filter name="group_hely"       string="Hely"                     context="{'group_by': 'hely_id'}"/>
+            <filter name="group_cikk"       string="Cikkazonosito"            context="{'group_by': 'cikk_id'}"/>
+            <filter name="group_cikkszam"   string="Cikkszám"                 context="{'group_by': 'cikkszam'}"/>
+            <filter name="group_osztaly"    string="Osztály"                  context="{'group_by': 'osztaly'}"/>
+            <filter name="group_meret"      string="Méret"                    context="{'group_by': 'meret'}"/>
+            <filter name="group_szin"       string="Szín"                     context="{'group_by': 'szin'}"/>
           </group>
         </search>
       </field>
@@ -392,7 +397,7 @@
                                                                   context="{'search_default_filter_szefo_e': 1}"/>
 
     <act_window id="keszlet_ertekel"    name="Készlet értékelés"  res_model="chance.keszlet"                                                       view_mode="graph"
-                                                                  context="{'search_default_filter_szefo_e': 1}"/>
+                                                                  context="{'search_default_filter_szefo_e': 1, 'search_default_filter_elso': 1}"/>
 
     <act_window id="keszlet_cikk"       name="Vállalati készlet"  res_model="chance.keszlet_cikk"                                                  view_mode="tree,form"/>
     <act_window id="cikkar"             name="Cikk ár"            res_model="chance.cikkar"                                                        view_mode="tree"/>

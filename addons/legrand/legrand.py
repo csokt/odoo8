@@ -688,9 +688,9 @@ class LegrandGyartasiLap(models.Model):
   gylap_muvelet_ids   = fields.One2many('legrand.gylap_legrand_muvelet','gyartasi_lap_id', u'Műveleti utasítás',    readonly=True, auto_join=True)
 
   @api.one
-  @api.depends('szefo_muvelet_ids', 'szefo_muvelet_ids.elter_db')
+  @api.depends('szefo_muvelet_ids', 'szefo_muvelet_ids.hiany_db')
   def _compute_muveletek_elvegezve(self):
-    self.muveletek_elvegezve = len(self.szefo_muvelet_ids.filtered(lambda r: r.elter_db < 0)) == 0
+    self.muveletek_elvegezve = len(self.szefo_muvelet_ids.filtered(lambda r: r.hiany_db > 0)) == 0
 
   @api.one
   @api.depends('rendelesszam', 'cikk_id')
@@ -970,10 +970,12 @@ class LegrandSzefoMuvelet(models.Model):
   osszes_db           = fields.Integer(u'Összes db',                compute='_compute_osszes_db',   store=True)
   kesz_db             = fields.Integer(u'Kész db',                  compute='_compute_kesz_db',     store=True)
   elter_db            = fields.Integer(u'Eltér db',                 compute='_compute_elter_db',    store=True)
+  hiany_db            = fields.Integer(u'Hiány db',                 compute='_compute_hiany',       store=True)
   osszes_ido          = fields.Float(u'Összes idő', digits=(16, 5), compute='_compute_osszes_ido',  store=True)
   osszes_ora          = fields.Float(u'Összes óra', digits=(16, 2), compute='_compute_osszes_ora',  store=True)
   kesz_ora            = fields.Float(u'Kész óra',   digits=(16, 2), compute='_compute_kesz_ora',    store=True)
   elter_ora           = fields.Float(u'Eltér óra',  digits=(16, 2), compute='_compute_elter_ora',   store=True)
+  hiany_ora           = fields.Float(u'Hiány óra',  digits=(16, 2), compute='_compute_hiany',       store=True)
   # virtual fields
   muveletvegzes_ids   = fields.One2many('legrand.muveletvegzes',  'szefo_muvelet_id', u'Műveletvégzés', auto_join=True)
   active              = fields.Boolean(u'Aktív?', related='gyartasi_lap_id.active', readonly=True)
@@ -997,6 +999,12 @@ class LegrandSzefoMuvelet(models.Model):
   @api.depends('osszes_db', 'kesz_db')
   def _compute_elter_db(self):
     self.elter_db = self.kesz_db - self.osszes_db
+
+  @api.one
+  @api.depends('osszes_db', 'kesz_db', 'osszes_ora', 'kesz_ora')
+  def _compute_hiany(self):
+    self.hiany_db  = self.osszes_db - self.kesz_db
+    self.hiany_ora = self.osszes_ora - self.kesz_ora
 
   @api.one
   @api.depends('osszes_db', 'normaora')
