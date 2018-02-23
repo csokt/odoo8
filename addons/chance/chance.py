@@ -187,7 +187,7 @@ class ChanceKeszlet(models.Model):
   _name               = 'chance.keszlet'
   _auto               = False
   _rec_name           = 'id'
-  _order              = 'cikk_id, hely_id'
+  _order              = 'hely_id, cikk_id, osztaly, meret, szin'
   cikk_id             = fields.Many2one('chance.cikk', string=u'Cikkazonosító', readonly=True)
   hely_id             = fields.Many2one('chance.hely', u'Raktárhely', readonly=True)
   szefo_e             = fields.Boolean(u'SZEFO készletbe számít?', readonly=True)

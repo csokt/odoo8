@@ -969,12 +969,10 @@ class LegrandSzefoMuvelet(models.Model):
   beall_ido           = fields.Float(u'Beállítási idő', digits=(16, 5), required=True)
   osszes_db           = fields.Integer(u'Összes db',                compute='_compute_osszes_db',   store=True)
   kesz_db             = fields.Integer(u'Kész db',                  compute='_compute_kesz_db',     store=True)
-  elter_db            = fields.Integer(u'Eltér db',                 compute='_compute_elter_db',    store=True)
   hiany_db            = fields.Integer(u'Hiány db',                 compute='_compute_hiany',       store=True)
   osszes_ido          = fields.Float(u'Összes idő', digits=(16, 5), compute='_compute_osszes_ido',  store=True)
   osszes_ora          = fields.Float(u'Összes óra', digits=(16, 2), compute='_compute_osszes_ora',  store=True)
   kesz_ora            = fields.Float(u'Kész óra',   digits=(16, 2), compute='_compute_kesz_ora',    store=True)
-  elter_ora           = fields.Float(u'Eltér óra',  digits=(16, 2), compute='_compute_elter_ora',   store=True)
   hiany_ora           = fields.Float(u'Hiány óra',  digits=(16, 2), compute='_compute_hiany',       store=True)
   # virtual fields
   muveletvegzes_ids   = fields.One2many('legrand.muveletvegzes',  'szefo_muvelet_id', u'Műveletvégzés', auto_join=True)
@@ -994,11 +992,6 @@ class LegrandSzefoMuvelet(models.Model):
   @api.depends('muveletvegzes_ids', 'muveletvegzes_ids.mennyiseg')
   def _compute_kesz_db(self):
     self.kesz_db = sum(self.muveletvegzes_ids.mapped('mennyiseg'))
-
-  @api.one
-  @api.depends('osszes_db', 'kesz_db')
-  def _compute_elter_db(self):
-    self.elter_db = self.kesz_db - self.osszes_db
 
   @api.one
   @api.depends('osszes_db', 'kesz_db', 'osszes_ora', 'kesz_ora')
@@ -1023,11 +1016,6 @@ class LegrandSzefoMuvelet(models.Model):
       self.kesz_ora = self.osszes_ora * self.kesz_db / self.osszes_db
     else:
       self.kesz_ora = 0
-
-  @api.one
-  @api.depends('kesz_ora', 'osszes_ora')
-  def _compute_elter_ora(self):
-    self.elter_ora = self.kesz_ora - self.osszes_ora
 
 ############################################################################################################################  Műveletvégzés  ###
 class LegrandMuveletvegzes(models.Model):

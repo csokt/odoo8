@@ -267,16 +267,16 @@
       <field  name="priority" eval="15"/>
       <field  name="arch" type="xml">
         <tree>
+          <field name="hely_id"/>
           <field name="cikkszam"/>
           <field name="megnevezes"/>
-          <field name="szin"/>
-          <field name="meret"/>
-          <field name="raktaron"/>
-          <field name="hely_id"/>
           <field name="osztaly"/>
+          <field name="meret"/>
+          <field name="szin"/>
           <field name="onkoltseg"/>
           <field name="ertek"/>
           <field name="varhato"/>
+          <field name="raktaron"/>
         </tree>
       </field>
     </record>
