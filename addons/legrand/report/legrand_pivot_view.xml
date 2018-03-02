@@ -28,7 +28,9 @@
      <field name="model">legrand.muveletvegzes</field>
      <field name="arch" type="xml">
        <graph string="Műveletvégzés értékelés"  type="pivot" stacked="True">
+         <field name="create_date"        type="row"        interval="month"/>
          <field name="hely_id"            type="row"/>
+         <field name="gyartasi_hely_id"   type="row"/>
          <field name="teljesitett_ora"    type="measure"/>
        </graph>
      </field>

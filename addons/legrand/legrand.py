@@ -72,7 +72,7 @@ class LegrandBom(models.Model):
   mozgassor_ids       = fields.One2many('legrand.mozgassor', 'bom_id', u'Szállítás sorok', readonly=True, auto_join=True)
   count_mozgassor_ids = fields.Integer(u'Szállítás sorok db', compute='_compute_count_mozgassor_ids')
   admin_e             = fields.Boolean(u'Admin?',             compute='_check_user_group')
-  legrand_admin_e     = fields.Boolean(u'Legrand admin?',     compute='_check_user_group')
+  legrand_director_e  = fields.Boolean(u'Legrand director?',  compute='_check_user_group')
   # temporary fields
   raktar_gylap_id     = fields.Integer(u'Gyártási lap sorszám')
 
@@ -96,7 +96,7 @@ class LegrandBom(models.Model):
   @api.one
   def _check_user_group(self):
     self.admin_e = self.env.user.has_group('base.group_system')
-    self.legrand_admin_e = self.env.user.has_group('legrand.group_legrand_admin')
+    self.legrand_director_e = self.env.user.has_group('legrand.group_legrand_director')
 
   @api.one
   def import_impex(self):
@@ -1029,8 +1029,9 @@ class LegrandMuveletvegzes(models.Model):
   megjegyzes          = fields.Char(u'Megjegyzés')
   nexon_azon          = fields.Integer(u'Személy Id')
   felvette_id         = fields.Many2one('res.users', u'Felvette', readonly=True, auto_join=True)
+  gyartasi_lap_id     = fields.Many2one('legrand.gyartasi_lap',  u'Gyártási lap', related='szefo_muvelet_id.gyartasi_lap_id', readonly=True, auto_join=True, store=True)
+  gyartasi_hely_id    = fields.Many2one('legrand.hely',  u'Fő gyártási hely', related='szefo_muvelet_id.gyartasi_lap_id.gyartasi_hely_id', readonly=True, auto_join=True, store=True)
   # virtual fields
-  gyartasi_lap_id     = fields.Many2one('legrand.gyartasi_lap',  u'Gyártási lap', related='szefo_muvelet_id.gyartasi_lap_id', readonly=True, auto_join=True)
   muveletnev          = fields.Char(u'Műveletnév',   related='szefo_muvelet_id.muveletnev', readonly=True)
   osszes_db           = fields.Integer(u'Összes db', related='szefo_muvelet_id.osszes_db', readonly=True)
   kesz_db             = fields.Integer(u'Kész db',   related='szefo_muvelet_id.kesz_db', readonly=True)

@@ -158,9 +158,9 @@
               <field name="count_mozgassor_ids"/>
               <field name="active"/>
               <field name="admin_e"             invisible="1"/>
-              <field name="legrand_admin_e"     invisible="1"/>
+              <field name="legrand_director_e"  invisible="1"/>
             </group>
-            <field name="bom_line_ids"          attrs="{'readonly': [('admin_e', '=', False), ('count_mozgassor_ids','>',0)]}"/>
+            <field name="bom_line_ids"          attrs="{'readonly': [('legrand_director_e', '=', False), ('count_mozgassor_ids','>',0)]}"/>
           </sheet>
         </form>
       </field>
@@ -584,6 +584,15 @@
           <field name="hely_id"/>
           <field name="nexon_azon"/>
           <field name="szemely_id"/>
+          <filter name="filter_depo"      string="Depó"                 domain="[('hely_id.azonosito','=','depo')]"/>
+          <filter name="filter_szentes"   string="Szentes"              domain="[('hely_id.azonosito','=','szentes')]"/>
+          <filter name="filter_hmvhely"   string="Hódmezővásárhely"     domain="[('hely_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_berkert"   string="Bérkert"              domain="[('hely_id.azonosito','=','berkert')]"/>
+          <filter name="filter_mako"      string="Makó"                 domain="[('hely_id.azonosito','=','mako')]"/>
+          <filter name="filter_oroshaza"  string="Orosháza"             domain="[('hely_id.azonosito','=','oroshaza')]"/>
+          <filter name="filter_apatfalva" string="Apátfalva"            domain="[('hely_id.azonosito','=','apatfalva')]"/>
+          <separator/>
+          <filter name="szamlazhato"      string="Számlázható"          domain="[('gyartasi_lap_id.szamlazhato_db','>',0)]"/>
         </search>
       </field>
     </record>
