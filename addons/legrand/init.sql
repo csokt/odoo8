@@ -288,3 +288,5 @@ WITH temp (k,v) AS (VALUES (0,-9999), (1, 100)) SELECT * FROM temp;
 
 update legrand_muvelet set legrand_normaora = normaora, legrand_beall_ido = beall_ido ;
 
+#########################################################################################
+

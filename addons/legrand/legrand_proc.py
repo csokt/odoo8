@@ -291,6 +291,7 @@ class LegrandParameter(models.Model):
 
     return True
 
+############################################################################################################################  Impex - Üzem készlet  ###
   @api.one
   def impex_uzem_keszlet(self):
     Impex  = self.env['legrand.impex']
@@ -304,4 +305,31 @@ class LegrandParameter(models.Model):
       UPDATE legrand_impex AS impex SET ertek = uzemi.keszlet FROM uzemi WHERE impex.cikk_id = uzemi.cikk_id
       """)
     self.env.cr.execute("""UPDATE legrand_impex SET megjegyzes = 'hiány' WHERE mennyiseg > ertek""")
+    return True
+
+############################################################################################################################  Anyagjegyzék ellenőrzése  ###
+  @api.one
+  def anyagj_ellenorzes(self):
+    Impex = self.env['legrand.impex']
+    Impex.search([]).unlink()
+
+    self.env.cr.execute("""
+      WITH list AS (
+      SELECT DISTINCT cikk.id AS termek_id, line.cikk_id AS anyag_id, round(beepules, 3) AS beepules FROM legrand_bom_line AS line
+      JOIN legrand_bom AS head on line.bom_id = head.id
+      JOIN legrand_cikk AS cikk on head.cikk_id = cikk.id
+      ),
+      ossz AS (
+      SELECT termek_id, anyag_id, count(*) AS count FROM list
+      GROUP BY termek_id, anyag_id
+      HAVING count(*) > 1
+      )
+      SELECT ossz.count, termek.cikkszam AS termek, anyag.cikkszam AS anyag, anyag.cikknev AS anyagnev FROM ossz
+      JOIN legrand_cikk AS termek on ossz.termek_id = termek.id
+      JOIN legrand_cikk AS anyag on ossz.anyag_id = anyag.id
+      ORDER BY termek, anyag
+      """)
+    rows = self.env.cr.fetchall()
+    for row in rows:
+      Impex.create({ 'megjegyzes': "%s|%s|%s|%s" % tuple(row) })
     return True

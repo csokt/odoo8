@@ -1271,6 +1271,7 @@
           <button name="calc_impex"         type="object" string="Impex id keres"             confirm="Az impex adattáblában kikeresi és beírja a hivatkozásokat." />
           <button name="impex_uzem_keszlet" type="object" string="Impex - Üzem készlet"       confirm="Az impex adattáblában lévő cikk mennyiség összevetése az üzem készletével." />
           <button name="gylap_ellenorzes"   type="object" string="Gyártási lapok ellenőrzése" confirm="Végigmegy a lezáratlan gyártási lapokon, a hibákak beírja az impex adattáblába." />
+          <button name="anyagj_ellenorzes"  type="object" string="Anyagjegyzék ellenőrzése"   confirm="A anyagjegyzékből készít [termék, alkatrész, beépülés] listát és kikeresi a többszörös beépüléseket." />
         </tree>
       </field>
     </record>

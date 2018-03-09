@@ -14,6 +14,7 @@ class ChanceHely(models.Model):
   azonosito           = fields.Char(u'Belső azonosító')
   sorrend             = fields.Integer(u'Sorrend')
   szefo_e             = fields.Boolean(u'SZEFO készletbe számít?')        # A SZEFO készletbe beszámít-e ez a hely?
+  cikk_ar_felvesz_e   = fields.Boolean(u'Cikk árat felvegye?')            # A cikkar táblába automatikus insert/update legyen-e?
   active              = fields.Boolean(u'Aktív?', default=True)
 
 ############################################################################################################################  Partner  ###
@@ -36,9 +37,9 @@ class ChanceCikk(models.Model):
   szin                = fields.Char(u'Szín',            required=True)
   megnevezes          = fields.Char(u'Megnevezés',      required=True)
   onkoltseg           = fields.Float(u'Önköltség',      digits=(16, 0))
+  indulo_keszlet      = fields.Float(u'Induló készlet', digits=(16, 0))
   vonalkod            = fields.Char(u'Vonalkód',        required=False)
   active              = fields.Boolean(u'Aktív?',       default=True)
-  indulo_keszlet      = fields.Float(u'Induló készlet', digits=(16, 0))
   # virtual fields
   feljegyzes_ids      = fields.One2many('chance.feljegyzes', 'cikk_id', u'Feljegyzések')
 
@@ -59,7 +60,7 @@ class ChanceCikkar(models.Model):
   _name               = 'chance.cikkar'
   _order              = 'hely_id, cikkszam'
   hely_id             = fields.Many2one('chance.hely', u'Raktárhely')
-  hely_azonosito      = fields.Char(u'Hely azonosító')
+  hely_azonosito      = fields.Char(u'Hely azonosító',    related='hely_id.azonosito', store=True)
   cikkszam            = fields.Char(u'Cikkszám',          required=True)
   osztaly             = fields.Char(u'Osztály',           required=True)
   megnevezes          = fields.Char(u'Megnevezés',        required=True)
@@ -143,22 +144,38 @@ class ChanceMozgassor(models.Model):
   mozgasfej_sorszam   = fields.Integer(u'Sz.lev.')
   # virtual fields
   state               = fields.Selection([('terv',u'Tervezet'),('szallit',u'Szállítás'),('elter',u'Átszállítva eltérésekkel'),('kesz',u'Átszállítva'),('konyvelt',u'Könyvelve')],
-                                        u'Állapot', related='mozgasfej_id.state')
-  forrashely_id       = fields.Many2one('chance.hely', u'Forráshely',       related='mozgasfej_id.forrashely_id')
-  celallomas_id       = fields.Many2one('chance.hely', u'Célállomás helye', related='mozgasfej_id.celallomas_id')
+                                        u'Állapot', related='mozgasfej_id.state', readonly=True)
+  forrashely_id       = fields.Many2one('chance.hely', u'Forráshely',       related='mozgasfej_id.forrashely_id', readonly=True)
+  celallomas_id       = fields.Many2one('chance.hely', u'Célállomás helye', related='mozgasfej_id.celallomas_id', readonly=True)
   raktaron            = fields.Float(u'Raktáron',   digits=(16, 0), compute='_compute_raktaron')
-  cikkszam            = fields.Char(u'Cikkszám',    related='cikk_id.cikkszam')
-  osztaly             = fields.Char(u'Osztály',     related='cikk_id.osztaly')
-  meret               = fields.Char(u'Méret',       related='cikk_id.meret')
-  szin                = fields.Char(u'Szín',        related='cikk_id.szin')
-  megnevezes          = fields.Char(u'Megnevezés',  related='cikk_id.megnevezes')
-  ertek               = fields.Float(u'Érték',      compute='_compute_ertek',    digits=(16, 0))
-  mozgaskod           = fields.Char(u'Mozgáskód',   related='mozgasfej_id.mozgastorzs_id.mozgaskod')
+  cikkszam            = fields.Char(u'Cikkszám',    related='cikk_id.cikkszam',   readonly=True)
+  osztaly             = fields.Char(u'Osztály',     related='cikk_id.osztaly',    readonly=True)
+  meret               = fields.Char(u'Méret',       related='cikk_id.meret',      readonly=True)
+  szin                = fields.Char(u'Szín',        related='cikk_id.szin',       readonly=True)
+  megnevezes          = fields.Char(u'Megnevezés',  related='cikk_id.megnevezes', readonly=True)
+  ertek               = fields.Float(u'Érték',      compute='_compute_ertek',     digits=(16, 0))
+  mozgaskod           = fields.Char(u'Mozgáskód',   related='mozgasfej_id.mozgastorzs_id.mozgaskod', readonly=True)
 
   @api.model
   def create(self, vals):
     new = super(ChanceMozgassor, self).create(vals)
     new.mozgasfej_sorszam = new.mozgasfej_id.id
+    if not new.celallomas_id.cikk_ar_felvesz_e:
+      return new
+    Cikkar = self.env['chance.cikkar']
+    cikkar = Cikkar.search([('hely_id', '=', new.celallomas_id.id), ('cikkszam', '=', new.cikk_id.cikkszam), ('osztaly', '=', new.cikk_id.osztaly)], limit=1, order='id desc')
+    if cikkar:
+      if new.egysegar != cikkar.nyilvantartasi_ar:
+        cikkar.nyilvantartasi_ar = new.egysegar
+    else:
+      cikkar_row = {
+        'hely_id'           : new.celallomas_id.id,
+        'cikkszam'          : new.cikk_id.cikkszam,
+        'osztaly'           : new.cikk_id.osztaly,
+        'megnevezes'        : new.cikk_id.megnevezes,
+        'nyilvantartasi_ar' : new.egysegar
+      }
+      Cikkar.create(cikkar_row)
     return new
 
   @api.one
@@ -180,7 +197,7 @@ class ChanceMozgassor(models.Model):
   def onchange_cikk_id(self):
     self.egysegar = self.env['chance.cikkar'].search([ ('hely_id', '=', self.celallomas_id.id), ('cikkszam', '=', self.cikk_id.cikkszam), ('osztaly', '=', self.cikk_id.osztaly)], order='id desc', limit=1).nyilvantartasi_ar
     self.raktaron = self.env['chance.keszlet'].search([('hely_id', '=', self.forrashely_id.id), ('cikk_id', '=', self.cikk_id.id)], limit=1).raktaron
-    if self.vonalkod: self.vonalkod = self.cikk_id.vonalkod
+    self.vonalkod = self.cikk_id.vonalkod
 
 ############################################################################################################################  Készlet  ###
 class ChanceKeszlet(models.Model):
@@ -193,15 +210,6 @@ class ChanceKeszlet(models.Model):
   szefo_e             = fields.Boolean(u'SZEFO készletbe számít?', readonly=True)
   raktaron            = fields.Float(string=u'Raktáron', digits=(16, 0), readonly=True)
   varhato             = fields.Float(string=u'Előrejelzés', digits=(16, 0), readonly=True)
-  # virtual fields
-#  cikkszam            = fields.Char(u'Cikkszám',    related='cikk_id.cikkszam')
-#  osztaly             = fields.Char(u'Osztály',     related='cikk_id.osztaly')
-#  meret               = fields.Char(u'Méret',       related='cikk_id.meret')
-#  szin                = fields.Char(u'Szín',        related='cikk_id.szin')
-#  megnevezes          = fields.Char(u'Megnevezés',  related='cikk_id.megnevezes')
-#  onkoltseg           = fields.Float(u'Önköltség',  related='cikk_id.onkoltseg', digits=(16, 0))
-#  ertek               = fields.Float(u'Érték',      compute='_compute_ertek',    digits=(16, 0))
-
   cikkszam            = fields.Char(u'Cikkszám')
   osztaly             = fields.Char(u'Osztály')
   meret               = fields.Char(u'Méret')
@@ -209,6 +217,7 @@ class ChanceKeszlet(models.Model):
   megnevezes          = fields.Char(u'Megnevezés')
   onkoltseg           = fields.Float(u'Önköltség', digits=(16, 0))
   ertek               = fields.Float(u'Érték',     digits=(16, 0))
+  vonalkod            = fields.Char(u'Vonalkód')
 
   def init(self, cr):
     tools.drop_view_if_exists(cr, self._table)
@@ -217,7 +226,7 @@ class ChanceKeszlet(models.Model):
 
       SELECT
         row_number() over() AS id,
-        keszlet.*, cikk.cikkszam, cikk.osztaly, cikk.meret, cikk.szin, cikk.megnevezes, cikk.onkoltseg, raktaron * cikk.onkoltseg AS ertek
+        keszlet.*, cikk.cikkszam, cikk.osztaly, cikk.meret, cikk.szin, cikk.megnevezes, cikk.onkoltseg, raktaron * cikk.onkoltseg AS ertek, cikk.vonalkod
       FROM (
         SELECT
           cikk_id,
@@ -249,7 +258,7 @@ class ChanceKeszlet(models.Model):
   def _compute_ertek(self):
     self.ertek = self.raktaron * self.cikk_id.onkoltseg
 
-class ChanceKeszlet(models.Model):
+class ChanceKeszletCikk(models.Model):
   _name               = 'chance.keszlet_cikk'
   _auto               = False
   _rec_name           = 'cikk_id'
@@ -264,6 +273,7 @@ class ChanceKeszlet(models.Model):
   megnevezes          = fields.Char(u'Megnevezés',  related='cikk_id.megnevezes')
   onkoltseg           = fields.Float(u'Önköltség',  related='cikk_id.onkoltseg', digits=(16, 0))
   ertek               = fields.Float(u'Érték',      compute='_compute_ertek',    digits=(16, 0))
+  vonalkod            = fields.Char(u'Vonalkód',    related='cikk_id.vonalkod')
 
   def init(self, cr):
     tools.drop_view_if_exists(cr, self._table)

@@ -16,8 +16,8 @@
             <field name="telepules"/>
             <field name="cim"/>
             <field name="sorrend"/>
-            <field name="id"                    readonly="1"/>
             <field name="szefo_e"/>
+            <field name="cikk_ar_felvesz_e"/>
             <field name="active"/>
           </group>
         </form>
@@ -37,6 +37,7 @@
           <field name="cim"/>
           <field name="sorrend"/>
           <field name="szefo_e"/>
+          <field name="cikk_ar_felvesz_e"/>
         </tree>
       </field>
     </record>
@@ -78,15 +79,33 @@
       <field name="priority" eval="15"/>
       <field name="arch" type="xml">
         <tree>
+          <field name="name"/>
           <field name="cikkszam"/>
           <field name="osztaly"/>
           <field name="meret"/>
           <field name="szin"/>
           <field name="megnevezes"/>
-          <field name="onkoltseg"/>
-          <field name="name"/>
           <field name="vonalkod"/>
+          <field name="onkoltseg"/>
         </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_cikk"    model="ir.ui.view">
+      <field  name="name">Cikk Filter</field>
+      <field  name="model">chance.cikk</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field name="name"/>
+          <field name="cikkszam"/>
+          <field name="megnevezes"/>
+          <field name="vonalkod"/>
+          <separator/>
+          <filter name="filter_elso"        string="1. osztály"               domain="[('osztaly','=','1')]"/>
+          <filter name="filter_masod"       string="2. osztály"               domain="[('osztaly','=','2')]"/>
+          <filter name="filter_otod"        string="5. osztály"               domain="[('osztaly','=','5')]"/>
+          <filter name="filter_n"           string="Nincs osztály"            domain="[('osztaly','=','N')]"/>
+        </search>
       </field>
     </record>
 
@@ -103,6 +122,27 @@
           <field name="megnevezes"/>
           <field name="nyilvantartasi_ar"/>
         </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_cikkar"    model="ir.ui.view">
+      <field  name="name">Cikkár Filter</field>
+      <field  name="model">chance.cikkar</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field name="cikkszam"/>
+          <field name="megnevezes"/>
+          <filter name="filter_keszaru"     string="Készáru raktár"           domain="[('hely_id.azonosito','in',('keszaru','keszaru2','keszaru3'))]"/>
+          <filter name="filter_minta"       string="Mintaraktár"              domain="[('hely_id.azonosito','in',('minta','minta2'))]"/>
+          <filter name="filter_biatorbagy"  string="Chance Brand Biatorbágy"  domain="[('hely_id.azonosito','=','biatorbagy')]"/>
+          <filter name="filter_szeged"      string="Szeged Márkabolt"         domain="[('hely_id.azonosito','=','szeged')]"/>
+          <filter name="filter_heviz"       string="Hévíz Márkabolt"          domain="[('hely_id.azonosito','=','heviz')]"/>
+          <separator/>
+          <filter name="filter_elso"        string="1. osztály"               domain="[('osztaly','=','1')]"/>
+          <filter name="filter_masod"       string="2. osztály"               domain="[('osztaly','=','2')]"/>
+          <filter name="filter_otod"        string="5. osztály"               domain="[('osztaly','=','5')]"/>
+          <filter name="filter_n"           string="Nincs osztály"            domain="[('osztaly','=','N')]"/>
+        </search>
       </field>
     </record>
 
@@ -201,15 +241,17 @@
       <field  name="arch" type="xml">
         <tree editable="bottom">
           <field name="cikk_id"                 options="{'no_create': True}"/>
-          <field name="raktaron"                invisible="context.get('mozgasnem') not in ('elad','belso','rendel')"  readonly="1"/>
-          <field name="mennyiseg"/>
+          <field name="raktaron"                invisible="context.get('mozgasnem') not in ('elad','belso','rendel')"   attrs="{'invisible': [('state','in',('szallit','kesz','konyvelt'))]}" />
+          <field name="mennyiseg"               sum="össz. db"/>
           <field name="egysegar"/>
-          <field name="ertek"/>
+          <field name="ertek"                   sum="össz. Ft"/>
           <field name="megjegyzes"/>
-          <field name="create_uid"              string="Felvette"/>
-          <field name="create_date"             string="Létrehozás ideje"/>
-          <field name="write_uid"               string="Módosította"/>
-          <field name="write_date"              string="Módosítás ideje"/>
+          <field name="vonalkod"/>
+          <field name="create_uid"              readonly="1"  string="Felvette"/>
+          <field name="create_date"             readonly="1"  string="Létrehozás ideje"/>
+          <field name="write_uid"               readonly="1"  string="Módosította"/>
+          <field name="write_date"              readonly="1"  string="Módosítás ideje"/>
+          <field name="state"                   invisible="1"/>
         </tree>
       </field>
     </record>
@@ -219,16 +261,16 @@
       <field  name="model">chance.mozgassor</field>
       <field  name="arch" type="xml">
         <tree>
-          <field name="mozgaskod"/>
           <field name="mozgasfej_sorszam"/>
           <field name="state"/>
           <field name="forrashely_id"/>
           <field name="celallomas_id"/>
           <field name="cikkszam"/>
+          <field name="megnevezes"/>
           <field name="osztaly"/>
           <field name="meret"/>
           <field name="szin"/>
-          <field name="megnevezes"/>
+          <field name="vonalkod"/>
           <field name="mennyiseg"/>
           <field name="egysegar"/>
           <field name="ertek"/>
@@ -268,11 +310,13 @@
       <field  name="arch" type="xml">
         <tree>
           <field name="hely_id"/>
+          <field name="cikk_id"/>
           <field name="cikkszam"/>
           <field name="megnevezes"/>
           <field name="osztaly"/>
           <field name="meret"/>
           <field name="szin"/>
+          <field name="vonalkod"/>
           <field name="onkoltseg"/>
           <field name="ertek"/>
           <field name="varhato"/>
@@ -336,15 +380,16 @@
       <field  name="priority" eval="15"/>
       <field  name="arch" type="xml">
         <tree>
+          <field name="cikk_id"/>
           <field name="cikkszam"/>
           <field name="megnevezes"/>
-          <field name="szin"/>
-          <field name="meret"/>
-          <field name="szefo_keszlet"/>
           <field name="osztaly"/>
+          <field name="meret"/>
+          <field name="szin"/>
+          <field name="vonalkod"/>
           <field name="onkoltseg"/>
           <field name="ertek"/>
-          <field name="cikk_id"/>
+          <field name="szefo_keszlet"/>
         </tree>
       </field>
     </record>

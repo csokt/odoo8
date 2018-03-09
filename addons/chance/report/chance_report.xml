@@ -77,13 +77,29 @@
                   <th class="text-right">Érték</th>
                   <th>Megj.</th>
                 </tr>
-                <tr t-foreach="o.mozgassor_ids" t-as="oo">
+                <t t-foreach="o.mozgassor_ids" t-as="oo">
+                  <tr>
                     <td> <span t-field="oo.cikk_id"/> </td>
                     <td class="text-right"> <span t-field="oo.mennyiseg"/> </td>
                     <td class="text-right"> <span t-field="oo.egysegar"/> </td>
                     <td class="text-right"> <span t-field="oo.ertek"/> </td>
                     <td> <span t-field="oo.megjegyzes"/> </td>
-                </tr>
+                  </tr>
+                  <!--  Totals  in  a last  row -->
+                  <t t-if="oo_last">
+                    <tr>
+                      <td><strong>Összesen</strong></td>
+                      <td class="text-right"><strong> <t t-esc="'{0:,.0f}'.format(int(sum(o.mozgassor_ids.mapped('mennyiseg')))).replace(',','.')"/></strong></td>
+                      <td></td>
+                      <td class="text-right"><strong> <t t-esc="'{0:,.0f}'.format(int(sum(o.mozgassor_ids.mapped('ertek')))).replace(',','.')"/></strong></td>
+                      <td></td>
+                    </tr>
+                  </t>
+                  <!--  End table totals
+                      <td class="text-right"><strong> <t t-esc="'%.0f'%(int(sum(o.mozgassor_ids.mapped('ertek'))))"/> </strong></td>
+                      <td class="text-right"><strong> <t t-esc="int(sum(o.mozgassor_ids.mapped('ertek')))"/></strong></td>
+                  -->
+                </t>
               </table>
               <br></br>
               <p>
