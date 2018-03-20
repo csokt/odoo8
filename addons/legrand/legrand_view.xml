@@ -558,18 +558,22 @@
       <field  name="priority" eval="15"/>
       <field  name="arch" type="xml">
         <tree editable="top">
-          <field name="szefo_muvelet_id"    options="{'no_create': True, 'no_open': True}"/>
-          <field name="gyartasi_lap_id"     options="{'no_create': True, 'no_open': True}"/>
-          <field name="hely_id"             options="{'no_create': True, 'no_open': True}"/>
-          <field name="nexon_azon"/>
-          <field name="szemely_id"          options="{'no_create': True, 'no_open': True}"/>
+          <field name="szefo_muvelet_id"    attrs="{'readonly': [('create_date', '!=', False)]}"      options="{'no_create': True, 'no_open': True}"/>
+          <field name="gyartasi_lap_id"                                                               options="{'no_create': True, 'no_open': True}"/>
+          <field name="hely_id"             attrs="{'readonly': [('create_date', '!=', False)]}"      options="{'no_create': True, 'no_open': True}"/>
+          <field name="nexon_azon"          attrs="{'readonly': [('create_date', '!=', False)]}"/>
+          <field name="szemely_id"          attrs="{'readonly': [('create_date', '!=', False)]}"      options="{'no_create': True, 'no_open': True}"/>
           <field name="osszes_db"/>
           <field name="kesz_db"/>
-          <field name="mennyiseg"/>
+          <field name="mennyiseg"           attrs="{'readonly': [('create_date', '!=', False)]}"/>
           <field name="teljesitett_ora"/>
           <field name="megjegyzes"/>
-          <field name="felvette_id"/>
+          <field name="felvette_id"                                                                   options="{'no_create': True, 'no_open': True}"/>
           <field name="create_date"         readonly="1"    string="Létrehozás ideje"/>
+          <field name="ellenorizte_id"                                                                options="{'no_create': True, 'no_open': True}"/>
+          <field name="minoseg"/>
+          <button name="jo"                 type="object"   string="Jó"                               attrs="{'invisible': [('minoseg', '!=', False)]}"/>
+          <button name="rossz"              type="object"   string="Rossz"                            attrs="{'invisible': [('minoseg', '!=', False)]}"/>
         </tree>
       </field>
     </record>
@@ -592,7 +596,7 @@
           <filter name="filter_oroshaza"  string="Orosháza"             domain="[('hely_id.azonosito','=','oroshaza')]"/>
           <filter name="filter_apatfalva" string="Apátfalva"            domain="[('hely_id.azonosito','=','apatfalva')]"/>
           <separator/>
-          <filter name="szamlazhato"      string="Számlázható"          domain="[('gyartasi_lap_id.szamlazhato_db','>',0)]"/>
+          <filter name="filter_rossz"     string="Nem megfelelő"        domain="[('minoseg','=','rossz')]"/>
         </search>
       </field>
     </record>

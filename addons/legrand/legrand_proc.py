@@ -324,12 +324,13 @@ class LegrandParameter(models.Model):
       GROUP BY termek_id, anyag_id
       HAVING count(*) > 1
       )
-      SELECT ossz.count, termek.cikkszam AS termek, anyag.cikkszam AS anyag, anyag.cikknev AS anyagnev FROM ossz
+      SELECT termek.cikkszam AS termek, anyag.cikkszam AS anyag, anyag.cikknev AS anyagnev, ossz.count FROM ossz
       JOIN legrand_cikk AS termek on ossz.termek_id = termek.id
       JOIN legrand_cikk AS anyag on ossz.anyag_id = anyag.id
       ORDER BY termek, anyag
       """)
     rows = self.env.cr.fetchall()
+    Impex.create({ 'megjegyzes': 'Referencia|Cikkszám|Cikknév|Számosság' })
     for row in rows:
       Impex.create({ 'megjegyzes': "%s|%s|%s|%s" % tuple(row) })
     return True

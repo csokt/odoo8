@@ -1029,8 +1029,10 @@ class LegrandMuveletvegzes(models.Model):
   megjegyzes          = fields.Char(u'Megjegyzés')
   nexon_azon          = fields.Integer(u'Személy Id')
   felvette_id         = fields.Many2one('res.users', u'Felvette', readonly=True, auto_join=True)
+  ellenorizte_id      = fields.Many2one('res.users', u'Ellenőrizte', readonly=True, auto_join=True)
   gyartasi_lap_id     = fields.Many2one('legrand.gyartasi_lap',  u'Gyártási lap', related='szefo_muvelet_id.gyartasi_lap_id', readonly=True, auto_join=True, store=True)
   gyartasi_hely_id    = fields.Many2one('legrand.hely',  u'Fő gyártási hely', related='szefo_muvelet_id.gyartasi_lap_id.gyartasi_hely_id', readonly=True, auto_join=True, store=True)
+  minoseg             = fields.Char(u'Minőség', readonly=True)
   # virtual fields
   muveletnev          = fields.Char(u'Műveletnév',   related='szefo_muvelet_id.muveletnev', readonly=True)
   osszes_db           = fields.Integer(u'Összes db', related='szefo_muvelet_id.osszes_db', readonly=True)
@@ -1057,6 +1059,19 @@ class LegrandMuveletvegzes(models.Model):
   def _compute_teljesitett_ora(self):
     if self.szefo_muvelet_id and self.szefo_muvelet_id.osszes_db:
       self.teljesitett_ora = (self.szefo_muvelet_id.osszes_ido + self.szefo_muvelet_id.beall_ido) * self.mennyiseg / self.szefo_muvelet_id.osszes_db
+
+  @api.one
+  def jo(self):
+    self.ellenorizte_id = self.env.user.id
+    self.minoseg = 'jó'
+    return True
+
+  @api.one
+  def rossz(self):
+    self.ellenorizte_id = self.env.user.id
+    self.minoseg = 'rossz'
+    self.megjegyzes = self.megjegyzes = u'hibás ' + self.megjegyzes if self.megjegyzes else u'hibás'
+    return True
 
 ############################################################################################################################  Feljegyzések  ###
 class LegrandFeljegyzes(models.Model):
