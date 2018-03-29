@@ -66,6 +66,9 @@
     </record>
 
     <!--####################################################################################################################  Actions  -->
+    <act_window id="anyaghiany"                 name="Anyaghiány"                   res_model="legrand.anyaghiany"                                                  view_mode="tree"/>
+    <act_window id="anyaghiany_log"             name="Anyaghiány log"               res_model="legrand.anyaghiany_log"                                              view_mode="tree"/>
+
     <act_window id="gylap_ertekel"              name="Gyártási lap értékelés"       res_model="legrand.gyartasi_lap"    view_id="view_graph_gylap_ertekel"          view_mode="graph"
                 context="{'search_default_szamlazhato':1}"/>
 
@@ -79,9 +82,11 @@
     <!--####################################################################################################################  Menu  items  -->
     <menuitem id="menu_kimutatas"               name="Kimutatások"                  parent="menu_root"                  sequence="110"                         />
       <menuitem id="menu_szefo_muvelet"         name="Gyártási lap műveletek"       parent="menu_kimutatas"             sequence="10"   action="szefo_muvelet" />
-      <menuitem id="menu_muveletvegzes_ertekel" name="Műveletvégzés értékelés"      parent="menu_kimutatas"             sequence="20"   action="muveletvegzes_ertekel" />
-      <menuitem id="menu_homogen_ertekel"       name="Homogén értékelés"            parent="menu_kimutatas"             sequence="30"   action="homogen_ertekel" />
-      <menuitem id="menu_gylap_ertekel"         name="Gyártási lap értékelés"       parent="menu_kimutatas"             sequence="40"   action="gylap_ertekel" />
-      <menuitem id="menu_jelenlet_ertekel"      name="Jelenlét értékelés"           parent="menu_kimutatas"             sequence="50"   action="jelenlet_ertekel" />
+      <menuitem id="menu_szefo_anyaghiany"      name="Anyaghiány"                   parent="menu_kimutatas"             sequence="20"   action="anyaghiany" />
+      <menuitem id="menu_szefo_anyaghiany_log"  name="Anyaghiány log"               parent="menu_kimutatas"             sequence="30"   action="anyaghiany_log" />
+      <menuitem id="menu_muveletvegzes_ertekel" name="Műveletvégzés értékelés"      parent="menu_kimutatas"             sequence="40"   action="muveletvegzes_ertekel" />
+      <menuitem id="menu_homogen_ertekel"       name="Homogén értékelés"            parent="menu_kimutatas"             sequence="50"   action="homogen_ertekel" />
+      <menuitem id="menu_gylap_ertekel"         name="Gyártási lap értékelés"       parent="menu_kimutatas"             sequence="60"   action="gylap_ertekel" />
+      <menuitem id="menu_jelenlet_ertekel"      name="Jelenlét értékelés"           parent="menu_kimutatas"             sequence="70"   action="jelenlet_ertekel" />
   </data>
 </openerp>

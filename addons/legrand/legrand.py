@@ -1292,6 +1292,87 @@ class LegrandCikkKeszlet(models.Model):
       % (self._table)
     )
 
+############################################################################################################################  Anyagszükséglet  ###
+class LegrandAnyagszukseglet(models.Model):
+  _name = 'legrand.anyagszukseglet'
+  _auto = False
+  _order = 'gyartasi_lap_id, cikk_id'
+  state               = fields.Selection([('uj',u'Új'),('mterv',u'Műveletterv'),('gyartas',u'Gyártás'),('gykesz',u'Gyártás kész'),('kesz',u'Rendelés teljesítve')], u'Állapot')
+  gyartasi_lap_id     = fields.Many2one('legrand.gyartasi_lap',  u'Gyártási lap', auto_join=True)
+  cikk_id             = fields.Many2one('legrand.cikk', string=u'Alkatrész', auto_join=True)
+  rendelt             = fields.Float(u'Rendelt', digits=(16, 2))
+  hatralek            = fields.Float(u'Hátralék',  digits=(16, 2))
+  # virtual fields
+
+  def init(self, cr):
+    tools.drop_view_if_exists(cr, self._table)
+    cr.execute(
+      """CREATE or REPLACE VIEW %s as (
+        SELECT
+          row_number() over() AS id,
+          gylap.state,
+          gylap.id AS gyartasi_lap_id,
+          line.cikk_id,
+          gylap.modositott_db * line.beepules AS rendelt,
+          gylap.hatralek_db * line.beepules AS hatralek
+        FROM legrand_gyartasi_lap AS gylap
+        JOIN legrand_bom_line     AS line ON line.bom_id = gylap.bom_id
+        WHERE gylap.active AND gylap.state != 'kesz'
+      )"""
+      % (self._table)
+    )
+
+############################################################################################################################  Anyaghiány  ###
+class LegrandAnyaghiany(models.Model):
+  _name = 'legrand.anyaghiany'
+  _auto = False
+  _order = 'cikk_id'
+  cikk_id             = fields.Many2one('legrand.cikk', string=u'Alkatrész', auto_join=True)
+  szefo_keszlet       = fields.Float(u'SZEFO készlet', digits=(16, 2))
+  mterv_igeny         = fields.Float(u'Műveletterv igénye',  digits=(16, 2))
+  gyartas_igeny       = fields.Float(u'Gyártás igénye',  digits=(16, 2))
+  mterv_gyartas_elter = fields.Float(u'Műveletterv + gyártás eltérés',  digits=(16, 2))
+  gyartas_elter       = fields.Float(u'Gyártás eltérés',  digits=(16, 2))
+  # virtual fields
+
+  def init(self, cr):
+    tools.drop_view_if_exists(cr, self._table)
+    cr.execute(
+      """CREATE or REPLACE VIEW %s as (
+        WITH
+        anyag AS (
+          SELECT state, cikk_id, SUM(hatralek) AS hatralek FROM legrand_anyagszukseglet GROUP BY state, cikk_id
+        ),
+        igeny AS (
+          SELECT keszlet.cikk_id, keszlet.szefo_keszlet,
+            CASE WHEN gyartas.state IS NULL THEN 0.0 ELSE gyartas.hatralek END AS gyartas_igeny,
+            CASE WHEN mterv.state   IS NULL THEN 0.0 ELSE mterv.hatralek   END AS mterv_igeny
+          FROM legrand_vall_keszlet AS keszlet
+          LEFT JOIN anyag AS gyartas ON gyartas.cikk_id = keszlet.cikk_id AND gyartas.state = 'gyartas'
+          LEFT JOIN anyag AS mterv ON mterv.cikk_id = keszlet.cikk_id AND mterv.state = 'mterv'
+        ),
+        elter AS (
+          SELECT cikk_id, szefo_keszlet, gyartas_igeny, mterv_igeny, szefo_keszlet - gyartas_igeny AS gyartas_elter , szefo_keszlet - gyartas_igeny - mterv_igeny AS mterv_gyartas_elter FROM igeny
+        )
+--        SELECT row_number() over() AS id, elter.* FROM elter WHERE mterv_gyartas_elter < 0 AND gyartas_igeny + mterv_igeny > 0
+        SELECT row_number() over() AS id, elter.* FROM elter WHERE gyartas_igeny + mterv_igeny > 0
+      )"""
+      % (self._table)
+    )
+
+############################################################################################################################  Anyaghiány log  ###
+class LegrandAnyaghianyLog(models.Model):
+  _name = 'legrand.anyaghiany_log'
+  _order = 'keszult desc, cikk_id, gyartasi_lap_id'
+  keszult             = fields.Date(u'Készült')
+  cikk_id             = fields.Many2one('legrand.cikk', string=u'Alkatrész', auto_join=True)
+  gyartasi_lap_id     = fields.Many2one('legrand.gyartasi_lap',  u'Gyártási lap', auto_join=True)
+  hatralek            = fields.Float(u'Hátralék',  digits=(16, 2))
+  szefo_keszlet       = fields.Float(u'SZEFO készlet', digits=(16, 2))
+  gyartas_igeny       = fields.Float(u'Gyártás igénye',  digits=(16, 2))
+  gyartas_elter       = fields.Float(u'Gyártás eltérés',  digits=(16, 2))
+  # virtual fields
+
 ############################################################################################################################  LIR users  ###
 class LegrandLirUser(models.Model):
   _name               = 'legrand.lir_user'

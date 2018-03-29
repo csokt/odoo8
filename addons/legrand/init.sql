@@ -284,9 +284,17 @@ select * from ( values ('egy','ketto'), ('3','4') ) as t (colname1, colname2);
 WITH temp (k,v) AS (VALUES (0,-9999), (1, 100)) SELECT * FROM temp;
 
 
-#mai update után
-
-update legrand_muvelet set legrand_normaora = normaora, legrand_beall_ido = beall_ido ;
-
 #########################################################################################
+
+delete from legrand_anyaghiany_log ;
+
+WITH
+  szukseg AS ( SELECT * FROM legrand_anyagszukseglet WHERE state = 'gyartas' AND hatralek > 0 ),
+  hiany   AS ( SELECT * FROM legrand_anyaghiany WHERE gyartas_elter < 0 ),
+  result  AS ( SELECT szukseg.cikk_id, gyartasi_lap_id, hatralek, szefo_keszlet, gyartas_igeny, gyartas_elter  FROM szukseg JOIN hiany ON szukseg.cikk_id = hiany.cikk_id )
+INSERT INTO legrand_anyaghiany_log (create_date, keszult, cikk_id, gyartasi_lap_id, hatralek, szefo_keszlet, gyartas_igeny, gyartas_elter)
+  SELECT now(), now(), cikk_id, gyartasi_lap_id, hatralek, szefo_keszlet, gyartas_igeny, gyartas_elter FROM result
+  ORDER BY cikk_id, gyartasi_lap_id
+;
+
 

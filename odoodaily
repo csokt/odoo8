@@ -1,0 +1,10 @@
+#!/bin/bash
+su odoo -c "psql raktar -c \"
+WITH
+  szukseg AS ( SELECT * FROM legrand_anyagszukseglet WHERE state = 'gyartas' AND hatralek > 0 ),
+  hiany   AS ( SELECT * FROM legrand_anyaghiany WHERE gyartas_elter < 0 ),
+  result  AS ( SELECT szukseg.cikk_id, gyartasi_lap_id, hatralek, szefo_keszlet, gyartas_igeny, gyartas_elter  FROM szukseg JOIN hiany ON szukseg.cikk_id = hiany.cikk_id )
+INSERT INTO legrand_anyaghiany_log (create_date, keszult, cikk_id, gyartasi_lap_id, hatralek, szefo_keszlet, gyartas_igeny, gyartas_elter)
+  SELECT now(), now(), cikk_id, gyartasi_lap_id, hatralek, szefo_keszlet, gyartas_igeny, gyartas_elter FROM result
+  ORDER BY cikk_id, gyartasi_lap_id
+\""
