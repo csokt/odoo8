@@ -677,6 +677,8 @@
             <field name="jegyzet"/>
             <field name="gyartasi_hely_ids"   widget="many2many_tags"/>
             <field name="utolso_feljegyzes"/>
+            <field name="leallas_ok"/>
+            <field name="aktivitas"/>
             <field name="cikkhiany"           attrs="{'invisible': [('state', '!=', 'mterv')]}"/>
           </group>
           <div>
@@ -750,6 +752,25 @@
       </field>
     </record>
 
+    <record id="view_tree_gyartasi_lap_leallas"   model="ir.ui.view">
+      <field  name="name">Gyártás leállás Tree</field>
+      <field  name="model">legrand.gyartasi_lap</field>
+      <field  name="arch" type="xml">
+        <tree create="true" editable="top" colors="red:aktivitas=='all'">
+          <field name="name"/>
+          <field name="hatarido"              readonly="1"/>
+          <field name="carnet_e"/>
+          <field name="gyartasi_hely_id"      options="{'no_create': True, 'no_open': True}"/>
+          <field name="hatralek_db"/>
+          <field name="utolso_feljegyzes"/>
+          <field name="feljegyzes_ideje"/>
+          <field name="aktivitas"/>
+          <field name="leallas_ok"/>
+          <field name="state"                 invisible="1"/>
+        </tree>
+      </field>
+    </record>
+
     <record id="view_filter_gyartasi_lap"    model="ir.ui.view">
       <field  name="name">Gyártási lap Filter</field>
       <field  name="model">legrand.gyartasi_lap</field>
@@ -779,6 +800,7 @@
           <separator/>
           <filter name="filter_carnet"      string="Carnet"                 domain="[('carnet_e','=',True)]"/>
           <filter name="filter_csokkentve"  string="Csökkentve/Visszavonva" domain="[('csokkentve_e','=',True)]"/>
+          <filter name="filter_leallas"     string="Gyártás áll"            domain="[('aktivitas','=','all')]"/>
           <group expand="0" string="Csoportosítás">
             <filter name="group_termek"     string="Termék"                 context="{'group_by': 'termekkod'}"/>
           </group>
@@ -1278,6 +1300,8 @@
       <field  name="arch" type="xml">
         <search>
           <field  name="cikk_id"/>
+          <filter name="filter_gy_cikkhiany"      string="Gyártás cikkhiány "                   domain="[('gyartas_elter','&lt;',0)]"/>
+          <filter name="filter_mtgy_cikkhiany"    string="Műveletterv + gyártás cikkhiány "     domain="[('mterv_gyartas_elter','&lt;',0)]"/>
         </search>
       </field>
     </record>
@@ -1289,12 +1313,12 @@
       <field  name="priority" eval="15"/>
       <field  name="arch" type="xml">
         <tree>
-          <field name="keszult"/>
+          <field name="datum"/>
           <field name="cikk_id"/>
-          <field name="gyartasi_lap_id"/>
-          <field name="hatralek"/>
           <field name="szefo_keszlet"/>
+          <field name="mterv_igeny"/>
           <field name="gyartas_igeny"/>
+          <field name="mterv_gyartas_elter"/>
           <field name="gyartas_elter"/>
         </tree>
       </field>
@@ -1305,9 +1329,54 @@
       <field  name="model">legrand.anyaghiany_log</field>
       <field  name="arch" type="xml">
         <search>
-          <field name="keszult"/>
           <field name="cikk_id"/>
+          <field name="datum"/>
+        </search>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Gyártási lap log  -->
+    <record id="view_tree_gyartasi_lap_log"    model="ir.ui.view">
+      <field  name="name">Gyártási lap log Tree</field>
+      <field  name="model">legrand.gyartasi_lap_log</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <tree>
+          <field name="datum"/>
           <field name="gyartasi_lap_id"/>
+          <field name="state"/>
+          <field name="gyartasi_hely_id"/>
+          <field name="rendelesszam"/>
+          <field name="termekkod"/>
+          <field name="hatarido"/>
+          <field name="hatralek_db"/>
+          <field name="hatralek_ora"        sum="nyitott"/>
+          <field name="termekcsoport"/>
+          <field name="aktivitas"/>
+          <field name="leallas_ok"          string="Leállás oka"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_gyartasi_lap_log"    model="ir.ui.view">
+      <field  name="name">Gyártási lap log Filter</field>
+      <field  name="model">legrand.gyartasi_lap_log</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field  name="datum"/>
+          <field  name="gyartasi_lap_id"/>
+          <field  name="termekcsoport"/>
+          <filter name="filter_szentes"     string="Szentes"                domain="[('gyartasi_hely_id.azonosito','=','szentes')]"/>
+          <filter name="filter_hmvhely"     string="Hódmezővásárhely"       domain="[('gyartasi_hely_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_berkert"     string="Szeged"                 domain="[('gyartasi_hely_id.azonosito','=','berkert')]"/>
+          <filter name="filter_mako"        string="Makó"                   domain="[('gyartasi_hely_id.azonosito','=','mako')]"/>
+          <filter name="filter_oroshaza"    string="Orosháza"               domain="[('gyartasi_hely_id.azonosito','=','oroshaza')]"/>
+          <filter name="filter_apatfalva"   string="Apátfalva"              domain="[('gyartasi_hely_id.azonosito','=','apatfalva')]"/>
+          <separator/>
+          <filter name="filter_mterv"       string="Műveletterv"            domain="[('state','=','mterv')]"/>
+          <filter name="filter_gyartas"     string="Gyártás"                domain="[('state','=','gyartas')]"/>
+          <separator/>
+          <filter name="filter_leallas"     string="Gyártás áll"            domain="[('aktivitas','=','all')]"/>
         </search>
       </field>
     </record>
@@ -1406,6 +1475,8 @@
 
     <act_window id="gylap_gyartas"      name="Gyártási lap"         res_model="legrand.gyartasi_lap"                                                  view_mode="tree,form"
                 domain="[('state','!=','uj')]"                      context="{'search_default_filter_gyartas': 1}"/>
+    <act_window id="gylap_leallas"      name="Gyártás leállás"      res_model="legrand.gyartasi_lap"      view_id="view_tree_gyartasi_lap_leallas"    view_mode="tree,form"
+                domain="[('state','=','gyartas')]"                 />
     <act_window id="gylap_dbjegyzek"    name="Darabjegyzék"         res_model="legrand.gylap_dbjegyzek"                                               view_mode="tree,form"/>
     <act_window id="gylap_muvelet"      name="Művelet"              res_model="legrand.gylap_legrand_muvelet"                                         view_mode="tree,form"/>
     <act_window id="gylap_homogen"      name="Homogén"              res_model="legrand.gylap_homogen"                                                 view_mode="tree,form"/>
@@ -1444,6 +1515,7 @@
       <menuitem id="menu_gylap_gyartas"   name="Gyártási lapok"               parent="menu_gyartas"               sequence="10" action="gylap_gyartas" />
       <menuitem id="menu_muveletvegzes"   name="Műveletvégzés"                parent="menu_gyartas"               sequence="20" action="muveletvegzes" />
       <menuitem id="menu_feljegyzes"      name="Napi jelentés, feljegyzések"  parent="menu_gyartas"               sequence="30" action="feljegyzes" />
+      <menuitem id="menu_gylap_leallas"   name="Gyártási akadályok"           parent="menu_gyartas"               sequence="40" action="gylap_leallas" />
 
     <menuitem id="menu_szallitas_uzem"    name="Szállítás (üzem)"             parent="menu_root"                  sequence="20" />
       <menuitem id="menu_mozgas_belso"    name="Belső szállítás"              parent="menu_szallitas_uzem"        sequence="10" action="mozgas_belso"   />

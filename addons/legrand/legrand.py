@@ -656,7 +656,7 @@ class LegrandGyartasiLap(models.Model):
   bom_id              = fields.Many2one('legrand.bom',  u'Anyagjegyzék', required=False, domain="[('cikk_id', '=', cikk_id)]", auto_join=True, states={'kesz': [('readonly', True)]})
   cikkek_uid          = fields.Char(u'Összes cikk uid', readonly=False)
   gyartasi_hely_ids   = fields.Many2many('legrand.hely', string=u'Fő gyártási helyek', domain=[('szefo_e', '=', True)], states={'kesz': [('readonly', True)]})
-  gyartasi_hely_id    = fields.Many2one('legrand.hely',  u'Fő gyártási hely', compute='_compute_gyartasi_hely_id', store=True)
+  gyartasi_hely_id    = fields.Many2one('legrand.hely',  u'Fő gyártási hely', compute='_compute_gyartasi_hely_id', store=True, auto_join=True)
   javitas_e           = fields.Boolean(u'Javítás?', default=False, states={'kesz': [('readonly', True)]})
   raklap              = fields.Char(u'Raklap',      readonly=True)
   raklap_min          = fields.Char(u'Raklap min',  readonly=True)
@@ -672,6 +672,8 @@ class LegrandGyartasiLap(models.Model):
   szamlazott_ora      = fields.Float(u'Számlázott óra',   digits=(16, 2), compute='_compute_szamlazott_ora',  store=True)
   szamlazhato_ora     = fields.Float(u'Számlázható óra',  digits=(16, 2), compute='_compute_szamlazhato_ora', store=True)
   termekcsoport       = fields.Char(u'Termékcsoport',     related='cikk_id.termekcsoport',    readonly=True,  store=True)
+  leallas_ok          = fields.Char(u'Gyártás leállásának oka')
+  aktivitas           = fields.Selection([('mind',u'Mindegy'),('foly',u'Folyamatban'),('all',u'Áll')], u'Gyártás aktivitás', compute='_compute_aktivitas', store=True)
   active              = fields.Boolean(u'Aktív?', default=True)
   # virtual fields
   cikknev             = fields.Char(u'Terméknév', related='cikk_id.cikknev', readonly=True)
@@ -686,6 +688,14 @@ class LegrandGyartasiLap(models.Model):
   gylap_homogen_ids   = fields.One2many('legrand.gylap_homogen',        'gyartasi_lap_id', u'Homogén',              states={'kesz': [('readonly', True)]}, auto_join=True)
   gylap_dbjegyzek_ids = fields.One2many('legrand.gylap_dbjegyzek',      'gyartasi_lap_id', u'Legrand darabjegyzék', readonly=True, auto_join=True)
   gylap_muvelet_ids   = fields.One2many('legrand.gylap_legrand_muvelet','gyartasi_lap_id', u'Műveleti utasítás',    readonly=True, auto_join=True)
+
+  @api.one
+  @api.depends('state', 'leallas_ok')
+  def _compute_aktivitas(self):
+    if self.state == 'gyartas':
+      self.aktivitas = 'all' if self.leallas_ok else 'foly'
+    else:
+      self.aktivitas = 'mind'
 
   @api.one
   @api.depends('szefo_muvelet_ids', 'szefo_muvelet_ids.hiany_db')
@@ -1362,15 +1372,37 @@ class LegrandAnyaghiany(models.Model):
 
 ############################################################################################################################  Anyaghiány log  ###
 class LegrandAnyaghianyLog(models.Model):
-  _name = 'legrand.anyaghiany_log'
-  _order = 'keszult desc, cikk_id, gyartasi_lap_id'
-  keszult             = fields.Date(u'Készült')
+  _name               = 'legrand.anyaghiany_log'
+  _order              = 'datum desc, cikk_id'
+  datum               = fields.Date(u'Dátum')
   cikk_id             = fields.Many2one('legrand.cikk', string=u'Alkatrész', auto_join=True)
-  gyartasi_lap_id     = fields.Many2one('legrand.gyartasi_lap',  u'Gyártási lap', auto_join=True)
-  hatralek            = fields.Float(u'Hátralék',  digits=(16, 2))
   szefo_keszlet       = fields.Float(u'SZEFO készlet', digits=(16, 2))
+  mterv_igeny         = fields.Float(u'Műveletterv igénye',  digits=(16, 2))
   gyartas_igeny       = fields.Float(u'Gyártás igénye',  digits=(16, 2))
+  mterv_gyartas_elter = fields.Float(u'Műveletterv + gyártás eltérés',  digits=(16, 2))
   gyartas_elter       = fields.Float(u'Gyártás eltérés',  digits=(16, 2))
+  # virtual fields
+
+############################################################################################################################  Gyártási lap log  ###
+class LegrandGyartasiLapLog(models.Model):
+  _name               = 'legrand.gyartasi_lap_log'
+  _order              = 'datum desc, gyartasi_lap_id'
+  datum               = fields.Date(u'Dátum')
+  gyartasi_lap_id     = fields.Many2one('legrand.gyartasi_lap',  u'Gyártási lap', auto_join=True)
+  state               = fields.Selection([('uj',u'Új'),('mterv',u'Műveletterv'),('gyartas',u'Gyártás'),('gykesz',u'Gyártás kész'),('kesz',u'Rendelés teljesítve')], u'Állapot', default='uj')
+  gyartasi_hely_id    = fields.Many2one('legrand.hely',  u'Fő gyártási hely', auto_join=True)
+  rendelesszam        = fields.Char(u'Rendelésszám')
+  termekkod           = fields.Char(u'Termékkód')
+  hatarido            = fields.Date(u'Határidő')
+  hatralek_db         = fields.Integer(u'Hátralék db')
+  rendelt_ora         = fields.Float(u'Rendelt óra',      digits=(16, 2))
+  teljesitett_ora     = fields.Float(u'Teljesített óra',  digits=(16, 2))
+  hatralek_ora        = fields.Float(u'Nyitott óra',      digits=(16, 2))
+  szamlazott_ora      = fields.Float(u'Számlázott óra',   digits=(16, 2))
+  szamlazhato_ora     = fields.Float(u'Számlázható óra',  digits=(16, 2))
+  termekcsoport       = fields.Char(u'Termékcsoport')
+  leallas_ok          = fields.Char(u'Gyártás leállásának oka')
+  aktivitas           = fields.Selection([('mind',u'Mindegy'),('foly',u'Folyamatban'),('all',u'Áll')], u'Gyártás aktivitás')
   # virtual fields
 
 ############################################################################################################################  LIR users  ###

@@ -1,10 +1,21 @@
 #!/bin/bash
+
 su odoo -c "psql raktar -c \"
-WITH
-  szukseg AS ( SELECT * FROM legrand_anyagszukseglet WHERE state = 'gyartas' AND hatralek > 0 ),
-  hiany   AS ( SELECT * FROM legrand_anyaghiany WHERE gyartas_elter < 0 ),
-  result  AS ( SELECT szukseg.cikk_id, gyartasi_lap_id, hatralek, szefo_keszlet, gyartas_igeny, gyartas_elter  FROM szukseg JOIN hiany ON szukseg.cikk_id = hiany.cikk_id )
-INSERT INTO legrand_anyaghiany_log (create_date, keszult, cikk_id, gyartasi_lap_id, hatralek, szefo_keszlet, gyartas_igeny, gyartas_elter)
-  SELECT now(), now(), cikk_id, gyartasi_lap_id, hatralek, szefo_keszlet, gyartas_igeny, gyartas_elter FROM result
-  ORDER BY cikk_id, gyartasi_lap_id
-\""
+INSERT INTO legrand_anyaghiany_log (create_date, datum, cikk_id, szefo_keszlet, mterv_igeny, gyartas_igeny, mterv_gyartas_elter, gyartas_elter)
+  SELECT now(), now(), cikk_id, szefo_keszlet, mterv_igeny, gyartas_igeny, mterv_gyartas_elter, gyartas_elter
+  FROM legrand_anyaghiany
+  WHERE mterv_gyartas_elter < 0
+  ORDER BY cikk_id
+\"
+"
+
+su odoo -c "psql raktar -c \"
+INSERT INTO legrand_gyartasi_lap_log (datum, create_uid, create_date, write_uid, write_date, gyartasi_lap_id, state, gyartasi_hely_id, rendelesszam, termekkod, hatarido,
+                                      hatralek_db, rendelt_ora, teljesitett_ora, hatralek_ora, szamlazott_ora, szamlazhato_ora, termekcsoport, leallas_ok, aktivitas)
+  SELECT now(), create_uid, create_date, write_uid, write_date, id, state, gyartasi_hely_id, rendelesszam, termekkod, hatarido,
+    hatralek_db, rendelt_ora, teljesitett_ora, hatralek_ora, szamlazott_ora, szamlazhato_ora, termekcsoport, leallas_ok, aktivitas
+  FROM legrand_gyartasi_lap
+  WHERE state IN ('mterv', 'gyartas') AND active
+  ORDER BY id
+\"
+"

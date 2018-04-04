@@ -22,6 +22,19 @@
      </field>
     </record>
 
+    <!--####################################################################################################################  Gyártási lap log  -->
+    <record id="view_graph_gylap_log_ertekel" model="ir.ui.view">
+     <field name="name">legrand.gylap_log_ertekel.graph</field>
+     <field name="model">legrand.gyartasi_lap_log</field>
+     <field name="arch" type="xml">
+       <graph string="Gyártási lap log értékelés"  type="pivot" stacked="True">
+         <field name="state"              type="col"/>
+         <field name="datum"              type="row"        interval="day"/>
+         <field name="hatralek_ora"       type="measure"/>
+       </graph>
+     </field>
+    </record>
+
     <!--####################################################################################################################  Műveletvégzés  -->
     <record id="view_graph_muveletvegzes_ertekel" model="ir.ui.view">
      <field name="name">legrand.muveletvegzes_ertekel.graph</field>
@@ -66,6 +79,9 @@
     </record>
 
     <!--####################################################################################################################  Actions  -->
+    <act_window id="gyartasi_lap_log"           name="Gyártási lap log"             res_model="legrand.gyartasi_lap_log"                                            view_mode="tree,form"/>
+    <act_window id="gylap_log_ertekel"          name="Gyártási lap log értékelés"   res_model="legrand.gyartasi_lap_log"    view_id="view_graph_gylap_log_ertekel"  view_mode="graph"/>
+
     <act_window id="anyaghiany"                 name="Anyaghiány"                   res_model="legrand.anyaghiany"                                                  view_mode="tree"/>
     <act_window id="anyaghiany_log"             name="Anyaghiány log"               res_model="legrand.anyaghiany_log"                                              view_mode="tree"/>
 
@@ -82,11 +98,15 @@
     <!--####################################################################################################################  Menu  items  -->
     <menuitem id="menu_kimutatas"               name="Kimutatások"                  parent="menu_root"                  sequence="110"                         />
       <menuitem id="menu_szefo_muvelet"         name="Gyártási lap műveletek"       parent="menu_kimutatas"             sequence="10"   action="szefo_muvelet" />
-      <menuitem id="menu_szefo_anyaghiany"      name="Anyaghiány"                   parent="menu_kimutatas"             sequence="20"   action="anyaghiany" />
-      <menuitem id="menu_szefo_anyaghiany_log"  name="Anyaghiány log"               parent="menu_kimutatas"             sequence="30"   action="anyaghiany_log" />
+      <menuitem id="menu_anyaghiany"            name="Anyaghiány"                   parent="menu_kimutatas"             sequence="20"   action="anyaghiany" />
       <menuitem id="menu_muveletvegzes_ertekel" name="Műveletvégzés értékelés"      parent="menu_kimutatas"             sequence="40"   action="muveletvegzes_ertekel" />
       <menuitem id="menu_homogen_ertekel"       name="Homogén értékelés"            parent="menu_kimutatas"             sequence="50"   action="homogen_ertekel" />
       <menuitem id="menu_gylap_ertekel"         name="Gyártási lap értékelés"       parent="menu_kimutatas"             sequence="60"   action="gylap_ertekel" />
       <menuitem id="menu_jelenlet_ertekel"      name="Jelenlét értékelés"           parent="menu_kimutatas"             sequence="70"   action="jelenlet_ertekel" />
+
+    <menuitem id="menu_idogep"                  name="Időgép"                       parent="menu_root"                  sequence="120"                         />
+      <menuitem id="menu_gyartasi_lap_log"      name="Gyártási lap log"             parent="menu_idogep"                sequence="10"   action="gyartasi_lap_log" />
+      <menuitem id="menu_gylap_log_ertekel"     name="Gyártási lap log értékelés"   parent="menu_idogep"                sequence="20"   action="gylap_log_ertekel" />
+      <menuitem id="menu_anyaghiany_log"        name="Anyaghiány log"               parent="menu_idogep"                sequence="30"   action="anyaghiany_log" />
   </data>
 </openerp>
