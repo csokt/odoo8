@@ -672,8 +672,9 @@ class LegrandGyartasiLap(models.Model):
   szamlazott_ora      = fields.Float(u'Számlázott óra',   digits=(16, 2), compute='_compute_szamlazott_ora',  store=True)
   szamlazhato_ora     = fields.Float(u'Számlázható óra',  digits=(16, 2), compute='_compute_szamlazhato_ora', store=True)
   termekcsoport       = fields.Char(u'Termékcsoport',     related='cikk_id.termekcsoport',    readonly=True,  store=True)
-  leallas_ok          = fields.Char(u'Gyártás leállásának oka')
-  aktivitas           = fields.Selection([('mind',u'Mindegy'),('foly',u'Folyamatban'),('all',u'Áll')], u'Gyártás aktivitás', compute='_compute_aktivitas', store=True)
+  leallas_ok          = fields.Char(u'Gyártás leállásának oka', readonly=True, states={'gyartas': [('readonly', False)]})
+  aktivitas           = fields.Char(u'Gyártás aktivitás', compute='_compute_aktivitas', store=True)
+  leallas_felelos     = fields.Selection([('Szefo',u'Szefo'),('Legrand',u'Legrand'),('vis maior',u'vis maior')], u'Felelős', readonly=True, states={'gyartas': [('readonly', False)]})
   active              = fields.Boolean(u'Aktív?', default=True)
   # virtual fields
   cikknev             = fields.Char(u'Terméknév', related='cikk_id.cikknev', readonly=True)
@@ -693,9 +694,11 @@ class LegrandGyartasiLap(models.Model):
   @api.depends('state', 'leallas_ok')
   def _compute_aktivitas(self):
     if self.state == 'gyartas':
-      self.aktivitas = 'all' if self.leallas_ok else 'foly'
+      self.aktivitas = u'áll' if self.leallas_ok else u'folyamatban'
+      self.leallas_felelos = 'Szefo' if self.leallas_ok else ''
     else:
-      self.aktivitas = 'mind'
+      self.aktivitas = ''
+      self.leallas_felelos = ''
 
   @api.one
   @api.depends('szefo_muvelet_ids', 'szefo_muvelet_ids.hiany_db')
@@ -1402,7 +1405,8 @@ class LegrandGyartasiLapLog(models.Model):
   szamlazhato_ora     = fields.Float(u'Számlázható óra',  digits=(16, 2))
   termekcsoport       = fields.Char(u'Termékcsoport')
   leallas_ok          = fields.Char(u'Gyártás leállásának oka')
-  aktivitas           = fields.Selection([('mind',u'Mindegy'),('foly',u'Folyamatban'),('all',u'Áll')], u'Gyártás aktivitás')
+  aktivitas           = fields.Char(u'Gyártás aktivitás')
+  leallas_felelos     = fields.Char(u'Felelős')
   # virtual fields
 
 ############################################################################################################################  LIR users  ###

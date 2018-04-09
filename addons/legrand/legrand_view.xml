@@ -679,6 +679,7 @@
             <field name="utolso_feljegyzes"/>
             <field name="leallas_ok"/>
             <field name="aktivitas"/>
+            <field name="leallas_felelos"/>
             <field name="cikkhiany"           attrs="{'invisible': [('state', '!=', 'mterv')]}"/>
           </group>
           <div>
@@ -766,6 +767,7 @@
           <field name="feljegyzes_ideje"/>
           <field name="aktivitas"/>
           <field name="leallas_ok"/>
+          <field name="leallas_felelos"/>
           <field name="state"                 invisible="1"/>
         </tree>
       </field>
@@ -800,7 +802,7 @@
           <separator/>
           <filter name="filter_carnet"      string="Carnet"                 domain="[('carnet_e','=',True)]"/>
           <filter name="filter_csokkentve"  string="Csökkentve/Visszavonva" domain="[('csokkentve_e','=',True)]"/>
-          <filter name="filter_leallas"     string="Gyártás áll"            domain="[('aktivitas','=','all')]"/>
+          <filter name="filter_leallas"     string="Gyártás áll"            domain="[('aktivitas','=','áll')]"/>
           <group expand="0" string="Csoportosítás">
             <filter name="group_termek"     string="Termék"                 context="{'group_by': 'termekkod'}"/>
           </group>
@@ -1354,6 +1356,7 @@
           <field name="termekcsoport"/>
           <field name="aktivitas"/>
           <field name="leallas_ok"          string="Leállás oka"/>
+          <field name="leallas_felelos"/>
         </tree>
       </field>
     </record>
@@ -1376,7 +1379,7 @@
           <filter name="filter_mterv"       string="Műveletterv"            domain="[('state','=','mterv')]"/>
           <filter name="filter_gyartas"     string="Gyártás"                domain="[('state','=','gyartas')]"/>
           <separator/>
-          <filter name="filter_leallas"     string="Gyártás áll"            domain="[('aktivitas','=','all')]"/>
+          <filter name="filter_leallas"     string="Gyártás áll"            domain="[('aktivitas','=','áll')]"/>
         </search>
       </field>
     </record>
@@ -1476,7 +1479,7 @@
     <act_window id="gylap_gyartas"      name="Gyártási lap"         res_model="legrand.gyartasi_lap"                                                  view_mode="tree,form"
                 domain="[('state','!=','uj')]"                      context="{'search_default_filter_gyartas': 1}"/>
     <act_window id="gylap_leallas"      name="Gyártás leállás"      res_model="legrand.gyartasi_lap"      view_id="view_tree_gyartasi_lap_leallas"    view_mode="tree,form"
-                domain="[('state','=','gyartas')]"                 />
+                domain="[('state','=','gyartas')]"                  context="{'search_default_filter_gyartas': 1}"/>
     <act_window id="gylap_dbjegyzek"    name="Darabjegyzék"         res_model="legrand.gylap_dbjegyzek"                                               view_mode="tree,form"/>
     <act_window id="gylap_muvelet"      name="Művelet"              res_model="legrand.gylap_legrand_muvelet"                                         view_mode="tree,form"/>
     <act_window id="gylap_homogen"      name="Homogén"              res_model="legrand.gylap_homogen"                                                 view_mode="tree,form"/>

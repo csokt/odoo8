@@ -299,11 +299,18 @@ INSERT INTO legrand_anyaghiany_log (create_date, datum, cikk_id, szefo_keszlet, 
 delete from legrand_gyartasi_lap_log ;
 
 INSERT INTO legrand_gyartasi_lap_log (datum, create_uid, create_date, write_uid, write_date, gyartasi_lap_id, state, gyartasi_hely_id, rendelesszam, termekkod, hatarido,
-                                      hatralek_db, rendelt_ora, teljesitett_ora, hatralek_ora, szamlazott_ora, szamlazhato_ora, termekcsoport, leallas_ok, aktivitas)
+                                      hatralek_db, rendelt_ora, teljesitett_ora, hatralek_ora, szamlazott_ora, szamlazhato_ora, termekcsoport, leallas_ok, aktivitas, leallas_felelos)
   SELECT now(), create_uid, create_date, write_uid, write_date, id, state, gyartasi_hely_id, rendelesszam, termekkod, hatarido,
-    hatralek_db, rendelt_ora, teljesitett_ora, hatralek_ora, szamlazott_ora, szamlazhato_ora, termekcsoport, leallas_ok, aktivitas
+    hatralek_db, rendelt_ora, teljesitett_ora, hatralek_ora, szamlazott_ora, szamlazhato_ora, termekcsoport, leallas_ok, aktivitas, leallas_felelos
   FROM legrand_gyartasi_lap
   WHERE state IN ('mterv', 'gyartas') AND active
   ORDER BY id
 ;
 
+update legrand_gyartasi_lap set aktivitas = '' where aktivitas = 'mind' ;
+update legrand_gyartasi_lap set aktivitas = 'folyamatban' where aktivitas = 'foly' ;
+update legrand_gyartasi_lap set aktivitas = 'áll' where aktivitas = 'all' ;
+
+update legrand_gyartasi_lap_log set aktivitas = '' where aktivitas = 'mind' ;
+update legrand_gyartasi_lap_log set aktivitas = 'folyamatban' where aktivitas = 'foly' ;
+update legrand_gyartasi_lap_log set aktivitas = 'áll' where aktivitas = 'all' ;
