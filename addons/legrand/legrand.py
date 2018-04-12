@@ -680,6 +680,7 @@ class LegrandGyartasiLap(models.Model):
   cikknev             = fields.Char(u'Terméknév', related='cikk_id.cikknev', readonly=True)
   utolso_feljegyzes   = fields.Char(u'Utolsó feljegyzés', compute='_compute_utolso_feljegyzes')
   feljegyzes_ideje    = fields.Char(u'Feljegyzés ideje',  compute='_compute_utolso_feljegyzes')
+  feljegyzo_id        = fields.Many2one('res.users', u'Feljegyző', compute='_compute_utolso_feljegyzes')
   check_cikkek_uid    = fields.Char(u'Ellenőrzés', compute='_compute_check_cikkek_uid')
   cikkhiany           = fields.Char(u'Cikkhiány', compute='_compute_cikkhiany')
   cikkhiany_count     = fields.Integer(u'Cikkhiány db', compute='_compute_cikkhiany')
@@ -764,6 +765,7 @@ class LegrandGyartasiLap(models.Model):
     utolso = self.env['legrand.feljegyzes'].search([('gyartasi_lap_id', '=', self.id)], limit=1, order='id desc')
     self.utolso_feljegyzes = utolso.feljegyzes
     self.feljegyzes_ideje  = utolso.create_date
+    self.feljegyzo_id      = utolso.create_uid
 
   @api.one
   @api.depends('bom_id')
@@ -875,6 +877,8 @@ class LegrandGylapDbjegyzek(models.Model):
   # calculated fields
   beepules            = fields.Float(u'Beépülés', digits=(16, 6), compute='_compute_beepules', store=True)
   ossz_bekerules      = fields.Float(u'Össz bekerülés', digits=(16, 5), compute='_compute_ossz_bekerules', store=True)
+  cikk_ar             = fields.Float(u'Cikktörzs ár',  digits=(16, 3), related='cikk_id.bekerulesi_ar', store=True)
+  arelteres           = fields.Float(u'Eltérés', digits=(16, 3), compute='_compute_arelteres', store=True)
   # virtual fields
   cikknev             = fields.Char(u'Megnevezés', related='cikk_id.cikknev', readonly=True)
   rendelt_db          = fields.Integer(u'Rendelt termék db', related='gyartasi_lap_id.rendelt_db', readonly=True)
@@ -889,6 +893,11 @@ class LegrandGylapDbjegyzek(models.Model):
   @api.depends('rendelt_db', 'bekerulesi_ar')
   def _compute_ossz_bekerules(self):
     self.ossz_bekerules = self.bekerulesi_ar * self.ossz_beepules
+
+  @api.one
+  @api.depends('cikk_id.bekerulesi_ar', 'bekerulesi_ar')
+  def _compute_arelteres(self):
+    self.arelteres = self.bekerulesi_ar - self.cikk_id.bekerulesi_ar
 
 ############################################################################################################################  Gylap Legrand művelet  ###
 class LegrandGylapMuvelet(models.Model):
@@ -1448,8 +1457,8 @@ class LegrandImpex(models.Model):
   gylap_state         = fields.Selection([('uj',u'Új'),('mterv',u'Műveletterv'),('gyartas',u'Gyártás'),('gykesz',u'Gyártás kész'),('kesz',u'Rendelés teljesítve')],
                         u'Állapot', related='gyartasi_lap_id.state', readonly=True)
   cikknev             = fields.Char(u'Cikknév', compute='_compute_cikknev')
+  price               = fields.Float(u'Price', digits=(16, 3), compute='_compute_price')
   gyartasi_hely_ids   = fields.Many2many('legrand.hely', string=u'Gyártási helyek', related='gyartasi_lap_id.gyartasi_hely_ids', readonly=True)
-  price               = fields.Float(u'Price', digits=(16, 3), related='cikk_id.bekerulesi_ar', readonly=True)
 
   @api.one
   @api.depends('mennyiseg', 'gyartasi_lap_id')
@@ -1460,3 +1469,11 @@ class LegrandImpex(models.Model):
   @api.depends('cikk_id', 'bom_id')
   def _compute_cikknev(self):
     self.cikknev = self.cikk_id.cikknev if self.cikk_id else self.bom_id.cikk_id.cikknev
+
+  @api.one
+  @api.depends('cikk_id', 'bom_id')
+  def _compute_price(self):
+    if self.gyartasi_lap_id:
+      self.price = self.env['legrand.gylap_dbjegyzek'].search([('cikk_id', '=', self.cikk_id.id), ('gyartasi_lap_id', '=', self.gyartasi_lap_id.id)]).bekerulesi_ar
+    else:
+      self.price = self.cikk_id.bekerulesi_ar
