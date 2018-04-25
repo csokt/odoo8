@@ -90,55 +90,9 @@ class LeltarParameter(models.Model):
         Eszkoz.create({'name': leltari_szam+' - '+megnevezes, 'hivszam': hivszam, 'leltari_szam': leltari_szam, 'megnevezes': megnevezes,
           'leltarcsoport_id': leltarcsoport_id, 'akt_leltarkorzet_id': akt_leltarkorzet_id, 'akt_hasznalo_id': akt_hasznalo_id,
           'leltarkorzet_kod': leltarkorzet_kod, 'csoportkod': csoportkod, 'leltari_szam_vonalkod': leltari_szam_vonalkod, 'gyartasi_szam': gyartasi_szam,
-          'megjegyzes': megjegyzes, 'ds_leltarkorzet': ds_leltarkorzet, 'ds_leltarfelelos': ds_leltarfelelos })
+          'megjegyzes': megjegyzes, 'ds_leltarkorzet': ds_leltarkorzet, 'ds_leltarfelelos': ds_leltarfelelos, 'idegen_e': False })
       row = cursor.fetchone()
     return True
-
-#  @api.one
-#  def import_felmeres(self):
-#    import pymssql
-#    mssql_conn = pymssql.connect(server='192.168.0.2\\PROLIANTML350', user='informix', password='informix', database='DominoSoft')
-#
-#    Leltar = self.env['leltar.leltar']
-#    Eszkoz = self.env['leltar.eszkoz']
-#    Korzet = self.env['leltar.korzet']
-#    Mozgas = self.env['leltar.eszkozmozgas']
-#    Log = self.env['szefo.log']
-#    Log.create({'loglevel': 'info', 'name': u'Leltár felmérés import', 'module': 'leltar'})
-#
-#    ut_hivszam = Leltar.search([], limit=1, order='hivszam desc').hivszam
-#    if not ut_hivszam: ut_hivszam = 0
-#    cursor = mssql_conn.cursor()
-#    cursor.execute("""SELECT hsz, targyev, targyho, lt_bfvonalkod, lt_blvonalkod, lt_szobaszam, ervkezdet FROM DominoSoft.dbo.befleltar
-#                      WHERE hsz > %s ORDER BY hsz""" % ut_hivszam)
-#    row = cursor.fetchone()
-#    while row:
-#      eszkoz_id = None
-#      leltarkorzet_id = None
-#      hivszam, targyev, targyho, leltari_szam_vonalkod, leltarkorzet_vonalkod, szobaszam, ervenyesseg_kezdete = trim(row)
-#      eszkoz_ids = Eszkoz.search_read([('leltari_szam_vonalkod', '=', leltari_szam_vonalkod)])
-#      if eszkoz_ids:
-#        eszkoz_id = eszkoz_ids[0]['id']
-#        csoportkod = eszkoz_ids[0]['csoportkod']
-#        akt_leltarkorzet = eszkoz_ids[0]['akt_leltarkorzet_id']
-#        if akt_leltarkorzet:
-#          akt_leltarkorzet_id = akt_leltarkorzet[0]
-#        else:
-#          akt_leltarkorzet_id = False
-#      korzet_ids = Korzet.search_read([('leltarkorzet_kod', '=', leltarkorzet_vonalkod)])
-##      korzet_ids = Korzet.search_read([('leltarkorzet_kod', '=', leltarkorzet_vonalkod), ('szobaszam', '=', szobaszam)])
-#      if korzet_ids: leltarkorzet_id = korzet_ids[0]['id']
-#      if eszkoz_id and leltarkorzet_id:
-#        Leltar.create({'eszkoz_id': eszkoz_id, 'leltarkorzet_id': leltarkorzet_id, 'hivszam': hivszam,
-#          'targyev': targyev, 'targyho': targyho, 'leltari_szam_vonalkod': leltari_szam_vonalkod,
-#          'leltarkorzet_vonalkod': leltarkorzet_vonalkod, 'szobaszam': szobaszam, 'ervenyesseg_kezdete': ervenyesseg_kezdete})
-#        if akt_leltarkorzet_id != leltarkorzet_id and csoportkod != '005':
-#          Mozgas.create({'eszkoz_id': eszkoz_id, 'honnan_leltarkorzet_id': akt_leltarkorzet_id,
-#                        'hova_leltarkorzet_id': leltarkorzet_id, 'megerkezett': True, 'megjegyzes': 'leltár' })
-#      else:
-#        Log.create({'loglevel': 'error', 'name': u'Sikertelen import', 'module': 'DominoSoft', 'table': 'befleltar', 'rowid': hivszam})
-#      row = cursor.fetchone()
-#    return True
 
 class LeltarDsFelelos(models.Model):
   _name       = 'leltar.ds_felelos'
@@ -220,26 +174,27 @@ class LeltarSzett(models.Model):
 
 class LeltarEszkoz(models.Model):
   _name                 = 'leltar.eszkoz'
-  name                  = fields.Char(u'Eszköz',  required=True)
-  hivszam               = fields.Integer(u'Hiv.szám',  required=True, index=True)
-  leltari_szam          = fields.Char(u'Leltári szám',   required=True, index=True)
-  megnevezes            = fields.Char(u'Eszköz név',   required=True)
+  name                  = fields.Char(u'Eszköz',        compute='_compute_name', store=True)
+  hivszam               = fields.Integer(u'Hiv.szám',   readonly=True)
+  leltari_szam          = fields.Char(u'Leltári szám',  required=True, index=True)
+  megnevezes            = fields.Char(u'Eszköz név',    required=True)
   akt_leltarkorzet_id   = fields.Many2one('leltar.korzet',  u'Aktuális leltárkörzet')
   akt_hasznalo_id       = fields.Many2one('hr.employee',    u'Aktuális használó')
   leltarcsoport_id      = fields.Many2one('leltar.csoport', u'Leltárcsoport')
   szett_id              = fields.Many2one('leltar.szett', u'Eszköz szett')
-  csoportkod            = fields.Char(u'Leltárcsoport kód',  required=True)
-  leltari_szam_vonalkod = fields.Char(u'Leltári szám vonalkód',   required=True)
+  csoportkod            = fields.Char(u'Leltárcsoport kód')
+  leltari_szam_vonalkod = fields.Char(u'Leltári szám vonalkód')
   gyartasi_szam         = fields.Char(u'Gyártási szám')
   megjegyzes            = fields.Char(u'Megjegyzés')
   leltarkorzet_kod      = fields.Char(u'DS <-> Leltárkörzet kód')
-  ds_leltarkorzet       = fields.Char(u'DS Leltárkörzet',  required=True)
+  ds_leltarkorzet       = fields.Char(u'DS Leltárkörzet')
   ds_leltarfelelos      = fields.Char(u'DS Leltárfelelős')
   netto_ertek           = fields.Integer(u'Nettó érték')
   selejt_ok             = fields.Char(u'Selejtezés oka')
   selejtezni            = fields.Boolean(u'Selejtezni', default=False)
-  zarolva               = fields.Boolean(u'Zárolva?', default=False)
-  active                = fields.Boolean(u'Aktív?',  default=True)
+  zarolva               = fields.Boolean(u'Zárolva?',   default=False)
+  idegen_e              = fields.Boolean(u'Idegen eszköz?', default=True)
+  active                = fields.Boolean(u'Aktív?',     default=True)
   # virtual fields
   not_active            = fields.Boolean(u'Nem aktív?', compute='_compute_not_active')
   mozgas_ids            = fields.One2many('leltar.eszkozmozgas', 'eszkoz_id', u'Eszköz mozgások')
@@ -250,6 +205,12 @@ class LeltarEszkoz(models.Model):
 #  @api.depends('selejtezni')
 #  def _compute_selejtezni_dup(self):
 #    self.selejtezni_dup = self.selejtezni
+
+  @api.one
+  @api.depends('leltari_szam', 'megnevezes')
+  def _compute_name(self):
+    if self.leltari_szam and self.megnevezes:
+      self.name = self.leltari_szam+' - '+self.megnevezes
 
   @api.one
   @api.depends('active')

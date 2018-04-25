@@ -101,29 +101,30 @@
       <field  name="model">leltar.eszkoz</field>
       <field  name="priority" eval="15"/>
       <field  name="arch" type="xml">
-        <form create="false" edit="true">
+        <form>
           <group col="4">
-            <field name="leltari_szam"          readonly="1"/>
-            <field name="megnevezes"            readonly="1"/>
-            <field name="name"                  readonly="1"/>
-            <field name="leltarcsoport_id"      readonly="0"    options="{'no_create': True}"/>
-            <field name="akt_leltarkorzet_id"   readonly="1"/>
+            <field name="leltari_szam"          attrs="{'readonly': [('idegen_e','!=',True)]}"/>
+            <field name="megnevezes"            attrs="{'readonly': [('idegen_e','!=',True)]}"/>
+            <field name="name"                  />
+            <field name="leltarcsoport_id"      readonly="0"    options="{'no_create': True, 'no_open': True}"/>
+            <field name="akt_leltarkorzet_id"   readonly="0"    options="{'no_create': True, 'no_open': True}"    attrs="{'readonly': [('idegen_e','!=',True)]}"/>
             <field name="akt_hasznalo_id"       readonly="1"/>
             <field name="tulajdonsag_ids"       widget="many2many_tags"/>
-            <field name="csoportkod"            readonly="0"/>
-            <field name="szett_id"              options="{'no_create': True}"/>
+            <field name="csoportkod"            readonly="1"/>
+            <field name="szett_id"              options="{'no_create': True, 'no_open': True}"/>
             <field name="hivszam"               readonly="1"/>
             <field name="megjegyzes"/>
             <field name="leltari_szam_vonalkod" readonly="1"/>
-            <field name="gyartasi_szam"         readonly="1"/>
+            <field name="gyartasi_szam"         attrs="{'readonly': [('idegen_e','!=',True)]}"/>
             <field name="leltarkorzet_kod"      readonly="1"/>
             <field name="netto_ertek"           readonly="1"/>
             <field name="ds_leltarkorzet"       readonly="1"/>
             <field name="selejtezni"            readonly="1"    string=""/>
             <field name="ds_leltarfelelos"      readonly="1"/>
             <field name="selejt_ok"             readonly="1"/>
+            <field name="idegen_e"              readonly="1"/>
             <field name="zarolva"               groups="leltar.group_leltar_manager"/>
-            <field name="active"                groups="leltar.group_leltar_manager"/>
+            <field name="active"                groups="leltar.group_leltar_manager"      attrs="{'readonly': [('idegen_e','!=',True)]}"/>
           </group>
           <div>
             <field name="mozgas_ids"/>
@@ -146,6 +147,7 @@
           <field name="akt_hasznalo_id"/>
           <field name="megjegyzes"/>
           <field name="tulajdonsag_ids"       widget="many2many_tags"/>
+          <field name="idegen_e"/>
           <field name="selejtezni"/>
           <field name="zarolva"/>
           <button name="zarolva_valt"         string="Nyit/Zár"         type="object" class="oe_highlight"      groups="leltar.group_leltar_manager"/>
@@ -221,7 +223,10 @@
           <field  name="name"/>
           <field  name="akt_leltarkorzet_id"/>
           <field  name="tulajdonsag_ids"/>
-          <filter string="Számítástechnika" domain="[('csoportkod','=','005')]"/>
+          <filter name="filter_sajat"     string="Saját eszköz"               domain="[('idegen_e','!=',True)]"/>
+          <filter name="filter_idegen"    string="Idegen eszköz"              domain="[('idegen_e','=',True)]"/>
+          <separator/>
+          <filter name="filter_szamtech"  string="Számítástechnika"           domain="[('csoportkod','=','005')]"/>
         </search>
       </field>
     </record>

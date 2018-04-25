@@ -1508,6 +1508,7 @@
                 domain="[('mozgasnem','=','belso')]"                context="{'mozgasnem':'belso'}"/>
     <act_window id="mozgassor"          name="Tétel"                res_model="legrand.mozgassor"         view_id="view_tree_mozgassor"               view_mode="tree"/>
     <act_window id="anyagigeny"         name="Anyagkérés"           res_model="legrand.anyagigeny"                                                    view_mode="tree"/>
+    <act_window id="anyagszukseglet"    name="Anyagszükséglet"      res_model="legrand.anyagszukseglet"                                               view_mode="tree"/>
 
     <act_window id="mozgas_bevet"       name="Bevételezés"          res_model="legrand.mozgasfej"                                                     view_mode="tree,form"
                 domain="[('mozgasnem','=','be')]"                   context="{'mozgasnem':'be'}"/>
@@ -1518,7 +1519,6 @@
     <act_window id="mozgas_helyesbit"   name="Készlethelyesbítés"   res_model="legrand.mozgasfej"                                                     view_mode="tree,form"
                 domain="[('mozgasnem','=','helyesbit')]"            context="{'mozgasnem':'helyesbit'}"/>
     <act_window id="cikk_mozgas"        name="Cikk mozgás"          res_model="legrand.cikk_mozgas"                                                   view_mode="tree"/>
-    <act_window id="anyagszukseglet"    name="Anyagszükséglet"      res_model="legrand.anyagszukseglet"                                               view_mode="tree"/>
 
     <act_window id="gylap_gyartas"      name="Gyártási lap"         res_model="legrand.gyartasi_lap"                                                  view_mode="tree,form"
                 domain="[('state','!=','uj')]"                      context="{'search_default_filter_gyartas': 1}"/>
@@ -1568,6 +1568,7 @@
     <menuitem id="menu_szallitas_uzem"    name="Szállítás (üzem)"             parent="menu_root"                  sequence="20" />
       <menuitem id="menu_mozgas_belso"    name="Belső szállítás"              parent="menu_szallitas_uzem"        sequence="10" action="mozgas_belso"   />
       <menuitem id="menu_mozgassor"       name="Szállítástételek"             parent="menu_szallitas_uzem"        sequence="20" action="mozgassor"  />
+      <menuitem id="menu_anyagszukseglet" name="Anyagszükséglet"              parent="menu_szallitas_uzem"        sequence="70" action="anyagszukseglet"  />
       <menuitem id="menu_anyagigeny"      name="Anyagkérés"                   parent="menu_szallitas_uzem"        sequence="90" action="anyagigeny"  />
 
     <menuitem id="menu_szallitas"         name="Szállítás"                    parent="menu_root"                  sequence="25"                                 groups="group_legrand_manager"/>
@@ -1576,7 +1577,6 @@
       <menuitem id="menu_mozgas_selejt"   name="Selejt visszaszállítás"       parent="menu_szallitas"             sequence="40" action="mozgas_selejt"  />
       <menuitem id="menu_mozgas_helyesb"  name="Készlethelyesbítés"           parent="menu_szallitas"             sequence="50" action="mozgas_helyesbit" />
       <menuitem id="menu_cikk_mozgas"     name="Cikk mozgás"                  parent="menu_szallitas"             sequence="60" action="cikk_mozgas" />
-      <menuitem id="menu_anyagszukseglet" name="Anyagszükséglet"              parent="menu_szallitas"             sequence="70" action="anyagszukseglet"  />
 
     <menuitem id="menu_raktar"            name="Termékek"                     parent="menu_root"                  sequence="30" />
       <menuitem id="menu_cikk"            name="Cikkek"                       parent="menu_raktar"                sequence="10" action="cikk" />
