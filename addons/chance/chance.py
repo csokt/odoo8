@@ -73,8 +73,9 @@ class ChanceMozgasfej(models.Model):
   _rec_name           = 'id'
   state               = fields.Selection([('terv',u'Tervezet'),('szallit',u'Szállítás'),('elter',u'Átszállítva eltérésekkel'),('kesz',u'Átszállítva'),('konyvelt',u'Könyvelve')],
                         u'Állapot', default='terv', readonly=False )
-  mozgasnem           = fields.Selection([('bevet',u'Bevételezés'),('elad',u'Értékesítés'),('belso',u'Belső szállítás'), ('korrekcio',u'Készlethelyesbítés'), ('selejt',u'Selejtezés'),
-                                          ('indulo',u'Induló készlet'),('rendel',u'Rendelés')], u'Mozgásnem', required=True, default=lambda self: self.env.context.get('mozgasnem', ''))
+  mozgasnem           = fields.Selection([('bevet',u'Bevételezés'),('elad',u'Értékesítés'),('belso',u'Belső szállítás'), ('korrekcio',u'Készlethelyesbítés'),
+                                          ('selejt',u'Selejtezés'),('indulo',u'Induló készlet'),('rendel',u'Rendelés'),('sajat',u'Saját felhasználás')],
+                                          u'Mozgásnem', required=True, default=lambda self: self.env.context.get('mozgasnem', ''))
   forrashely_id       = fields.Many2one('chance.hely', u'Forráshely', index=True)
   celallomas_id       = fields.Many2one('chance.hely', u'Célállomás helye', index=True)
   vevo_id             = fields.Many2one('chance.partner', u'Vevő')
@@ -90,6 +91,8 @@ class ChanceMozgasfej(models.Model):
     celdict  = {'bevet': 'keszaru', 'selejt': 'korrekcio'}
     if vals['mozgasnem']   == 'elad':
       vals['celallomas_id'] = self.env['chance.hely'].search([('azonosito', '=', 'vevo')]).id
+    elif vals['mozgasnem']   == 'sajat':
+      vals['celallomas_id'] = self.env['chance.hely'].search([('azonosito', '=', 'sajat')]).id
     elif vals['mozgasnem']   == 'korrekcio':
       vals['forrashely_id'] = self.env['chance.hely'].search([('azonosito', '=', 'korrekcio')]).id
     elif vals['mozgasnem']   == 'indulo':

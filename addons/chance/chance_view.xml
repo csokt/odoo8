@@ -172,7 +172,7 @@
               <field name="id"                  string="Szállítólevél száma"/>
               <field name="create_uid"          readonly="1"    string="Felvette"/>
               <field name="create_date"         readonly="1"    string="Létrehozás ideje"/>
-              <field name="forrashely_id"       attrs="{'readonly': ['|',('state','!=','terv'),('mozgasnem', 'not in', ('belso','elad'))], 'required': [('mozgasnem', 'in', ('belso','elad'))]}"
+              <field name="forrashely_id"       attrs="{'readonly': ['|',('state','!=','terv'),('mozgasnem', 'not in', ('belso','elad','sajat'))], 'required': [('mozgasnem', 'in', ('belso','elad','sajat'))]}"
                                                 options="{'no_create': True, 'no_open': True}"
                                                 domain="[('szefo_e', '=', True)]"/>
               <field name="write_uid"           readonly="1"    string="Módosította"/>
@@ -241,7 +241,7 @@
       <field  name="arch" type="xml">
         <tree editable="bottom">
           <field name="cikk_id"                 options="{'no_create': True}"/>
-          <field name="raktaron"                invisible="context.get('mozgasnem') not in ('elad','belso','rendel')"   attrs="{'invisible': [('state','in',('szallit','kesz','konyvelt'))]}" />
+          <field name="raktaron"                invisible="context.get('mozgasnem') not in ('elad','sajat','belso','rendel')"   attrs="{'invisible': [('state','in',('szallit','kesz','konyvelt'))]}" />
           <field name="mennyiseg"               sum="össz. db"/>
           <field name="egysegar"/>
           <field name="ertek"                   sum="össz. Ft"/>
@@ -455,6 +455,8 @@
                 domain="[('mozgasnem','=','belso')]"              context="{'mozgasnem':'belso'}"/>
     <act_window id="mozgas_elad"        name="Értékesítés"        res_model="chance.mozgasfej"                                                     view_mode="tree,form"
                 domain="[('mozgasnem','=','elad')]"               context="{'mozgasnem':'elad'}"/>
+    <act_window id="mozgas_sajat"       name="Saját felhasználás" res_model="chance.mozgasfej"                                                     view_mode="tree,form"
+                domain="[('mozgasnem','=','sajat')]"              context="{'mozgasnem':'sajat'}"/>
     <act_window id="mozgas_leltar"      name="Készlethelyesbítés" res_model="chance.mozgasfej"                                                     view_mode="tree,form"
                 domain="[('mozgasnem','=','korrekcio')]"          context="{'mozgasnem':'korrekcio'}"/>
     <act_window id="mozgas_selejt"      name="Selejtezés"         res_model="chance.mozgasfej"                                                     view_mode="tree,form"
@@ -475,9 +477,10 @@
       <menuitem id="menu_mozgas_rendel"   name="Rendelés"                     parent="menu_raktar"                sequence="25" action="mozgas_rendel"  />
       <menuitem id="menu_mozgas_belso"    name="Belső szállítás"              parent="menu_raktar"                sequence="30" action="mozgas_belso" />
       <menuitem id="menu_mozgas_elad"     name="Értékesítés"                  parent="menu_raktar"                sequence="40" action="mozgas_elad"  />
-      <menuitem id="menu_mozgas_leltar"   name="Készlethelyesbítés"           parent="menu_raktar"                sequence="50" action="mozgas_leltar"          groups="group_chance_manager" />
-      <menuitem id="menu_mozgas_selejt"   name="Selejtezés"                   parent="menu_raktar"                sequence="60" action="mozgas_selejt"          groups="group_chance_manager" />
-      <menuitem id="menu_mozgas_indulo"   name="Induló készlet"               parent="menu_raktar"                sequence="70" action="mozgas_indulo"          groups="group_chance_manager" />
+      <menuitem id="menu_mozgas_sajat"    name="Saját felhasználás"           parent="menu_raktar"                sequence="50" action="mozgas_sajat"  />
+      <menuitem id="menu_mozgas_leltar"   name="Készlethelyesbítés"           parent="menu_raktar"                sequence="60" action="mozgas_leltar"          groups="group_chance_manager" />
+      <menuitem id="menu_mozgas_selejt"   name="Selejtezés"                   parent="menu_raktar"                sequence="70" action="mozgas_selejt"          groups="group_chance_manager" />
+      <menuitem id="menu_mozgas_indulo"   name="Induló készlet"               parent="menu_raktar"                sequence="80" action="mozgas_indulo"          groups="group_chance_manager" />
       <menuitem id="menu_mozgassor"       name="Összes tétel"                 parent="menu_raktar"                sequence="90" action="mozgassor"  />
 
     <menuitem id="menu_termek"            name="Termékek"                     parent="menu_root"                  sequence="30" />
