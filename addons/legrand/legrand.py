@@ -390,7 +390,6 @@ class LegrandCikkMozgas(models.Model):
           JOIN legrand_bom_line  AS line ON sor.bom_id = line.bom_id
           WHERE sor.bom_id > 0
         ) AS move
-        WHERE (forrashely_id = 1 OR celallomas_id = 1)
       )"""
       % (self._table)
     )

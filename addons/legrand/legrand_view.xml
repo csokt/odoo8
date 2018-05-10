@@ -402,6 +402,39 @@
       </field>
     </record>
 
+    <record id="view_filter_cikk_mozgas"    model="ir.ui.view">
+      <field  name="name">Cikk mozgás Filter</field>
+      <field  name="model">legrand.cikk_mozgas</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field  name="cikk_id"/>
+          <field  name="bom_id"/>
+          <field  name="forrashely_id"/>
+          <field  name="celallomas_id"/>
+          <filter name="filter_depo"      string="Depó"                       domain="[('|'),('forrashely_id.azonosito','=','depo'),      ('celallomas_id.azonosito','=','depo')]"/>
+          <filter name="filter_szentes"   string="Szentes"                    domain="[('|'),('forrashely_id.azonosito','=','szentes'),   ('celallomas_id.azonosito','=','szentes')]"/>
+          <filter name="filter_hmvhely"   string="Hódmezővásárhely"           domain="[('|'),('forrashely_id.azonosito','=','hmvhely'),   ('celallomas_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_berkert"   string="Bérkert"                    domain="[('|'),('forrashely_id.azonosito','=','berkert'),   ('celallomas_id.azonosito','=','berkert')]"/>
+          <filter name="filter_mako"      string="Makó"                       domain="[('|'),('forrashely_id.azonosito','=','mako'),      ('celallomas_id.azonosito','=','mako')]"/>
+          <filter name="filter_oroshaza"  string="Orosháza"                   domain="[('|'),('forrashely_id.azonosito','=','oroshaza'),  ('celallomas_id.azonosito','=','oroshaza')]"/>
+          <filter name="filter_apatfalva" string="Apátfalva"                  domain="[('|'),('forrashely_id.azonosito','=','apatfalva'), ('celallomas_id.azonosito','=','apatfalva')]"/>
+          <separator/>
+          <filter name="filter_be"        string="Alkatrész bevételezés"      domain="[('mozgasnem','=','be')]"/>
+          <filter name="filter_ki"        string="Termék kiszállítás"         domain="[('mozgasnem','=','ki')]"/>
+          <filter name="filter_belso"     string="Belső szállítás"            domain="[('mozgasnem','=','belso')]"/>
+          <filter name="filter_leltar"    string="Készlethelyesbítés"         domain="[('mozgasnem','=','helyesbit')]"/>
+          <filter name="filter_vissza"    string="Alkatrész visszaszállítás"  domain="[('mozgasnem','=','vissza')]"/>
+          <filter name="filter_selejt"    string="Selejt visszaszállítás"     domain="[('mozgasnem','=','selejt')]"/>
+          <separator/>
+          <filter name="filter_terv"      string="Tervezet"                   domain="[('state','=','terv')]"/>
+          <filter name="filter_szallit"   string="Szállítás"                  domain="[('state','=','szallit')]"/>
+          <filter name="filter_elter"     string="Átszállítva eltérésekkel"   domain="[('state','=','elter')]"/>
+          <filter name="filter_kesz"      string="Átszállítva"                domain="[('state','=','kesz')]"/>
+          <filter name="filter_konyvelt"  string="Könyvelve"                  domain="[('state','=','konyvelt')]"/>
+        </search>
+      </field>
+    </record>
+
     <!--####################################################################################################################  Anyagigénylés  -->
     <record id="view_tree_anyagigeny"   model="ir.ui.view">
       <field  name="name">Anyagigény Tree</field>
