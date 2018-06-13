@@ -703,8 +703,10 @@
             <field name="muveletek_elvegezve" />
             <field name="carnet_db"           />
             <field name="csokkentve_e"        />
-            <field name="aktivitas"/>
-            <field name="leallas_felelos"/>
+
+            <field name="raktar"              />
+            <field name="aktivitas"           />
+            <field name="leallas_felelos"     />
             <field name="active"              groups="legrand.group_legrand_director"/>
           </group>
           <group col="4">
@@ -931,6 +933,7 @@
           <field name="homogen_id"/>
           <field name="termekcsalad"/>
           <field name="hatarido"/>
+          <field name="gyartasi_hely_id"/>
         </tree>
       </field>
     </record>

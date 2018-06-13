@@ -661,6 +661,7 @@ class LegrandGyartasiLap(models.Model):
   raklap_min          = fields.Char(u'Raklap min',  readonly=True)
   raklap_max          = fields.Char(u'Raklap max',  readonly=True)
   rakat_tipus         = fields.Char(u'Rakat tipus', readonly=True)
+  raktar              = fields.Char(u'Raktár',      readonly=True)
   muveletek_elvegezve = fields.Boolean(u'Műveletek elvégezve?', compute='_compute_muveletek_elvegezve', store=True)
   carnet_db           = fields.Integer(u'Carnet db', states={'kesz': [('readonly', True)]})
   carnet_e            = fields.Boolean(u'Carnet?', compute='_compute_carnet_e', store=True)
@@ -936,6 +937,7 @@ class LegrandGylapHomogen(models.Model):
   termekkod           = fields.Char(u'Tételkód', related='gyartasi_lap_id.termekkod', readonly=True)
   szamlazhato_db      = fields.Integer(u'Számlázható', related='gyartasi_lap_id.szamlazhato_db', readonly=True)
   hatarido            = fields.Date(u'Határidő', related='gyartasi_lap_id.hatarido', readonly=True)
+  gyartasi_hely_id    = fields.Many2one('legrand.hely',  u'Fő gyártási hely', related='gyartasi_lap_id.gyartasi_hely_id', auto_join=True, readonly=True)
   active              = fields.Boolean(u'Aktív?', related='gyartasi_lap_id.active', readonly=True)
 
   @api.one
