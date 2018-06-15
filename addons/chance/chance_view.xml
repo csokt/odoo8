@@ -37,6 +37,7 @@
           <field name="cim"/>
           <field name="sorrend"/>
           <field name="szefo_e"/>
+          <field name="keszaru_e"/>
           <field name="cikk_ar_felvesz_e"/>
         </tree>
       </field>
@@ -177,7 +178,7 @@
                                                 domain="[('szefo_e', '=', True)]"/>
               <field name="write_uid"           readonly="1"    string="Módosította"/>
               <field name="write_date"          readonly="1"    string="Módosítás ideje"/>
-              <field name="celallomas_id"       attrs="{'readonly': ['|',('state','!=','terv'),('mozgasnem', 'not in', ('belso','korrekcio','indulo','rendel'))], 'required': [('mozgasnem', 'in', ('belso','korrekcio','indulo','rendel'))]}"
+              <field name="celallomas_id"       attrs="{'readonly': ['|',('state','!=','terv'),('mozgasnem', 'not in', ('bevet','belso','korrekcio','indulo','rendel'))], 'required': [('mozgasnem', 'in', ('bevet','belso','korrekcio','indulo','rendel'))]}"
                                                 options="{'no_create': True, 'no_open': True}"
                                                 domain="[('szefo_e', '=', True)]"/>
               <field name="mozgastorzs_id"      attrs="{'readonly': [('state','=','konyvelt')]}"

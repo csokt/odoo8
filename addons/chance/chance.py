@@ -14,6 +14,7 @@ class ChanceHely(models.Model):
   azonosito           = fields.Char(u'Belső azonosító')
   sorrend             = fields.Integer(u'Sorrend')
   szefo_e             = fields.Boolean(u'SZEFO készletbe számít?')        # A SZEFO készletbe beszámít-e ez a hely?
+  keszaru_e           = fields.Boolean(u'Készáru raktár?')                # Késztermék bevételezésnél jelenjen-e meg?
   cikk_ar_felvesz_e   = fields.Boolean(u'Cikk árat felvegye?')            # A cikkar táblába automatikus insert/update legyen-e?
   active              = fields.Boolean(u'Aktív?', default=True)
 
@@ -93,6 +94,8 @@ class ChanceMozgasfej(models.Model):
       vals['celallomas_id'] = self.env['chance.hely'].search([('azonosito', '=', 'vevo')]).id
     elif vals['mozgasnem']   == 'sajat':
       vals['celallomas_id'] = self.env['chance.hely'].search([('azonosito', '=', 'sajat')]).id
+    elif vals['mozgasnem']   == 'bevet':
+      vals['forrashely_id'] = self.env['chance.hely'].search([('azonosito', '=', 'gyartas')]).id
     elif vals['mozgasnem']   == 'korrekcio':
       vals['forrashely_id'] = self.env['chance.hely'].search([('azonosito', '=', 'korrekcio')]).id
     elif vals['mozgasnem']   == 'indulo':
