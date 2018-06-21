@@ -382,6 +382,50 @@
       </field>
     </record>
 
+    <!--####################################################################################################################  Előszerelés  -->
+    <record id="view_tree_eloszereles_default"    model="ir.ui.view">
+      <field  name="name">Előszerelés Tree</field>
+      <field  name="model">legrand.eloszereles</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <tree editable="top">
+          <field name="hely_id"                 options="{'no_create': True}"/>
+          <field name="gyartasi_lap_id"         options="{'no_create': True}"/>
+          <field name="bom_id"                  options="{'no_create': True}"     string="Anyagjegyzék"/>
+          <field name="cikknev"/>
+          <field name="mennyiseg"/>
+          <field name="akcio"/>
+          <field name="megjegyzes"/>
+          <field name="create_uid"              readonly="1"  string="Felvette"/>
+          <field name="create_date"             readonly="1"  string="Létrehozás ideje"/>
+          <field name="write_uid"               readonly="1"  string="Módosította"/>
+          <field name="write_date"              readonly="1"  string="Módosítás ideje"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_eloszereles"    model="ir.ui.view">
+      <field  name="name">Előszerelés Filter</field>
+      <field  name="model">legrand.eloszereles</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field  name="bom_id"/>
+          <field  name="gyartasi_lap_id"/>
+          <filter name="filter_szentes"         string="Szentes"                domain="[('hely_id.azonosito','=','szentes')]"/>
+          <filter name="filter_hmvhely"         string="Hódmezővásárhely"       domain="[('hely_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_berkert"         string="Bérkert"                domain="[('hely_id.azonosito','=','berkert')]"/>
+          <filter name="filter_mako"            string="Makó"                   domain="[('hely_id.azonosito','=','mako')]"/>
+          <filter name="filter_oroshaza"        string="Orosháza"               domain="[('hely_id.azonosito','=','oroshaza')]"/>
+          <filter name="filter_apatfalva"       string="Apátfalva"              domain="[('hely_id.azonosito','=','apatfalva')]"/>
+          <separator/>
+          <group expand="0" string="Csoportosítás">
+            <filter name="group_bom"            string="Anyagjegyzék"           context="{'group_by': 'bom_id'}"/>
+            <filter name="group_hely"           string="Gyártási hely"          context="{'group_by': 'hely_id'}"/>
+          </group>
+        </search>
+      </field>
+    </record>
+
     <!--####################################################################################################################  Cikk mozgás  -->
     <record id="view_tree_cikk_mozgas"    model="ir.ui.view">
       <field  name="name">Cikk mozgás Tree</field>
@@ -1566,6 +1610,7 @@
     <act_window id="szefo_muvelet"      name="Művelet"              res_model="legrand.gylap_szefo_muvelet" view_id="view_tree_szefo_muvelet"         view_mode="tree"/>
     <act_window id="gylap_dbjegyzek"    name="Darabjegyzék"         res_model="legrand.gylap_dbjegyzek"   view_id="view_tree_gylap_dbjegyzek"         view_mode="tree"/>
     <act_window id="muveletvegzes"      name="Műveletvégzés"        res_model="legrand.muveletvegzes"                                                 view_mode="tree"/>
+    <act_window id="eloszereles"        name="Műveletvégzés"        res_model="legrand.eloszereles"                                                   view_mode="tree,form"/>
     <act_window id="feljegyzes"         name="Feljegyzés"           res_model="legrand.feljegyzes"                                                    view_mode="tree,form"/>
 
     <act_window id="mozgas_kiszall"     name="Kiszállítás"          res_model="legrand.mozgasfej"                                                     view_mode="tree,form"
@@ -1598,8 +1643,9 @@
     <menuitem id="menu_gyartas"           name="Gyártás"                      parent="menu_root"                  sequence="10" />
       <menuitem id="menu_gylap_gyartas"   name="Gyártási lapok"               parent="menu_gyartas"               sequence="10" action="gylap_gyartas" />
       <menuitem id="menu_muveletvegzes"   name="Műveletvégzés"                parent="menu_gyartas"               sequence="20" action="muveletvegzes" />
-      <menuitem id="menu_feljegyzes"      name="Napi jelentés, feljegyzések"  parent="menu_gyartas"               sequence="30" action="feljegyzes" />
-      <menuitem id="menu_gylap_leallas"   name="Gyártási akadályok"           parent="menu_gyartas"               sequence="40" action="gylap_leallas" />
+      <menuitem id="menu_eloszereles"     name="Előszerelés"                  parent="menu_gyartas"               sequence="30" action="eloszereles" />
+      <menuitem id="menu_feljegyzes"      name="Napi jelentés, feljegyzések"  parent="menu_gyartas"               sequence="40" action="feljegyzes" />
+      <menuitem id="menu_gylap_leallas"   name="Gyártási akadályok"           parent="menu_gyartas"               sequence="50" action="gylap_leallas" />
 
     <menuitem id="menu_szallitas_uzem"    name="Szállítás (üzem)"             parent="menu_root"                  sequence="20" />
       <menuitem id="menu_mozgas_belso"    name="Belső szállítás"              parent="menu_szallitas_uzem"        sequence="10" action="mozgas_belso"   />

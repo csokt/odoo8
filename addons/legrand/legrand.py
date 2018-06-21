@@ -342,6 +342,35 @@ class LegrandMozgassor(models.Model):
     else:
       self.forrashelyen = self.env['legrand.keszlet'].search([('cikk_id', '=', self.cikk_id.id), ('hely_id', '=', self.forrashely_id.id)]).raktaron
 
+############################################################################################################################  Előszerelés  ###
+class LegrandEloszereles(models.Model):
+  _name               = 'legrand.eloszereles'
+  _order              = 'id desc'
+  hely_id             = fields.Many2one('legrand.hely', string=u'Gyártási hely', domain=[('gyartasi_hely_e', '=', True)], required=True, auto_join=True)
+  gyartasi_lap_id     = fields.Many2one('legrand.gyartasi_lap',  u'Gyártási lap', auto_join=True)
+  bom_id              = fields.Many2one('legrand.bom',  u'Anyagjegyzék', required=True, auto_join=True)
+  mennyiseg           = fields.Float(u'Mennyiség', digits=(16, 2), required=True)
+  megjegyzes          = fields.Char(u'Megjegyzés')
+  # virtual fields
+  cikknev             = fields.Char(u'Cikknév', related='bom_id.cikk_id.cikknev', readonly=True)
+  akcio               = fields.Char(u'Akció', compute='_compute_akcio')
+
+  @api.onchange('gyartasi_lap_id')
+  def onchange_gyartasi_lap_id(self):
+    bom_domain  = [('beepul_e', '=', True)]
+    self.bom_id = False
+    if self.gyartasi_lap_id:
+      bom_ids  = self.gyartasi_lap_id.bom_id.cikk_id.beepulok_ids.mapped('id')
+      bom_domain  = [('id','in',bom_ids)]
+    return {'domain': {'bom_id': bom_domain}}
+
+  @api.one
+  @api.depends('mennyiseg')
+  def _compute_akcio(self):
+    if self.mennyiseg > 0: self.akcio = u'előgyártás'
+    elif self.mennyiseg < 0: self.akcio = u'felhasználás'
+    else: self.akcio = ''
+
 ############################################################################################################################  Cikk mozgás  ###
 class LegrandCikkMozgas(models.Model):
   _name = 'legrand.cikk_mozgas'
