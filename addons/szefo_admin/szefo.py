@@ -62,17 +62,23 @@ class SzefoTelephely(models.Model):
       self.name = self.helyseg+', '+self.cim
 
 class NexonSzemely(models.Model):
-  _name         = 'nexon.szemely'
-  name          = fields.Char(u'Teljes név', compute='_compute_name', store=True)
-  SzemelyId     = fields.Integer(u'SzemelyId',  required=True, index=True)
-  AktEloNev     = fields.Char(u'AktEloNev')
-  AktCsaladNev  = fields.Char(u'AktCsaladNev')
-  AktUtoNev     = fields.Char(u'AktUtoNev')
-  AktNevAzon    = fields.Char(u'AktNevAzon')
-  SzulIdo       = fields.Date('Születési dátum')
-  employee_id   = fields.Many2one('hr.employee',  u'VIR alkalmazott')
-  telephely_id  = fields.Many2one('szefo.telephely',  u'Telephely')
-  active        = fields.Boolean(u'Aktív?', default=True)
+  _name               = 'nexon.szemely'
+  name                = fields.Char(u'Teljes név', compute='_compute_name', store=True)
+  SzemelyId           = fields.Integer(u'SzemelyId',  required=True, index=True)
+  AktEloNev           = fields.Char(u'AktEloNev')
+  AktCsaladNev        = fields.Char(u'AktCsaladNev')
+  AktUtoNev           = fields.Char(u'AktUtoNev')
+  AktNevAzon          = fields.Char(u'AktNevAzon')
+  SzulIdo             = fields.Date('Születési dátum')
+  employee_id         = fields.Many2one('hr.employee',  u'VIR alkalmazott')
+  telephely_id        = fields.Many2one('szefo.telephely',  u'Telephely')
+  loopback_id         = fields.Char(u'LoopBack ID', index=True)
+  loopback_login      = fields.Char(u'LoopBack login')
+  loopback_password   = fields.Char(u'LoopBack password')
+  main_role           = fields.Char(u'Main role')
+  tir_role            = fields.Char(u'TIR role')
+  tir_azonosito       = fields.Integer(u'TIR azonosító')
+  active              = fields.Boolean(u'Aktív?', default=True)
 
   @api.one
   @api.depends('AktEloNev', 'AktCsaladNev', 'AktUtoNev', 'AktNevAzon')
