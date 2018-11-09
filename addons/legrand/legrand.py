@@ -690,6 +690,7 @@ class LegrandGyartasiLap(models.Model):
   raklap_min          = fields.Char(u'Raklap min',  readonly=True)
   raklap_max          = fields.Char(u'Raklap max',  readonly=True)
   rakat_tipus         = fields.Char(u'Rakat tipus', readonly=True)
+  keu_szam            = fields.Char(u'KEU szám',    readonly=True)
   raktar              = fields.Char(u'Raktár',      readonly=True)
   muveletek_elvegezve = fields.Boolean(u'Műveletek elvégezve?', compute='_compute_muveletek_elvegezve', store=True)
   carnet_db           = fields.Integer(u'Carnet db', states={'kesz': [('readonly', True)]})

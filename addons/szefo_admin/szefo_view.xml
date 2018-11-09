@@ -2,7 +2,7 @@
 <openerp>
   <data>
 
-    <!--  Log  -->
+    <!--####################################################################################################################  Log  -->
     <record id="view_tree_szefo_log"    model="ir.ui.view">
       <field  name="name">Log Tree</field>
       <field  name="model">szefo.log</field>
@@ -38,7 +38,7 @@
       </field>
     </record>
 
-    <!--  Szefo admin import -->
+    <!--####################################################################################################################  Szefo admin import  -->
     <record id="view_tree_szefo_admin_import"    model="ir.ui.view">
       <field  name="name">Szefo Admin Import Tree</field>
       <field  name="model">szefo.parameter</field>
@@ -49,7 +49,35 @@
       </field>
     </record>
 
-    <!--  Személy  -->
+    <!--####################################################################################################################  Személy  -->
+    <record id="view_form_nexon_szemely"    model="ir.ui.view">
+      <field name="name">Nexon Szemely Form</field>
+      <field name="model">nexon.szemely</field>
+      <field name="arch" type="xml">
+        <form>
+          <group col="4">
+            <field name="name"/>
+            <field name="SzemelyId"/>
+            <field name="AktEloNev"/>
+            <field name="AktCsaladNev"/>
+            <field name="AktUtoNev"/>
+            <field name="AktNevAzon"/>
+            <field name="SzulIdo"/>
+            <field name="employee_id"/>
+            <field name="telephely_id"/>
+            <field name="loopback_id"/>
+            <field name="loopback_login"/>
+            <field name="loopback_password"/>
+            <field name="main_role"/>
+            <field name="tir_azonosito"/>
+            <field name="tir_role"/>
+            <field name="tv_role"/>
+            <field name="active"/>
+          </group>
+        </form>
+      </field>
+    </record>
+
     <record id="view_tree_nexon_szemely"    model="ir.ui.view">
       <field  name="name">Nexon Szemely Tree</field>
       <field  name="model">nexon.szemely</field>
@@ -76,7 +104,7 @@
       </field>
     </record>
 
-    <!--  Odoo users  -->
+    <!--####################################################################################################################  Odoo users  -->
     <record id="view_tree_szefo_user"    model="ir.ui.view">
       <field  name="name">Odoo User Tree</field>
       <field  name="model">res.users</field>
@@ -185,7 +213,7 @@
       </field>
     </record>
 
-    <!--  Actions  -->
+    <!--####################################################################################################################  Actions  -->
     <act_window id="szefo_telephely" name="Telephely" res_model="szefo.telephely" view_mode="tree,form" />
     <act_window id="nexon_szemely" name="Nexon személy" res_model="nexon.szemely" view_mode="tree,form" />
     <act_window id="szefo_jogosultsag" name="Jogosultság" res_model="szefo.jogosultsag" view_mode="tree,form" context="{'search_default_filter_enged': 1}" />
@@ -195,7 +223,7 @@
     <act_window id="szefo_user" name="Felhasználó" res_model="res.users" view_mode="tree" view_id="view_tree_szefo_user"/>
 
 
-    <!--  Menu  items  -->
+    <!--####################################################################################################################  Menu  items  -->
     <menuitem id="menu_root" name="SZEFO admin" sequence="400" groups="group_szefoadmin_manager" />
     <menuitem id="menu_adat" name="Adattáblák" parent="menu_root" sequence="10" />
       <menuitem id="menu_szefo_telephely" name="Telephelyek" parent="menu_adat" sequence="10" action="szefo_telephely" />

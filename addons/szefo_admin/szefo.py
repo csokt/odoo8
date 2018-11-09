@@ -76,8 +76,9 @@ class NexonSzemely(models.Model):
   loopback_login      = fields.Char(u'LoopBack login')
   loopback_password   = fields.Char(u'LoopBack password')
   main_role           = fields.Char(u'Main role')
-  tir_role            = fields.Char(u'TIR role')
   tir_azonosito       = fields.Integer(u'TIR azonosító')
+  tir_role            = fields.Char(u'TIR role')
+  tv_role             = fields.Char(u'TV role')
   active              = fields.Boolean(u'Aktív?', default=True)
 
   @api.one

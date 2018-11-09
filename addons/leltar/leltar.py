@@ -11,6 +11,7 @@ def trim(list):
     else: ret.append(elem)
   return ret
 
+############################################################################################################################  Paraméter  ###
 class LeltarParameter(models.Model):
   _inherit  = 'szefo.parameter'
 
@@ -69,7 +70,7 @@ class LeltarParameter(models.Model):
 
     cursor = mssql_conn.cursor()
     cursor.execute("""SELECT hivszam, bf_lelt, bf_megnev, bf_ltkorzet, bf_ltfelelos, bf_ltcsoport, bf_gyszam, bf_param, bf_vonalkod
-                      FROM DominoSoft.dbo.beftorzs WHERE targyev = 2017 AND status = 0 AND bf_kiido IS NULL order by hivszam""")
+                      FROM DominoSoft.dbo.beftorzs WHERE targyev = 2018 AND status = 0 AND bf_kiido IS NULL order by hivszam""")
     row = cursor.fetchone()
     while row:
       leltarcsoport_id    = None
@@ -94,6 +95,7 @@ class LeltarParameter(models.Model):
       row = cursor.fetchone()
     return True
 
+############################################################################################################################  DsFelelos  ###
 class LeltarDsFelelos(models.Model):
   _name       = 'leltar.ds_felelos'
   bl_kod      = fields.Char(u'Kód',  required=True)
@@ -101,16 +103,19 @@ class LeltarDsFelelos(models.Model):
   SzemelyId   = fields.Integer(u'SzemelyId',  required=True)
   employee_id = fields.Integer(u'Employee id')
 
+############################################################################################################################  Csoport  ###
 class LeltarCsoport(models.Model):
   _name       = 'leltar.csoport'
   name        = fields.Char(u'Leltárcsoport név',  required=True)
   csoportkod  = fields.Char(u'Leltárcsoport kód',  required=True)
   active      = fields.Boolean(u'Aktív?',  default=True)
 
+############################################################################################################################  Tulajdonság  ###
 class LeltarTulajdonsag(models.Model):
   _name       = 'leltar.tulajdonsag'
   name        = fields.Char(u'Tulajdonság',  required=True)
 
+############################################################################################################################  Körzet  ###
 class LeltarKorzet(models.Model):
   _name               = 'leltar.korzet'
   _order              = 'leltarkorzet_kod'
@@ -121,6 +126,7 @@ class LeltarKorzet(models.Model):
   szobaszam           = fields.Char(u'Szobaszám',   required=True)
   megnevezes          = fields.Char(u'Leltárkörzet név',   required=True)
   zarolva             = fields.Boolean(u'Zárolva?', default=False)
+  leltarozni          = fields.Boolean(u'Leltározni?', default=True)
   ds_leltarkorzet     = fields.Char(u'DS Leltárkörzet',  required=True)
   ds_korzet_vonalkod  = fields.Char(u'DS Leltárkörzet vonalkód',   required=True)
   active              = fields.Boolean(u'Aktív?', default=True)
@@ -138,6 +144,12 @@ class LeltarKorzet(models.Model):
     self.zarolva = not self.zarolva
     return True
 
+  @api.one
+  def leltarozni_valt(self):
+    self.leltarozni = not self.leltarozni
+    return True
+
+############################################################################################################################  Szett  ###
 class LeltarSzett(models.Model):
   _name                 = 'leltar.szett'
   name                  = fields.Char(u'Szett név', required=True)
@@ -172,6 +184,7 @@ class LeltarSzett(models.Model):
       self.env['leltar.eszkozatvetel'].create({'eszkoz_id': eszkoz.id, 'uj_hasznalo_id': self.hasznalo_id.id, 'megjegyzes': self.megjegyzes})
     return True
 
+############################################################################################################################  Eszköz  ###
 class LeltarEszkoz(models.Model):
   _name                 = 'leltar.eszkoz'
   name                  = fields.Char(u'Eszköz',        compute='_compute_name', store=True)
@@ -198,6 +211,7 @@ class LeltarEszkoz(models.Model):
   # virtual fields
   not_active            = fields.Boolean(u'Nem aktív?', compute='_compute_not_active')
   mozgas_ids            = fields.One2many('leltar.eszkozmozgas', 'eszkoz_id', u'Eszköz mozgások')
+  atvetel_ids           = fields.One2many('leltar.eszkozatvetel', 'eszkoz_id', u'Eszköz átvételek')
   tulajdonsag_ids       = fields.Many2many('leltar.tulajdonsag', string=u'Tulajdonságok')
 #  selejtezni_dup        = fields.Boolean(u'Selejtezni', compute='_compute_selejtezni_dup')
 #
@@ -245,6 +259,7 @@ class LeltarEszkoz(models.Model):
     self.active = not self.active
     return True
 
+############################################################################################################################  Eszközmozgás  ###
 class LeltarEszkozmozgas(models.Model):
   _name                 = 'leltar.eszkozmozgas'
   _order                = 'id desc'
@@ -302,6 +317,7 @@ class LeltarEszkozmozgas(models.Model):
     self.megjegyzes = megjegyzes
     return True
 
+############################################################################################################################  Körzetmozgás  ###
 class LeltarKorzetmozgas(models.Model):
   _name                 = 'leltar.korzetmozgas'
   _order                = 'id desc'
@@ -321,21 +337,38 @@ class LeltarKorzetmozgas(models.Model):
                      'megerkezett': True, 'megjegyzes': u'Körzet mozgatás' })
     return super(LeltarKorzetmozgas, self).create(vals)
 
+############################################################################################################################  Eszközátvétel  ###
 class LeltarEszkozatvetel(models.Model):
   _name                 = 'leltar.eszkozatvetel'
   _order                = 'id desc'
   eszkoz_id             = fields.Many2one('leltar.eszkoz', u'Eszköz',  required=True, auto_join=True)
-  akt_hasznalo_id       = fields.Many2one('hr.employee',   u'Aktuális használó',  related='eszkoz_id.akt_hasznalo_id' )
+  regi_hasznalo_id      = fields.Many2one('hr.employee',   u'Régi használó', readonly=True)
   uj_hasznalo_id        = fields.Many2one('hr.employee',   u'Új használó',  required=False )
+  hr_bevette            = fields.Boolean(u'HR bevette', default=False)
   megjegyzes            = fields.Char(u'Megjegyzés')
   eszkoz_megjegyzes     = fields.Char(u'Eszköz megjegyzés',  related='eszkoz_id.megjegyzes' )
+  # virtual fields
+  akt_hasznalo_id       = fields.Many2one('hr.employee',   u'Aktuális használó',  related='eszkoz_id.akt_hasznalo_id' )
 
-  def create(self, cr, uid, vals, context=None):
-    vals['akt_hasznalo_id']   = vals['uj_hasznalo_id']
+  @api.model
+  def create(self, vals):
+    eszkoz_id = vals['eszkoz_id']
+    eszkoz    = self.env['leltar.eszkoz'].search([('id', '=', eszkoz_id)])
+    regi_id   = eszkoz.akt_hasznalo_id.id
+    uj_id     = vals['uj_hasznalo_id']
+    if regi_id == uj_id:
+      raise exceptions.Warning(u'A régi és az új használó megegyezik!')
+    vals['regi_hasznalo_id'] = regi_id
+    vals['akt_hasznalo_id']   = uj_id
     if vals['megjegyzes']: vals['eszkoz_megjegyzes'] = vals['megjegyzes']
-    return super(LeltarEszkozatvetel, self).create(cr, uid, vals, context=context)
+    return super(LeltarEszkozatvetel, self).create(vals)
 
+  @api.one
+  def hr_bevette_valt(self):
+    self.hr_bevette = not self.hr_bevette
+    return True
 
+############################################################################################################################  Leltár  ###
 class LeltarLeltar(models.Model):
   _name                 = 'leltar.leltar'
   eszkoz_id             = fields.Many2one('leltar.eszkoz', u'Eszköz',  required=False, auto_join=True)
@@ -350,6 +383,7 @@ class LeltarLeltar(models.Model):
   # virtual fields
   leltari_szam          = fields.Char(u'Leltári szám',  related='eszkoz_id.leltari_szam')
 
+############################################################################################################################  Vonalkódolvas  ###
 class LeltarVonalkodolvas(models.Model):
   _name   = 'leltar.vonalkodolvas'
   _order  = 'id desc'
@@ -434,3 +468,48 @@ class LeltarVonalkodolvas(models.Model):
       self.uzenet = u'Nincs találat'
 
     self.vonalkod = ''
+
+############################################################################################################################  Leltárív  ###
+class LeltarLeltariv(models.Model):
+  _name               = 'leltar.leltariv'
+  state               = fields.Selection([('terv',u'Tervezet'),('kesz',u'Kész'),('konyvelt',u'Könyvelt')], u'Állapot', default='terv' )
+  leltarkorzet_id     = fields.Many2one('leltar.korzet',  u'Leltárkörzet',  required=True)
+  letrehozva          = fields.Date(u'Létrehozva',  default=fields.Date.today())
+  leltarvezeto_id     = fields.Many2one('hr.employee',  u'Leltárvezető',  auto_join=True)
+  leltarozo_id        = fields.Many2one('hr.employee',  u'Leltározó',  auto_join=True)
+  # virtual fields
+  ujeszkozok_ids      = fields.One2many('leltar.leltarivujeszkoz', 'leltariv_id', u'Új eszközök a leltáríven')
+  eszkozok_ids        = fields.One2many('leltar.leltariveszkoz', 'leltariv_id', u'Eszközök a leltáríven')
+
+  @api.model
+  def create(self, vals):
+    leltarkorzet_id = vals['leltarkorzet_id']
+    elozo_leltariv = self.env['leltar.leltariv'].search([('leltarkorzet_id', '=', leltarkorzet_id), ('state', '=', 'terv')])
+    if elozo_leltariv:
+      raise exceptions.Warning(u'A leltárkörzet már fel van véve!')
+    leltariv = super(LeltarLeltariv, self).create(vals)
+
+    eszkozok  = self.env['leltar.eszkoz'].search([('akt_leltarkorzet_id', '=', leltarkorzet_id)])
+    for eszkoz in eszkozok:
+      self.env['leltar.leltariveszkoz'].create({'leltariv_id': leltariv.id, 'eszkoz_id': eszkoz.id})
+
+    return leltariv
+
+
+############################################################################################################################  Leltárív eszközök  ###
+class LeltarLeltarivEszkoz(models.Model):
+  _name               = 'leltar.leltariveszkoz'
+  leltariv_id         = fields.Many2one('leltar.leltariv', u'Leltárív', required=True, auto_join=True)
+  eszkoz_id           = fields.Many2one('leltar.eszkoz', u'Eszköz',     readonly=True, auto_join=True)
+  fellelheto          = fields.Boolean(u'Fellelhető', default=False)
+  selejtezni          = fields.Boolean(u'Selejtezni', default=False)
+  megjegyzes          = fields.Char(u'Megjegyzés')
+
+############################################################################################################################  Leltárív új eszközök  ###
+class LeltarLeltarivUjeszkoz(models.Model):
+  _name               = 'leltar.leltarivujeszkoz'
+  leltariv_id         = fields.Many2one('leltar.leltariv', u'Leltárív', required=True, auto_join=True)
+  eszkoz_id           = fields.Many2one('leltar.eszkoz', u'Eszköz',     required=True, auto_join=True)
+  selejtezni          = fields.Boolean(u'Selejtezni', default=False)
+  megjegyzes          = fields.Char(u'Megjegyzés')
+

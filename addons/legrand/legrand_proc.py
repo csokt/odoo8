@@ -146,6 +146,7 @@ class LegrandParameter(models.Model):
         'raklap_min'    : fej['raklap_min'],
         'raklap_max'    : fej['raklap_max'],
         'rakat_tipus'   : fej['rakat_tipus'],
+        'keu_szam'      : fej['keu_szam'],
         'raktar'        : fej['raktar'],
         'cikkek_uid'    : gylap_cikkek_uid,
         'bom_id'        : bom.id,

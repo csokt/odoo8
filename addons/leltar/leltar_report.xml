@@ -85,15 +85,21 @@
       <t t-call="report.html_container">
         <t t-call="report.external_layout">
           <div class="page" style="font-size: 12pt;">
-            <h3 style="text-align: center;">ÁTVÉTELI ELISMERVÉNY</h3>
             <br></br>
-            <p style="text-align: justify;">Alulírott <span t-field="docs[0].uj_hasznalo_id"/> (született: <span t-field="docs[0].uj_hasznalo_id.birthday"/>), mint a Szegedi SZEFO zrt munkavállalója ezennel elismerem, hogy a Szegedi SZEFO zrt (6724 Szeged, Tavasz u. 2., Adószám: 11090036-2-06) tulajdonát képezõ alábbi számítástechnikai eszközök átvételét, mint az eszközök felelős őrzője, igazolom:</p>
+            <h3 style="text-align: center;">ÁTVÉTELI ELISMERVÉNY - #ÁTAD<span t-field="docs[0].id"/></h3>
+            <h6 style="text-align: center;">a Szegedi SZEFO zrt. munkavállalójának átadott, a munkaköre ellátásához szükséges tárgyi eszközről (nyilatkozat megőrzési felelősségről)</h6>
+            <br></br>
+            <p style="text-align: justify;">Alulírott <span t-field="docs[0].uj_hasznalo_id"/> (született: <span t-field="docs[0].uj_hasznalo_id.birthday"/>), mint a Szegedi SZEFO zrt. (6724 Szeged, Tavasz u. 2.sz., Adószám: 11090036-2-06) (a továbbiakban: Munkáltató) munkavállalója, (a továbbiakban: Munkavállaló), ezen átvételi elismervény aláírásával elismerem, hogy a Munkáltató  tulajdonát képező, a munkavégzésemhez szükséges alábbi tárgyi eszközt a mai napon az átadó Munkáltató megbízottjától, átvettem.</p>
+            <p style="text-align: justify;">Tudomásul veszem, hogy a megőrzésre elszámolási és visszaszolgáltatási kötelezettséggel átvett tárgyi eszköz hiányért – a Munka törvénykönyvéről szóló 2012. évi I. törvény 180. §-a értelmében, – vétkességemre tekintet nélkül, teljes mértékben kártérítési felelősséggel tartozom.</p>
+            <p style="text-align: justify;">Felelősségem alapján, hiány esetén, a hiányzó eszköznek, a károkozás időpontjában érvényes fogyasztói árát – az avulásra is tekintettel – tartozom megfizetni a Munkáltatónak.</p>
+            <p style="text-align: justify;"><span t-field="docs[0].megjegyzes"/></p>
             <br></br>
             <table  class="table  table-bordered">
               <tr>
                 <th>Eszköz megnevezése</th>
                 <th>Leltári száma</th>
                 <th>Leltárkörzet</th>
+                <th>Nettó érték Ft</th>
               </tr>
               <t t-foreach="docs" t-as="o">
                 <t t-if="docs[0].uj_hasznalo_id.id == o.uj_hasznalo_id.id">
@@ -101,6 +107,7 @@
                     <td> <span t-field="o.eszkoz_id.megnevezes"/> </td>
                     <td> <span t-field="o.eszkoz_id.leltari_szam"/> </td>
                     <td> <span t-field="o.eszkoz_id.akt_leltarkorzet_id"/> </td>
+                    <td> <span t-field="o.eszkoz_id.netto_ertek"/> </td>
                   </tr>
                 </t>
               </t>
@@ -111,24 +118,112 @@
             <br></br>
 
             <div class="row">
-              <div  class="col-xs-3"> </div>
-              <div  class="col-xs-4">
-                .....................................................
+              <div  class="col-xs-1"> </div>
+              <div  class="col-xs-5">
+                ..................................................................
               </div>
-              <div  class="col-xs-4">
-                .....................................................
+              <div  class="col-xs-5">
+                ..................................................................
               </div>
               <div  class="col-xs-1"> </div>
             </div>
             <div class="row">
-              <div  class="col-xs-4"> </div>
+              <div  class="col-xs-3"> </div>
               <div  class="col-xs-4">
                 Átadó
               </div>
-              <div  class="col-xs-4">
-                Átvevő
+              <div  class="col-xs-5">
+                Átvevő Munkavállaló
               </div>
             </div>
+            <br></br>
+            <h6>
+              <div class="row">
+                <div  class="col-xs-3">
+                  Készült 2 eredeti példányban:
+                </div>
+                <div  class="col-xs-9">
+                  1 példány a munkavállaló példánya
+                </div>
+              </div>
+              <div class="row">
+                <div  class="col-xs-3"></div>
+                <div  class="col-xs-9">
+                  1 példány a HR igazgatóság példánya (amely a munkavállaló személyi anyagában kerül tárolásra)
+                </div>
+              </div>
+            </h6>
+          </div>
+        </t>
+
+        <t t-call="report.external_layout">
+          <div class="page" style="font-size: 12pt;">
+            <h3 style="text-align: center;">ÁTVÉTELI ELISMERVÉNY - #VISSZA<span t-field="docs[0].id"/></h3>
+            <h6 style="text-align: center;">a Szegedi SZEFO zrt. munkavállalója által a munkaköre ellátásához használt tárgyi eszköz visszavételezéséről</h6>
+            <br></br>
+            <p style="text-align: justify;">Alulírott <span t-field="docs[0].regi_hasznalo_id"/> (született: <span t-field="docs[0].regi_hasznalo_id.birthday"/>), mint a Szegedi SZEFO zrt. (6724 Szeged, Tavasz u. 2.sz., Adószám: 11090036-2-06) (a továbbiakban: Munkáltató) munkavállalója, (a továbbiakban: Munkavállaló), a Munkáltató  tulajdonát képező, a munkavégzésemhez használt – megőrzési, elszámolási és visszaszolgáltatási kötelezettséggel átvett – alábbi tárgyi eszközt a mai napon a Munkáltató megbízottjának visszaszolgáltattam.</p>
+            <p style="text-align: justify;">Átvevő Munkáltató képviselője ezen átvételi elismervény aláírásával elismerem, hogy a Munkavállalótól a megőrzésre elszámolási és visszaszolgáltatási kötelezettséggel átvett alábbi tárgyi eszközt hiánytalanul/ megjegyzéssel átvettem.</p>
+            <p style="text-align: justify;"><span t-field="docs[0].megjegyzes"/></p>
+            <br></br>
+            <table  class="table  table-bordered">
+              <tr>
+                <th>Eszköz megnevezése</th>
+                <th>Leltári száma</th>
+                <th>Leltárkörzet</th>
+                <th>Nettó érték Ft</th>
+              </tr>
+              <t t-foreach="docs" t-as="o">
+                <t t-if="docs[0].regi_hasznalo_id.id == o.regi_hasznalo_id.id">
+                  <tr>
+                    <td> <span t-field="o.eszkoz_id.megnevezes"/> </td>
+                    <td> <span t-field="o.eszkoz_id.leltari_szam"/> </td>
+                    <td> <span t-field="o.eszkoz_id.akt_leltarkorzet_id"/> </td>
+                    <td> <span t-field="o.eszkoz_id.netto_ertek"/> </td>
+                  </tr>
+                </t>
+              </t>
+            </table>
+            <br></br>
+            <p>Kelt: Szeged, <span t-field="docs[0].create_date"/></p>
+            <br></br>
+            <br></br>
+
+            <div class="row">
+              <div  class="col-xs-1"> </div>
+              <div  class="col-xs-5">
+                ..................................................................
+              </div>
+              <div  class="col-xs-5">
+                ..................................................................
+              </div>
+              <div  class="col-xs-1"> </div>
+            </div>
+            <div class="row">
+              <div  class="col-xs-2"> </div>
+              <div  class="col-xs-5">
+                Átadó Munkavállaló
+              </div>
+              <div  class="col-xs-5">
+                Átvevő Munkáltató képviselője
+              </div>
+            </div>
+            <br></br>
+            <h6>
+              <div class="row">
+                <div  class="col-xs-3">
+                  Készült 2 eredeti példányban:
+                </div>
+                <div  class="col-xs-9">
+                  1 példány a munkavállaló példánya
+                </div>
+              </div>
+              <div class="row">
+                <div  class="col-xs-3"></div>
+                <div  class="col-xs-9">
+                  1 példány a HR igazgatóság példánya (amely a munkavállaló személyi anyagában kerül tárolásra)
+                </div>
+              </div>
+            </h6>
           </div>
         </t>
       </t>

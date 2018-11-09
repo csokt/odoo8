@@ -150,7 +150,8 @@
                 </tr>
 
                 <tr>
-                  <td>Raklap:</td>                      <td colspan="3"><span t-field="o.raklap"/> </td>
+                  <td>KEU szám:</td>                    <td> <span t-field="o.keu_szam"/> </td>
+                  <td align="right">Raklap:</td>        <td> <span t-field="o.raklap"/> </td>
                   <td align="right">Raklap min:</td>    <td> <span t-field="o.raklap_min"/> </td>
                   <td align="right">Raklap max:</td>    <td> <span t-field="o.raklap_max"/> </td>
                 </tr>

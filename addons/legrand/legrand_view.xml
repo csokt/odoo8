@@ -748,6 +748,7 @@
             <field name="carnet_db"           />
             <field name="csokkentve_e"        />
 
+            <field name="keu_szam"            />
             <field name="raktar"              />
             <field name="aktivitas"           />
             <field name="leallas_felelos"     />

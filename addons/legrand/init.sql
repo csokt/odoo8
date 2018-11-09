@@ -314,3 +314,36 @@ update legrand_gyartasi_lap set aktivitas = 'áll' where aktivitas = 'all' ;
 update legrand_gyartasi_lap_log set aktivitas = '' where aktivitas = 'mind' ;
 update legrand_gyartasi_lap_log set aktivitas = 'folyamatban' where aktivitas = 'foly' ;
 update legrand_gyartasi_lap_log set aktivitas = 'áll' where aktivitas = 'all' ;
+
+
+WITH
+anyag AS (
+  SELECT state, cikk_id, SUM(hatralek) AS hatralek FROM legrand_anyagszukseglet GROUP BY state, cikk_id
+),
+igeny AS (
+  SELECT keszlet.cikk_id, keszlet.szefo_keszlet,
+    CASE WHEN gyartas.state IS NULL THEN 0.0 ELSE gyartas.hatralek END AS gyartas_igeny,
+    CASE WHEN mterv.state   IS NULL THEN 0.0 ELSE mterv.hatralek   END AS mterv_igeny
+  FROM legrand_vall_keszlet AS keszlet
+  LEFT JOIN anyag AS gyartas ON gyartas.cikk_id = keszlet.cikk_id AND gyartas.state = 'gyartas'
+  LEFT JOIN anyag AS mterv ON mterv.cikk_id = keszlet.cikk_id AND mterv.state = 'mterv'
+),
+elter AS (
+  SELECT cikk_id, szefo_keszlet, gyartas_igeny, mterv_igeny, szefo_keszlet - gyartas_igeny AS gyartas_elter , szefo_keszlet - gyartas_igeny - mterv_igeny AS mterv_gyartas_elter FROM igeny
+)
+--        SELECT row_number() over() AS id, elter.* FROM elter WHERE mterv_gyartas_elter < 0 AND gyartas_igeny + mterv_igeny > 0
+SELECT row_number() over() AS id, elter.* FROM elter WHERE gyartas_igeny + mterv_igeny > 0
+;
+
+WITH
+eszkoz as ( select max(id) as max_id, eszkoz_id from leltar_eszkozatvetel where regi_hasznalo_id is null group by eszkoz_id having count(*) > 1 ),
+eszkoz_elozok as ( select atvet.id as prev_id, eszkoz.* from leltar_eszkozatvetel as atvet, eszkoz where atvet.eszkoz_id = eszkoz.eszkoz_id and atvet.id < eszkoz.max_id ),
+atvet_rel as (select eszkoz_id, max_id, max(prev_id) as prev_id from eszkoz_elozok group by eszkoz_id, max_id),
+update_rel as (select atvet_rel.*, atvet.uj_hasznalo_id as prev_hasznalo_id from atvet_rel join leltar_eszkozatvetel as atvet on atvet_rel.prev_id = atvet.id)
+update leltar_eszkozatvetel set regi_hasznalo_id = prev_hasznalo_id from update_rel where id = max_id
+;
+
+select * from update_rel
+order by max_id desc
+limit 10
+;
