@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 
-from openerp import  models, fields, api, exceptions
+from openerp import tools, models, fields, api, exceptions
 import logging, re
 _logger = logging.getLogger(__name__)
 
@@ -93,6 +93,12 @@ class LeltarParameter(models.Model):
           'leltarkorzet_kod': leltarkorzet_kod, 'csoportkod': csoportkod, 'leltari_szam_vonalkod': leltari_szam_vonalkod, 'gyartasi_szam': gyartasi_szam,
           'megjegyzes': megjegyzes, 'ds_leltarkorzet': ds_leltarkorzet, 'ds_leltarfelelos': ds_leltarfelelos, 'idegen_e': False })
       row = cursor.fetchone()
+    return True
+
+  @api.one
+  def leltariv_generalas(self):
+    for korzet in self.env['leltar.korzet'].search([('leltarozni', '=', True)]):
+      self.env['leltar.leltariv'].create({'leltarkorzet_id': korzet.id})
     return True
 
 ############################################################################################################################  DsFelelos  ###
@@ -472,21 +478,24 @@ class LeltarVonalkodolvas(models.Model):
 ############################################################################################################################  Leltárív  ###
 class LeltarLeltariv(models.Model):
   _name               = 'leltar.leltariv'
+  _rec_name           = 'leltarkorzet_id'
+  _order              = 'leltarkorzet_kod, id desc'
   state               = fields.Selection([('terv',u'Tervezet'),('kesz',u'Kész'),('konyvelt',u'Könyvelt')], u'Állapot', default='terv' )
   leltarkorzet_id     = fields.Many2one('leltar.korzet',  u'Leltárkörzet',  required=True)
-  letrehozva          = fields.Date(u'Létrehozva',  default=fields.Date.today())
-  leltarvezeto_id     = fields.Many2one('hr.employee',  u'Leltárvezető',  auto_join=True)
-  leltarozo_id        = fields.Many2one('hr.employee',  u'Leltározó',  auto_join=True)
+  letrehozva          = fields.Date(u'Létrehozva',  readonly=True, default=fields.Date.today())
+  leltarvezeto_id     = fields.Many2one('hr.employee',  u'Leltárvezető',  auto_join=True, states={'kesz': [('readonly', True)], 'konyvelt': [('readonly', True)]})
+  leltarozo_id        = fields.Many2one('hr.employee',  u'Leltározó',  auto_join=True, states={'kesz': [('readonly', True)], 'konyvelt': [('readonly', True)]})
+  leltarkorzet_kod    = fields.Char(u'Leltárkörzet kód', related='leltarkorzet_id.leltarkorzet_kod', readonly=True, store=True)
   # virtual fields
-  ujeszkozok_ids      = fields.One2many('leltar.leltarivujeszkoz', 'leltariv_id', u'Új eszközök a leltáríven')
-  eszkozok_ids        = fields.One2many('leltar.leltariveszkoz', 'leltariv_id', u'Eszközök a leltáríven')
+  ujeszkozok_ids      = fields.One2many('leltar.leltarivujeszkoz', 'leltariv_id', u'Új eszközök a leltáríven', states={'kesz': [('readonly', True)], 'konyvelt': [('readonly', True)]})
+  eszkozok_ids        = fields.One2many('leltar.leltariveszkoz', 'leltariv_id', u'Eszközök a leltáríven', states={'kesz': [('readonly', True)], 'konyvelt': [('readonly', True)]})
 
   @api.model
   def create(self, vals):
     leltarkorzet_id = vals['leltarkorzet_id']
-    elozo_leltariv = self.env['leltar.leltariv'].search([('leltarkorzet_id', '=', leltarkorzet_id), ('state', '=', 'terv')])
+    elozo_leltariv = self.env['leltar.leltariv'].search([('leltarkorzet_id', '=', leltarkorzet_id), ('state', '!=', 'konyvelt')])
     if elozo_leltariv:
-      raise exceptions.Warning(u'A leltárkörzet már fel van véve!')
+      raise exceptions.Warning(elozo_leltariv.leltarkorzet_id.name + u' leltárkörzet már fel van véve!')
     leltariv = super(LeltarLeltariv, self).create(vals)
 
     eszkozok  = self.env['leltar.eszkoz'].search([('akt_leltarkorzet_id', '=', leltarkorzet_id)])
@@ -495,6 +504,17 @@ class LeltarLeltariv(models.Model):
 
     return leltariv
 
+  @api.one
+  def state2kesz(self):
+    if not self.leltarvezeto_id or not self.leltarozo_id:
+      raise exceptions.Warning(u'A leltárfelelősöket fel kell venni!')
+    self.state  = 'kesz'
+    return True
+
+  @api.one
+  def state2terv(self):
+    self.state  = 'terv'
+    return True
 
 ############################################################################################################################  Leltárív eszközök  ###
 class LeltarLeltarivEszkoz(models.Model):
@@ -512,4 +532,30 @@ class LeltarLeltarivUjeszkoz(models.Model):
   eszkoz_id           = fields.Many2one('leltar.eszkoz', u'Eszköz',     required=True, auto_join=True)
   selejtezni          = fields.Boolean(u'Selejtezni', default=False)
   megjegyzes          = fields.Char(u'Megjegyzés')
+
+############################################################################################################################  Leltárív új eszközök duplikátumok  ###
+class LeltarLeltarivDupla(models.Model):
+  _name               = 'leltar.leltariv_dupla'
+  _auto               = False
+  _order              = 'eszkoz_id'
+  eszkoz_id           = fields.Many2one('leltar.eszkoz', u'Eszköz',     required=True, auto_join=True)
+  leltariv_id         = fields.Many2one('leltar.leltariv', u'Leltárív', required=True, auto_join=True)
+
+  def init(self, cr):
+    tools.drop_view_if_exists(cr, self._table)
+    cr.execute(
+      """CREATE or REPLACE VIEW %s as (
+        WITH
+          dupla AS (
+            SELECT eszkoz_id, count(*) FROM leltar_leltarivujeszkoz AS uj
+            JOIN leltar_leltariv AS iv ON iv.id = uj.leltariv_id
+            WHERE iv.state != 'konyvelt'
+            GROUP BY eszkoz_id
+            HAVING count(*) > 1
+          )
+          SELECT uj.id, uj.eszkoz_id, uj.leltariv_id FROM leltar_leltarivujeszkoz AS uj
+          JOIN dupla ON dupla.eszkoz_id = uj.eszkoz_id
+      )"""
+      % (self._table)
+    )
 
