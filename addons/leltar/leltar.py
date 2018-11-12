@@ -101,6 +101,19 @@ class LeltarParameter(models.Model):
       self.env['leltar.leltariv'].create({'leltarkorzet_id': korzet.id})
     return True
 
+  @api.one
+  def leltar_lezaras(self):
+    if self.env['leltar.leltariv_dupla'].search([]):
+      raise exceptions.Warning(u'Többszörösen felvett új eszközök!')
+    if self.env['leltar.leltariv_hiany'].search([]):
+      raise exceptions.Warning(u'Nincs minden eszköz leltározva!')
+    # if self.env['leltar.leltariv'].search([('state', '=', 'terv')]):
+    #   raise exceptions.Warning(u'Leltárív nem lehet Tervezet állapotban!')
+    for selejt in self.env['leltar.leltariv_selejt'].search([]):
+        selejt.eszkoz_id.write({'selejt_ok': selejt.megjegyzes, 'selejtezni': True})
+
+    return True
+
 ############################################################################################################################  DsFelelos  ###
 class LeltarDsFelelos(models.Model):
   _name       = 'leltar.ds_felelos'
@@ -219,12 +232,6 @@ class LeltarEszkoz(models.Model):
   mozgas_ids            = fields.One2many('leltar.eszkozmozgas', 'eszkoz_id', u'Eszköz mozgások')
   atvetel_ids           = fields.One2many('leltar.eszkozatvetel', 'eszkoz_id', u'Eszköz átvételek')
   tulajdonsag_ids       = fields.Many2many('leltar.tulajdonsag', string=u'Tulajdonságok')
-#  selejtezni_dup        = fields.Boolean(u'Selejtezni', compute='_compute_selejtezni_dup')
-#
-#  @api.one
-#  @api.depends('selejtezni')
-#  def _compute_selejtezni_dup(self):
-#    self.selejtezni_dup = self.selejtezni
 
   @api.one
   @api.depends('leltari_szam', 'megnevezes')
@@ -555,6 +562,76 @@ class LeltarLeltarivDupla(models.Model):
           )
           SELECT uj.id, uj.eszkoz_id, uj.leltariv_id FROM leltar_leltarivujeszkoz AS uj
           JOIN dupla ON dupla.eszkoz_id = uj.eszkoz_id
+      )"""
+      % (self._table)
+    )
+
+############################################################################################################################  Leltárív nem fellelhető eszközök  ###
+class LeltarLeltarivDupla(models.Model):
+  _name               = 'leltar.leltariv_hiany'
+  _auto               = False
+  _order              = 'eszkoz_id'
+  eszkoz_id           = fields.Many2one('leltar.eszkoz', u'Eszköz',     required=True, auto_join=True)
+  leltariv_id         = fields.Many2one('leltar.leltariv', u'Leltárív', required=True, auto_join=True)
+
+  def init(self, cr):
+    tools.drop_view_if_exists(cr, self._table)
+    cr.execute(
+      """CREATE or REPLACE VIEW %s as (
+        SELECT gen.id, gen.eszkoz_id, gen.leltariv_id FROM leltar_leltariveszkoz AS gen
+        JOIN leltar_leltariv AS iv ON iv.id = gen.leltariv_id
+        LEFT JOIN leltar_leltarivujeszkoz AS uj ON uj.eszkoz_id = gen.eszkoz_id
+        WHERE iv.state != 'konyvelt' AND NOT fellelheto AND uj.id IS NULL
+      )"""
+      % (self._table)
+    )
+
+############################################################################################################################  Leltárív selejtezésre javasolt eszközök  ###
+class LeltarLeltarivSelejt(models.Model):
+  _name               = 'leltar.leltariv_selejt'
+  _auto               = False
+  _order              = 'eszkoz_id'
+  eszkoz_id           = fields.Many2one('leltar.eszkoz', u'Eszköz',     required=True, auto_join=True)
+  leltariv_id         = fields.Many2one('leltar.leltariv', u'Leltárív', required=True, auto_join=True)
+  megjegyzes          = fields.Char(u'Megjegyzés')
+
+  def init(self, cr):
+    tools.drop_view_if_exists(cr, self._table)
+    cr.execute(
+      """CREATE or REPLACE VIEW %s as (
+        WITH selejt AS (
+          SELECT eszkoz_id, leltariv_id, megjegyzes FROM leltar_leltariveszkoz
+          JOIN leltar_leltariv AS iv ON iv.id = leltariv_id
+          WHERE iv.state != 'konyvelt' AND selejtezni
+          UNION ALL
+          SELECT eszkoz_id, leltariv_id, megjegyzes FROM leltar_leltarivujeszkoz
+          JOIN leltar_leltariv AS iv ON iv.id = leltariv_id
+          WHERE iv.state != 'konyvelt' AND selejtezni
+          )
+        SELECT row_number() over() AS id, * FROM selejt
+      )"""
+      % (self._table)
+    )
+
+############################################################################################################################  Leltárív új mozgások  ###
+class LeltarLeltarivMozgas(models.Model):
+  _name               = 'leltar.leltariv_mozgas'
+  _auto               = False
+  _order              = 'eszkoz_id'
+  eszkoz_id           = fields.Many2one('leltar.eszkoz', u'Eszköz',     required=True, auto_join=True)
+  leltariv_id         = fields.Many2one('leltar.leltariv', u'Leltárív', required=True, auto_join=True)
+  megjegyzes          = fields.Char(u'Megjegyzés')
+
+  def init(self, cr):
+    tools.drop_view_if_exists(cr, self._table)
+    cr.execute(
+      """CREATE or REPLACE VIEW %s as (
+        WITH kihagy AS (
+          SELECT DISTINCT uj.eszkoz_id from leltar_leltarivujeszkoz AS uj
+          JOIN leltar_eszkozmozgas AS mozgas ON mozgas.eszkoz_id = uj.eszkoz_id
+          WHERE mozgas.create_date > uj.create_date
+        )
+        SELECT * from leltar_leltarivujeszkoz WHERE eszkoz_id NOT IN (SELECT * from kihagy)
       )"""
       % (self._table)
     )

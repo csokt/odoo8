@@ -39,6 +39,10 @@ access_leltar_leltariv_group_manager,leltar.leltariv.manager,model_leltar_leltar
 
 access_leltar_leltariv_dupla_group_viewer,leltar.leltariv_dupla.viewer,model_leltar_leltariv_dupla,group_leltar_viewer,1,0,0,0
 
+access_leltar_leltariv_hiany_group_viewer,leltar.leltariv_hiany.viewer,model_leltar_leltariv_hiany,group_leltar_viewer,1,0,0,0
+
+access_leltar_leltariv_selejt_group_viewer,leltar.leltariv_selejt.viewer,model_leltar_leltariv_selejt,group_leltar_viewer,1,0,0,0
+
 access_leltar_leltariveszkoz_group_viewer,leltar.leltariveszkoz.viewer,model_leltar_leltariveszkoz,group_leltar_viewer,1,0,0,0
 access_leltar_leltariveszkoz_group_user,leltar.leltariveszkoz.user,model_leltar_leltariveszkoz,group_leltar_user,1,1,0,0
 access_leltar_leltariveszkoz_group_manager,leltar.leltariveszkoz.manager,model_leltar_leltariveszkoz,group_leltar_manager,1,1,1,0

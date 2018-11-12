@@ -603,45 +603,73 @@
       </field>
     </record>
 
-    <!--  Actions  -->
-    <act_window id="leltar_eszkozmozgas"          name="Tárgyi eszköz mozgás"         res_model="leltar.eszkozmozgas"   view_mode="tree"      view_id="view_tree_leltar_eszkoz_ujmozgas"/>
-    <act_window id="leltar_eszkozmozgas_vonalkod" name="Eszköz vonalkódos mozgás"     res_model="leltar.vonalkodolvas"  view_mode="form"      view_id="view_form_leltar_vonalkodolvas_felvesz"  target="new"
+    <!--####################################################################################################################  Leltárív nem fellelhető eszközök  -->
+    <record id="view_tree_leltariv_hiany"    model="ir.ui.view">
+      <field  name="name">Leltárív nem fellelhető eszközök Tree</field>
+      <field  name="model">leltar.leltariv_hiany</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <tree>
+          <field name="eszkoz_id"/>
+          <field name="leltariv_id"/>
+        </tree>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Leltárív selejtezésre javasolt eszközök  -->
+    <record id="view_tree_leltariv_selejt"    model="ir.ui.view">
+      <field  name="name">Leltárív selejtezésre javasolt eszközök Tree</field>
+      <field  name="model">leltar.leltariv_selejt</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <tree>
+          <field name="eszkoz_id"/>
+          <field name="leltariv_id"/>
+          <field name="megjegyzes"/>
+        </tree>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Actions  -->
+    <act_window id="leltar_eszkozmozgas"          name="Tárgyi eszköz mozgás"         res_model="leltar.eszkozmozgas"     view_mode="tree"      view_id="view_tree_leltar_eszkoz_ujmozgas"/>
+    <act_window id="leltar_eszkozmozgas_vonalkod" name="Eszköz vonalkódos mozgás"     res_model="leltar.vonalkodolvas"    view_mode="form"      view_id="view_form_leltar_vonalkodolvas_felvesz"  target="new"
                                                                                       context="{'readonly_by_pass': ['leltarkorzet_id'], 'leltar': False}"/>
-    <act_window id="leltar_eszkozerkezes"         name="Tárgyi eszköz érkezés"        res_model="leltar.eszkozmozgas"   view_mode="tree"      view_id="view_tree_leltar_eszkozerkezes"
+    <act_window id="leltar_eszkozerkezes"         name="Tárgyi eszköz érkezés"        res_model="leltar.eszkozmozgas"     view_mode="tree"      view_id="view_tree_leltar_eszkozerkezes"
                 domain="[('megerkezett','=',False)]"/>
-    <act_window id="leltar_eszkozmozgas_sztorno"  name="Eszköz mozgás sztornó"        res_model="leltar.eszkozmozgas"   view_mode="tree"      view_id="view_tree_leltar_eszkozmozgas_sztorno"
+    <act_window id="leltar_eszkozmozgas_sztorno"  name="Eszköz mozgás sztornó"        res_model="leltar.eszkozmozgas"     view_mode="tree"      view_id="view_tree_leltar_eszkozmozgas_sztorno"
                 domain="[('megerkezett','=',False)]"/>
-    <act_window id="leltar_eszkozatvetel"         name="Személyes használatba vétel"  res_model="leltar.eszkozatvetel"  view_mode="tree"      view_id="view_tree_leltar_eszkozatvetel" />
-    <act_window id="leltar_eszkozatvetel_hr"      name="HR bevette"                   res_model="leltar.eszkozatvetel"  view_mode="tree"      view_id="view_tree_leltar_eszkozatvetel_hr"
+    <act_window id="leltar_eszkozatvetel"         name="Személyes használatba vétel"  res_model="leltar.eszkozatvetel"    view_mode="tree"      view_id="view_tree_leltar_eszkozatvetel" />
+    <act_window id="leltar_eszkozatvetel_hr"      name="HR bevette"                   res_model="leltar.eszkozatvetel"    view_mode="tree"      view_id="view_tree_leltar_eszkozatvetel_hr"
                 domain="[('hr_bevette','=',False)]"/>
 
-    <act_window id="leltar_eszkoz"                name="Tárgyi eszköz"                res_model="leltar.eszkoz"         view_mode="tree,form" view_id="view_tree_leltar_eszkoz" />
-    <act_window id="leltar_eszkoz_selejt_jelol"   name="Tárgyi eszköz"                res_model="leltar.eszkoz"         view_mode="tree"      view_id="view_tree_leltar_eszkoz_selejt_jelol"
+    <act_window id="leltar_eszkoz"                name="Tárgyi eszköz"                res_model="leltar.eszkoz"           view_mode="tree,form" view_id="view_tree_leltar_eszkoz" />
+    <act_window id="leltar_eszkoz_selejt_jelol"   name="Tárgyi eszköz"                res_model="leltar.eszkoz"           view_mode="tree"      view_id="view_tree_leltar_eszkoz_selejt_jelol"
                                                                                       context="{'readonly_by_pass': ['selejtezni']}"/>
-    <act_window id="leltar_eszkoz_selejtez"       name="Tárgyi eszköz"                res_model="leltar.eszkoz"         view_mode="tree"      view_id="view_tree_leltar_eszkoz_selejtez"
+    <act_window id="leltar_eszkoz_selejtez"       name="Tárgyi eszköz"                res_model="leltar.eszkoz"           view_mode="tree"      view_id="view_tree_leltar_eszkoz_selejtez"
                 domain="[('selejtezni','=',True)]"/>
-    <act_window id="leltar_leltar"                name="Tárgyi eszköz felmérés"       res_model="leltar.leltar"         view_mode="tree" />
+    <act_window id="leltar_leltar"                name="Tárgyi eszköz felmérés"       res_model="leltar.leltar"           view_mode="tree" />
 
-    <act_window id="leltar_szett"                 name="Tárgyi eszköz szett"          res_model="leltar.szett"          view_mode="tree,form" view_id="view_tree_leltar_szett" />
-    <act_window id="leltar_szett_ossze"           name="Szett összeállítása"          res_model="leltar.eszkoz"         view_mode="tree"      view_id="view_tree_leltar_eszkoz_szett" />
+    <act_window id="leltar_szett"                 name="Tárgyi eszköz szett"          res_model="leltar.szett"            view_mode="tree,form" view_id="view_tree_leltar_szett" />
+    <act_window id="leltar_szett_ossze"           name="Szett összeállítása"          res_model="leltar.eszkoz"           view_mode="tree"      view_id="view_tree_leltar_eszkoz_szett" />
 
-    <act_window id="leltar_leltariv"              name="Leltárív"                     res_model="leltar.leltariv"       view_mode="tree,form"
+    <act_window id="leltar_leltariv"              name="Leltárív"                     res_model="leltar.leltariv"         view_mode="tree,form"
                                                                                       context="{'search_default_filter_terv': 1}"/>
-    <act_window id="leltar_leltariv_dupla"        name="Duplikátumok"                 res_model="leltar.leltariv_dupla" view_mode="tree,form" />
-    <act_window id="leltar_leltariv_hiany"        name="Nincs leltározva"             res_model="leltar.leltariveszkoz" view_mode="tree" />
-    <act_window id="leltar_leltariv_admin"        name="Leltár leltarív admin"        res_model="szefo.parameter"       view_mode="tree"      view_id="view_tree_leltar_leltariv_admin"/>
+    <act_window id="leltar_leltariv_dupla"        name="Duplikátumok"                 res_model="leltar.leltariv_dupla"   view_mode="tree,form" />
+    <act_window id="leltar_leltariv_hiany"        name="Nincs leltározva"             res_model="leltar.leltariv_hiany"   view_mode="tree,form" />
+    <act_window id="leltar_leltariv_selejt"       name="Selejtezésre javasol"         res_model="leltar.leltariv_selejt"  view_mode="tree,form" />
+    <act_window id="leltar_leltariv_admin"        name="Leltár leltarív admin"        res_model="szefo.parameter"         view_mode="tree"      view_id="view_tree_leltar_leltariv_admin"/>
 
-    <act_window id="leltar_vonalkodolvas"         name="Vonalkód olvasás"             res_model="leltar.vonalkodolvas"  view_mode="form"      view_id="view_form_leltar_vonalkodolvas_felvesz"
+    <act_window id="leltar_vonalkodolvas"         name="Vonalkód olvasás"             res_model="leltar.vonalkodolvas"    view_mode="form"      view_id="view_form_leltar_vonalkodolvas_felvesz"
                                                                                       context="{'readonly_by_pass': ['leltarkorzet_id'], 'leltar': True}"/>
-    <act_window id="leltar_gordulo_leltar"        name="Gördülő leltár"               res_model="leltar.vonalkodolvas"  view_mode="tree,form" view_id="view_tree_leltar_vonalkodolvas"
+    <act_window id="leltar_gordulo_leltar"        name="Gördülő leltár"               res_model="leltar.vonalkodolvas"    view_mode="tree,form" view_id="view_tree_leltar_vonalkodolvas"
                 domain="[('leltar','=',True)]" />
 
-    <act_window id="leltar_korzet"                name="Leltár körzet"                res_model="leltar.korzet"         view_mode="tree,form" />
-    <act_window id="leltar_csoport"               name="Leltár csoport"               res_model="leltar.csoport"        view_mode="tree,form" />
+    <act_window id="leltar_korzet"                name="Leltár körzet"                res_model="leltar.korzet"           view_mode="tree,form" />
+    <act_window id="leltar_csoport"               name="Leltár csoport"               res_model="leltar.csoport"          view_mode="tree,form" />
 
-    <act_window id="leltar_import"                name="Import"                       res_model="szefo.parameter"       view_mode="tree"      view_id="view_tree_leltar_import"/>
+    <act_window id="leltar_import"                name="Import"                       res_model="szefo.parameter"         view_mode="tree"      view_id="view_tree_leltar_import"/>
 
-    <act_window id="leltar_korzetmozgas"          name="Körzetmozgás"                 res_model="leltar.korzetmozgas"   view_mode="tree,form" />
+    <act_window id="leltar_korzetmozgas"          name="Körzetmozgás"                 res_model="leltar.korzetmozgas"     view_mode="tree,form" />
 <!--
 -->
     <!--  Menu  items  -->
@@ -668,7 +696,8 @@
       <menuitem id="menu_leltar_leltariv"               name="Leltárív"                 parent="menu_leltar"          sequence="10" action="leltar_leltariv" />
       <menuitem id="menu_leltar_leltariv_dupla"         name="Duplikátumok"             parent="menu_leltar"          sequence="20" action="leltar_leltariv_dupla" />
       <menuitem id="menu_leltar_leltariv_hiany"         name="Nincs leltározva"         parent="menu_leltar"          sequence="30" action="leltar_leltariv_hiany" />
-      <menuitem id="menu_leltar_leltariv_admin"         name="Adminisztrátor"           parent="menu_leltar"          sequence="90" action="leltar_leltariv_admin"        groups="base.group_system" />
+      <menuitem id="menu_leltar_leltariv_selejt"        name="Selejtezésre javasolt"    parent="menu_leltar"          sequence="40" action="leltar_leltariv_selejt" />
+      <menuitem id="menu_leltar_leltariv_admin"         name="Admin tevékenységek"      parent="menu_leltar"          sequence="90" action="leltar_leltariv_admin"        groups="base.group_system" />
 
     <menuitem id="menu_torzs"                           name="Törzsadatok"              parent="menu_root"            sequence="50" />
       <menuitem id="menu_leltar_korzet"                 name="Leltárkörzetek"           parent="menu_torzs"           sequence="30" action="leltar_korzet" />
