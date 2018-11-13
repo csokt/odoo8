@@ -260,6 +260,96 @@
       </t>
     </template>
 
+<!--
+-->
+    <template id="report_leltariv">
+      <t t-call="report.html_container">
+        <t t-foreach="docs"  t-as="o">
+          <t t-call="report.internal_layout">
+<!--
+-->
+            <div class="page" style="font-size: 12pt;">
+              <h4>
+              <div class="row">
+                <div  class="col-xs-3">
+                  Leltárív <span t-field="o.letrehozva"/>
+                </div>
+                <div  class="col-xs-7 text-center">
+                  <span t-field="o.leltarkorzet_id.name"/>
+                </div>
+                <div  class="col-xs-2 text-right">
+                  #<span t-field="o.id"/> - <span t-field="o.state"/>
+                </div>
+              </div>
+              </h4>
+
+              <br></br>
+              Új tárgyi eszközök
+              <table class="table table-condensed table-bordered">
+                <tr>
+                  <th>Leltári szám</th>
+                  <th>Eszköz megnevezése</th>
+                  <th>Selejtezni</th>
+                  <th>Megjegyzés</th>
+                </tr>
+                <tr t-foreach="o.ujeszkozok_ids.sorted(key=lambda b: b.eszkoz_id.leltari_szam)" t-as="oo">
+                    <td> <span t-field="oo.eszkoz_id.leltari_szam"/> </td>
+                    <td> <span t-field="oo.eszkoz_id.megnevezes"/> </td>
+                    <td> <span t-if="oo.selejtezni">igen</span> </td>
+                    <td> <span t-field="oo.megjegyzes"/> </td>
+                </tr>
+              </table>
+
+              <br></br>
+              Nyilvántartott tárgyi eszközök
+              <table class="table table-condensed table-bordered">
+                <tr>
+                  <th>Leltári szám</th>
+                  <th>Eszköz megnevezése</th>
+                  <th>Fellelhető</th>
+                  <th>Selejtezni</th>
+                  <th>Megjegyzés</th>
+                </tr>
+                <tr t-foreach="o.eszkozok_ids.sorted(key=lambda b: b.eszkoz_id.leltari_szam)" t-as="oo">
+                    <td> <span t-field="oo.eszkoz_id.leltari_szam"/> </td>
+                    <td> <span t-field="oo.eszkoz_id.megnevezes"/> </td>
+                    <td> <span t-if="oo.fellelheto">igen</span> <span t-if="not oo.fellelheto">-</span> </td>
+                    <td> <span t-if="oo.selejtezni">igen</span> </td>
+                    <td> <span t-field="oo.megjegyzes"/> </td>
+                </tr>
+              </table>
+
+              <br></br>
+              <div class="row text-center">
+                <div  class="col-xs-4">
+                  <span t-field="o.leltarvezeto_id.name"/>
+                </div>
+                <div  class="col-xs-4">
+                  <span t-field="o.leltarozo_id.name"/>
+                </div>
+                <div  class="col-xs-4">
+                  <span t-field="o.write_date"/>
+                </div>
+              </div>
+              <div class="row text-center">
+                <div  class="col-xs-4">
+                  leltárvezető
+                </div>
+                <div  class="col-xs-4">
+                  leltározó
+                </div>
+                <div  class="col-xs-4">
+                  rögzítés dátuma
+                </div>
+              </div>
+            </div>
+<!--
+-->
+          </t>
+        </t>
+      </t>
+    </template>
+
     <report
         id="report_leltar_szallitolevel"
         model="leltar.eszkozmozgas"
@@ -282,6 +372,14 @@
         string="Leltár"
         report_type="qweb-pdf"
         name="leltar.report_leltar"
+    />
+
+    <report
+        id="report_leltar_leltariv"
+        model="leltar.leltariv"
+        string="Leltárív"
+        report_type="qweb-pdf"
+        name="leltar.report_leltariv"
     />
 
   </data>

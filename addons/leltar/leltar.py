@@ -566,12 +566,10 @@ class LeltarLeltarivDupla(models.Model):
           -- generált és új leltárív eszközök uniója
           osszes AS (
             SELECT eszkoz_id, leltariv_id, fellelheto FROM leltar_leltariv_eszkoz
-            JOIN leltar_leltariv AS iv ON iv.id = leltariv_id
-            WHERE iv.state != 'konyvelt'
+            JOIN leltar_leltariv AS iv ON iv.id = leltariv_id AND iv.state != 'konyvelt'
             UNION ALL
             SELECT eszkoz_id, leltariv_id, true AS fellelheto FROM leltar_leltariv_ujeszkoz
-            JOIN leltar_leltariv AS iv ON iv.id = leltariv_id
-            WHERE iv.state != 'konyvelt'
+            JOIN leltar_leltariv AS iv ON iv.id = leltariv_id AND iv.state != 'konyvelt'
           ),
           -- szűrés a generált és fellelhető táblában egyúttal az új táblában is szereplő eszközökre
           dupla AS (
@@ -595,7 +593,7 @@ class LeltarLeltarivDupla(models.Model):
     )
 
 ############################################################################################################################  Leltárív nem fellelhető eszközök  ###
-class LeltarLeltarivDupla(models.Model):
+class LeltarLeltarivHiany(models.Model):
   _name               = 'leltar.leltariv_hiany'
   _auto               = False
   _order              = 'eszkoz_id'
@@ -606,10 +604,22 @@ class LeltarLeltarivDupla(models.Model):
     tools.drop_view_if_exists(cr, self._table)
     cr.execute(
       """CREATE or REPLACE VIEW %s as (
-        SELECT gen.id, gen.eszkoz_id, gen.leltariv_id FROM leltar_leltariv_eszkoz AS gen
-        JOIN leltar_leltariv AS iv ON iv.id = gen.leltariv_id
-        LEFT JOIN leltar_leltariv_ujeszkoz AS uj ON uj.eszkoz_id = gen.eszkoz_id
-        WHERE iv.state != 'konyvelt' AND NOT fellelheto AND uj.id IS NULL
+        WITH
+          -- generált, nem könyvelt és nem fellelhető leltárív eszközök szűrése
+          nem_fellelt AS (
+            SELECT gen.id, gen.eszkoz_id, gen.leltariv_id FROM leltar_leltariv_eszkoz AS gen
+            JOIN leltar_leltariv AS iv ON iv.id = gen.leltariv_id AND iv.state != 'konyvelt'
+            WHERE NOT gen.fellelheto
+          ),
+          -- új és nem könyvelt leltárív eszközök szűrése
+          ujak AS (
+            SELECT uj.id, uj.eszkoz_id, uj.leltariv_id FROM leltar_leltariv_ujeszkoz AS uj
+            JOIN leltar_leltariv AS iv ON iv.id = uj.leltariv_id AND iv.state != 'konyvelt'
+          )
+          -- a nem fellelt de újak között sem található eszközök szűrése
+          SELECT gen.id, gen.eszkoz_id, gen.leltariv_id FROM nem_fellelt AS gen
+          LEFT JOIN ujak AS uj ON uj.eszkoz_id = gen.eszkoz_id
+          WHERE uj.id IS NULL
       )"""
       % (self._table)
     )
@@ -630,12 +640,12 @@ class LeltarLeltarivSelejt(models.Model):
         WITH
           selejt AS (
             SELECT eszkoz_id, leltariv_id, megjegyzes FROM leltar_leltariv_eszkoz
-            JOIN leltar_leltariv AS iv ON iv.id = leltariv_id
-            WHERE iv.state != 'konyvelt' AND selejtezni
+            JOIN leltar_leltariv AS iv ON iv.id = leltariv_id AND iv.state != 'konyvelt'
+            WHERE selejtezni
             UNION ALL
             SELECT eszkoz_id, leltariv_id, megjegyzes FROM leltar_leltariv_ujeszkoz
-            JOIN leltar_leltariv AS iv ON iv.id = leltariv_id
-            WHERE iv.state != 'konyvelt' AND selejtezni
+            JOIN leltar_leltariv AS iv ON iv.id = leltariv_id AND iv.state != 'konyvelt'
+            WHERE selejtezni
           )
         SELECT row_number() over() AS id, * FROM selejt
       )"""
@@ -654,13 +664,17 @@ class LeltarLeltarivMozgas(models.Model):
     tools.drop_view_if_exists(cr, self._table)
     cr.execute(
       """CREATE or REPLACE VIEW %s as (
-        WITH kihagy AS (
-          SELECT DISTINCT uj.eszkoz_id from leltar_leltariv_ujeszkoz AS uj
-          JOIN leltar_eszkozmozgas AS mozgas ON mozgas.eszkoz_id = uj.eszkoz_id
-          WHERE mozgas.create_date > uj.create_date
-        )
-        SELECT id, eszkoz_id, leltariv_id from leltar_leltariv_ujeszkoz WHERE eszkoz_id NOT IN (SELECT * from kihagy)
+        WITH
+          ujak AS (
+            SELECT uj.id, uj.eszkoz_id, uj.leltariv_id, uj.create_date FROM leltar_leltariv_ujeszkoz AS uj
+            JOIN leltar_leltariv AS iv ON iv.id = uj.leltariv_id AND iv.state != 'konyvelt'
+          ),
+          kihagy AS (
+            SELECT DISTINCT uj.eszkoz_id from ujak AS uj
+            JOIN leltar_eszkozmozgas AS mozgas ON mozgas.eszkoz_id = uj.eszkoz_id
+            WHERE mozgas.create_date > uj.create_date
+          )
+        SELECT id, eszkoz_id, leltariv_id from ujak WHERE eszkoz_id NOT IN (SELECT id from kihagy)
       )"""
       % (self._table)
     )
-
