@@ -558,7 +558,7 @@
     <!--####################################################################################################################  Leltárív eszközök  -->
     <record id="view_tree_leltariveszkoz"    model="ir.ui.view">
       <field  name="name">Leltárív eszközök Tree</field>
-      <field  name="model">leltar.leltariveszkoz</field>
+      <field  name="model">leltar.leltariv_eszkoz</field>
       <field  name="priority" eval="15"/>
       <field  name="arch" type="xml">
         <tree editable="top" create="false">
@@ -575,7 +575,7 @@
     <!--####################################################################################################################  Leltárív új eszközök  -->
     <record id="view_tree_leltarivujeszkoz"    model="ir.ui.view">
       <field  name="name">Leltárív új eszközök Tree</field>
-      <field  name="model">leltar.leltarivujeszkoz</field>
+      <field  name="model">leltar.leltariv_ujeszkoz</field>
       <field  name="priority" eval="15"/>
       <field  name="arch" type="xml">
         <tree editable="bottom">

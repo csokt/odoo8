@@ -504,8 +504,8 @@ class LeltarLeltariv(models.Model):
   leltarozo_id        = fields.Many2one('hr.employee',  u'Leltározó',  auto_join=True, states={'kesz': [('readonly', True)], 'konyvelt': [('readonly', True)]})
   leltarkorzet_kod    = fields.Char(u'Leltárkörzet kód', related='leltarkorzet_id.leltarkorzet_kod', readonly=True, store=True)
   # virtual fields
-  ujeszkozok_ids      = fields.One2many('leltar.leltarivujeszkoz', 'leltariv_id', u'Új eszközök a leltáríven', states={'kesz': [('readonly', True)], 'konyvelt': [('readonly', True)]})
-  eszkozok_ids        = fields.One2many('leltar.leltariveszkoz', 'leltariv_id', u'Eszközök a leltáríven', states={'kesz': [('readonly', True)], 'konyvelt': [('readonly', True)]})
+  ujeszkozok_ids      = fields.One2many('leltar.leltariv_ujeszkoz', 'leltariv_id', u'Új eszközök a leltáríven', states={'kesz': [('readonly', True)], 'konyvelt': [('readonly', True)]})
+  eszkozok_ids        = fields.One2many('leltar.leltariv_eszkoz', 'leltariv_id', u'Eszközök a leltáríven', states={'kesz': [('readonly', True)], 'konyvelt': [('readonly', True)]})
 
   @api.model
   def create(self, vals):
@@ -517,7 +517,7 @@ class LeltarLeltariv(models.Model):
 
     eszkozok  = self.env['leltar.eszkoz'].search([('akt_leltarkorzet_id', '=', leltarkorzet_id)])
     for eszkoz in eszkozok:
-      self.env['leltar.leltariveszkoz'].create({'leltariv_id': leltariv.id, 'eszkoz_id': eszkoz.id})
+      self.env['leltar.leltariv_eszkoz'].create({'leltariv_id': leltariv.id, 'eszkoz_id': eszkoz.id})
 
     return leltariv
 
@@ -535,7 +535,7 @@ class LeltarLeltariv(models.Model):
 
 ############################################################################################################################  Leltárív eszközök  ###
 class LeltarLeltarivEszkoz(models.Model):
-  _name               = 'leltar.leltariveszkoz'
+  _name               = 'leltar.leltariv_eszkoz'
   leltariv_id         = fields.Many2one('leltar.leltariv', u'Leltárív', required=True, auto_join=True)
   eszkoz_id           = fields.Many2one('leltar.eszkoz', u'Eszköz',     readonly=True, auto_join=True)
   fellelheto          = fields.Boolean(u'Fellelhető', default=False)
@@ -544,7 +544,7 @@ class LeltarLeltarivEszkoz(models.Model):
 
 ############################################################################################################################  Leltárív új eszközök  ###
 class LeltarLeltarivUjeszkoz(models.Model):
-  _name               = 'leltar.leltarivujeszkoz'
+  _name               = 'leltar.leltariv_ujeszkoz'
   leltariv_id         = fields.Many2one('leltar.leltariv', u'Leltárív', required=True, auto_join=True)
   eszkoz_id           = fields.Many2one('leltar.eszkoz', u'Eszköz',     required=True, auto_join=True)
   selejtezni          = fields.Boolean(u'Selejtezni', default=False)
@@ -565,11 +565,11 @@ class LeltarLeltarivDupla(models.Model):
         WITH
           -- generált és új leltárív eszközök uniója
           osszes AS (
-            SELECT eszkoz_id, leltariv_id, fellelheto FROM leltar_leltariveszkoz
+            SELECT eszkoz_id, leltariv_id, fellelheto FROM leltar_leltariv_eszkoz
             JOIN leltar_leltariv AS iv ON iv.id = leltariv_id
             WHERE iv.state != 'konyvelt'
             UNION ALL
-            SELECT eszkoz_id, leltariv_id, true AS fellelheto FROM leltar_leltarivujeszkoz
+            SELECT eszkoz_id, leltariv_id, true AS fellelheto FROM leltar_leltariv_ujeszkoz
             JOIN leltar_leltariv AS iv ON iv.id = leltariv_id
             WHERE iv.state != 'konyvelt'
           ),
@@ -606,9 +606,9 @@ class LeltarLeltarivDupla(models.Model):
     tools.drop_view_if_exists(cr, self._table)
     cr.execute(
       """CREATE or REPLACE VIEW %s as (
-        SELECT gen.id, gen.eszkoz_id, gen.leltariv_id FROM leltar_leltariveszkoz AS gen
+        SELECT gen.id, gen.eszkoz_id, gen.leltariv_id FROM leltar_leltariv_eszkoz AS gen
         JOIN leltar_leltariv AS iv ON iv.id = gen.leltariv_id
-        LEFT JOIN leltar_leltarivujeszkoz AS uj ON uj.eszkoz_id = gen.eszkoz_id
+        LEFT JOIN leltar_leltariv_ujeszkoz AS uj ON uj.eszkoz_id = gen.eszkoz_id
         WHERE iv.state != 'konyvelt' AND NOT fellelheto AND uj.id IS NULL
       )"""
       % (self._table)
@@ -629,11 +629,11 @@ class LeltarLeltarivSelejt(models.Model):
       """CREATE or REPLACE VIEW %s as (
         WITH
           selejt AS (
-            SELECT eszkoz_id, leltariv_id, megjegyzes FROM leltar_leltariveszkoz
+            SELECT eszkoz_id, leltariv_id, megjegyzes FROM leltar_leltariv_eszkoz
             JOIN leltar_leltariv AS iv ON iv.id = leltariv_id
             WHERE iv.state != 'konyvelt' AND selejtezni
             UNION ALL
-            SELECT eszkoz_id, leltariv_id, megjegyzes FROM leltar_leltarivujeszkoz
+            SELECT eszkoz_id, leltariv_id, megjegyzes FROM leltar_leltariv_ujeszkoz
             JOIN leltar_leltariv AS iv ON iv.id = leltariv_id
             WHERE iv.state != 'konyvelt' AND selejtezni
           )
@@ -655,11 +655,11 @@ class LeltarLeltarivMozgas(models.Model):
     cr.execute(
       """CREATE or REPLACE VIEW %s as (
         WITH kihagy AS (
-          SELECT DISTINCT uj.eszkoz_id from leltar_leltarivujeszkoz AS uj
+          SELECT DISTINCT uj.eszkoz_id from leltar_leltariv_ujeszkoz AS uj
           JOIN leltar_eszkozmozgas AS mozgas ON mozgas.eszkoz_id = uj.eszkoz_id
           WHERE mozgas.create_date > uj.create_date
         )
-        SELECT id, eszkoz_id, leltariv_id from leltar_leltarivujeszkoz WHERE eszkoz_id NOT IN (SELECT * from kihagy)
+        SELECT id, eszkoz_id, leltariv_id from leltar_leltariv_ujeszkoz WHERE eszkoz_id NOT IN (SELECT * from kihagy)
       )"""
       % (self._table)
     )
