@@ -630,6 +630,19 @@
       </field>
     </record>
 
+    <!--####################################################################################################################  Leltárív új mozgások  -->
+    <record id="view_tree_leltariv_mozgas"    model="ir.ui.view">
+      <field  name="name">Leltárív új mozgások Tree</field>
+      <field  name="model">leltar.leltariv_mozgas</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <tree>
+          <field name="eszkoz_id"/>
+          <field name="leltariv_id"/>
+        </tree>
+      </field>
+    </record>
+
     <!--####################################################################################################################  Actions  -->
     <act_window id="leltar_eszkozmozgas"          name="Tárgyi eszköz mozgás"         res_model="leltar.eszkozmozgas"     view_mode="tree"      view_id="view_tree_leltar_eszkoz_ujmozgas"/>
     <act_window id="leltar_eszkozmozgas_vonalkod" name="Eszköz vonalkódos mozgás"     res_model="leltar.vonalkodolvas"    view_mode="form"      view_id="view_form_leltar_vonalkodolvas_felvesz"  target="new"
@@ -657,6 +670,7 @@
     <act_window id="leltar_leltariv_dupla"        name="Duplikátumok"                 res_model="leltar.leltariv_dupla"   view_mode="tree,form" />
     <act_window id="leltar_leltariv_hiany"        name="Nincs leltározva"             res_model="leltar.leltariv_hiany"   view_mode="tree,form" />
     <act_window id="leltar_leltariv_selejt"       name="Selejtezésre javasol"         res_model="leltar.leltariv_selejt"  view_mode="tree,form" />
+    <act_window id="leltar_leltariv_mozgas"       name="Új eszköz mozgások"           res_model="leltar.leltariv_mozgas"  view_mode="tree,form" />
     <act_window id="leltar_leltariv_admin"        name="Leltár leltarív admin"        res_model="szefo.parameter"         view_mode="tree"      view_id="view_tree_leltar_leltariv_admin"/>
 
     <act_window id="leltar_vonalkodolvas"         name="Vonalkód olvasás"             res_model="leltar.vonalkodolvas"    view_mode="form"      view_id="view_form_leltar_vonalkodolvas_felvesz"
@@ -697,6 +711,7 @@
       <menuitem id="menu_leltar_leltariv_dupla"         name="Duplikátumok"             parent="menu_leltar"          sequence="20" action="leltar_leltariv_dupla" />
       <menuitem id="menu_leltar_leltariv_hiany"         name="Nincs leltározva"         parent="menu_leltar"          sequence="30" action="leltar_leltariv_hiany" />
       <menuitem id="menu_leltar_leltariv_selejt"        name="Selejtezésre javasolt"    parent="menu_leltar"          sequence="40" action="leltar_leltariv_selejt" />
+      <menuitem id="menu_leltar_leltariv_mozgas"        name="Új eszköz mozgások"       parent="menu_leltar"          sequence="50" action="leltar_leltariv_mozgas" />
       <menuitem id="menu_leltar_leltariv_admin"         name="Admin tevékenységek"      parent="menu_leltar"          sequence="90" action="leltar_leltariv_admin"        groups="base.group_system" />
 
     <menuitem id="menu_torzs"                           name="Törzsadatok"              parent="menu_root"            sequence="50" />

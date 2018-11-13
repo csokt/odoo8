@@ -107,10 +107,20 @@ class LeltarParameter(models.Model):
       raise exceptions.Warning(u'Többszörösen felvett új eszközök!')
     if self.env['leltar.leltariv_hiany'].search([]):
       raise exceptions.Warning(u'Nincs minden eszköz leltározva!')
-    # if self.env['leltar.leltariv'].search([('state', '=', 'terv')]):
-    #   raise exceptions.Warning(u'Leltárív nem lehet Tervezet állapotban!')
+    if self.env['leltar.eszkoz'].search([('zarolva', '=', True)]):
+      raise exceptions.Warning(u'Eszköz nem lehet zárolva!')
+    if self.env['leltar.korzet'].search([('zarolva', '=', True)]):
+      raise exceptions.Warning(u'Körzet nem lehet zárolva!')
+    if self.env['leltar.leltariv'].search([('state', '=', 'terv')]):
+      raise exceptions.Warning(u'Leltárív nem lehet Tervezet állapotban!')
+
     for selejt in self.env['leltar.leltariv_selejt'].search([]):
-        selejt.eszkoz_id.write({'selejt_ok': selejt.megjegyzes, 'selejtezni': True})
+      selejt.eszkoz_id.write({'selejt_ok': selejt.megjegyzes, 'selejtezni': True})
+
+    for mozgas in self.env['leltar.leltariv_mozgas'].search([]):
+      self.env['leltar.eszkozmozgas'].create({'eszkoz_id': mozgas.eszkoz_id.id, 'hova_leltarkorzet_id': mozgas.leltariv_id.leltarkorzet_id.id, 'megerkezett': True, 'megjegyzes': u'leltár' })
+
+    self.env['leltar.leltariv'].search([('state', '!=', 'konyvelt')]).write({'state': 'konyvelt'})
 
     return True
 
@@ -553,15 +563,33 @@ class LeltarLeltarivDupla(models.Model):
     cr.execute(
       """CREATE or REPLACE VIEW %s as (
         WITH
-          dupla AS (
-            SELECT eszkoz_id, count(*) FROM leltar_leltarivujeszkoz AS uj
-            JOIN leltar_leltariv AS iv ON iv.id = uj.leltariv_id
+          -- generált és új leltárív eszközök uniója
+          osszes AS (
+            SELECT eszkoz_id, leltariv_id, fellelheto FROM leltar_leltariveszkoz
+            JOIN leltar_leltariv AS iv ON iv.id = leltariv_id
             WHERE iv.state != 'konyvelt'
-            GROUP BY eszkoz_id
-            HAVING count(*) > 1
+            UNION ALL
+            SELECT eszkoz_id, leltariv_id, true AS fellelheto FROM leltar_leltarivujeszkoz
+            JOIN leltar_leltariv AS iv ON iv.id = leltariv_id
+            WHERE iv.state != 'konyvelt'
+          ),
+          -- szűrés a generált és fellelhető táblában egyúttal az új táblában is szereplő eszközökre
+          dupla AS (
+            SELECT eszkoz_id, count(*) FROM osszes WHERE fellelheto GROUP BY eszkoz_id HAVING count(*) > 1
+          ),
+          -- szűrés az egyazon leltáríven szereplő, generált táblában és az új táblában is szereplő eszközökre
+          -- az előző szűrés eredményét kivonjuk
+          dupla2 AS (
+            SELECT eszkoz_id, leltariv_id, count(*) FROM osszes
+            WHERE eszkoz_id NOT IN (SELECT eszkoz_id FROM dupla)
+            GROUP BY eszkoz_id, leltariv_id HAVING count(*) > 1
+          ),
+          result AS (
+            SELECT osszes.eszkoz_id, osszes.leltariv_id FROM osszes JOIN dupla ON dupla.eszkoz_id = osszes.eszkoz_id
+            UNION ALL
+            SELECT eszkoz_id, leltariv_id FROM dupla2
           )
-          SELECT uj.id, uj.eszkoz_id, uj.leltariv_id FROM leltar_leltarivujeszkoz AS uj
-          JOIN dupla ON dupla.eszkoz_id = uj.eszkoz_id
+          SELECT row_number() over() AS id, eszkoz_id, leltariv_id FROM result
       )"""
       % (self._table)
     )
@@ -599,14 +627,15 @@ class LeltarLeltarivSelejt(models.Model):
     tools.drop_view_if_exists(cr, self._table)
     cr.execute(
       """CREATE or REPLACE VIEW %s as (
-        WITH selejt AS (
-          SELECT eszkoz_id, leltariv_id, megjegyzes FROM leltar_leltariveszkoz
-          JOIN leltar_leltariv AS iv ON iv.id = leltariv_id
-          WHERE iv.state != 'konyvelt' AND selejtezni
-          UNION ALL
-          SELECT eszkoz_id, leltariv_id, megjegyzes FROM leltar_leltarivujeszkoz
-          JOIN leltar_leltariv AS iv ON iv.id = leltariv_id
-          WHERE iv.state != 'konyvelt' AND selejtezni
+        WITH
+          selejt AS (
+            SELECT eszkoz_id, leltariv_id, megjegyzes FROM leltar_leltariveszkoz
+            JOIN leltar_leltariv AS iv ON iv.id = leltariv_id
+            WHERE iv.state != 'konyvelt' AND selejtezni
+            UNION ALL
+            SELECT eszkoz_id, leltariv_id, megjegyzes FROM leltar_leltarivujeszkoz
+            JOIN leltar_leltariv AS iv ON iv.id = leltariv_id
+            WHERE iv.state != 'konyvelt' AND selejtezni
           )
         SELECT row_number() over() AS id, * FROM selejt
       )"""
@@ -620,7 +649,6 @@ class LeltarLeltarivMozgas(models.Model):
   _order              = 'eszkoz_id'
   eszkoz_id           = fields.Many2one('leltar.eszkoz', u'Eszköz',     required=True, auto_join=True)
   leltariv_id         = fields.Many2one('leltar.leltariv', u'Leltárív', required=True, auto_join=True)
-  megjegyzes          = fields.Char(u'Megjegyzés')
 
   def init(self, cr):
     tools.drop_view_if_exists(cr, self._table)
@@ -631,7 +659,7 @@ class LeltarLeltarivMozgas(models.Model):
           JOIN leltar_eszkozmozgas AS mozgas ON mozgas.eszkoz_id = uj.eszkoz_id
           WHERE mozgas.create_date > uj.create_date
         )
-        SELECT * from leltar_leltarivujeszkoz WHERE eszkoz_id NOT IN (SELECT * from kihagy)
+        SELECT id, eszkoz_id, leltariv_id from leltar_leltarivujeszkoz WHERE eszkoz_id NOT IN (SELECT * from kihagy)
       )"""
       % (self._table)
     )
