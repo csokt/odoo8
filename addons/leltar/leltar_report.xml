@@ -320,6 +320,7 @@
               </table>
 
               <br></br>
+              <br></br>
               <div class="row text-center">
                 <div  class="col-xs-4">
                   <span t-field="o.leltarvezeto_id.name"/>

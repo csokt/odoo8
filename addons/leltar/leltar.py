@@ -499,7 +499,7 @@ class LeltarLeltariv(models.Model):
   _order              = 'leltarkorzet_kod, id desc'
   state               = fields.Selection([('terv',u'Tervezet'),('kesz',u'Kész'),('konyvelt',u'Könyvelt')], u'Állapot', default='terv' )
   leltarkorzet_id     = fields.Many2one('leltar.korzet',  u'Leltárkörzet',  required=True)
-  letrehozva          = fields.Date(u'Létrehozva',  readonly=True, default=fields.Date.today())
+  letrehozva          = fields.Date(u'Létrehozva',  readonly=True)
   leltarvezeto_id     = fields.Many2one('hr.employee',  u'Leltárvezető',  auto_join=True, states={'kesz': [('readonly', True)], 'konyvelt': [('readonly', True)]})
   leltarozo_id        = fields.Many2one('hr.employee',  u'Leltározó',  auto_join=True, states={'kesz': [('readonly', True)], 'konyvelt': [('readonly', True)]})
   leltarkorzet_kod    = fields.Char(u'Leltárkörzet kód', related='leltarkorzet_id.leltarkorzet_kod', readonly=True, store=True)
@@ -509,6 +509,7 @@ class LeltarLeltariv(models.Model):
 
   @api.model
   def create(self, vals):
+    vals['letrehozva'] = fields.Date.today()
     leltarkorzet_id = vals['leltarkorzet_id']
     elozo_leltariv = self.env['leltar.leltariv'].search([('leltarkorzet_id', '=', leltarkorzet_id), ('state', '!=', 'konyvelt')])
     if elozo_leltariv:
@@ -518,7 +519,6 @@ class LeltarLeltariv(models.Model):
     eszkozok  = self.env['leltar.eszkoz'].search([('akt_leltarkorzet_id', '=', leltarkorzet_id)])
     for eszkoz in eszkozok:
       self.env['leltar.leltariv_eszkoz'].create({'leltariv_id': leltariv.id, 'eszkoz_id': eszkoz.id})
-
     return leltariv
 
   @api.one
