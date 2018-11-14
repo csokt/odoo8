@@ -495,8 +495,8 @@ class LeltarVonalkodolvas(models.Model):
 ############################################################################################################################  Leltárív  ###
 class LeltarLeltariv(models.Model):
   _name               = 'leltar.leltariv'
-  _rec_name           = 'leltarkorzet_id'
   _order              = 'leltarkorzet_kod, id desc'
+  name                = fields.Char(u'Leltárív', compute='_compute_name', store=True)
   state               = fields.Selection([('terv',u'Tervezet'),('kesz',u'Kész'),('konyvelt',u'Könyvelt')], u'Állapot', default='terv' )
   leltarkorzet_id     = fields.Many2one('leltar.korzet',  u'Leltárkörzet',  required=True)
   letrehozva          = fields.Date(u'Létrehozva',  readonly=True)
@@ -520,6 +520,11 @@ class LeltarLeltariv(models.Model):
     for eszkoz in eszkozok:
       self.env['leltar.leltariv_eszkoz'].create({'leltariv_id': leltariv.id, 'eszkoz_id': eszkoz.id})
     return leltariv
+
+  @api.one
+  @api.depends('leltarkorzet_id')
+  def _compute_name(self):
+    self.name = self.leltarkorzet_id.name
 
   @api.one
   def state2kesz(self):
