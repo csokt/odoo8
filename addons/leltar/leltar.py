@@ -570,6 +570,7 @@ class LeltarLeltarivOsszes(models.Model):
   megjegyzes          = fields.Char(u'Megjegyzés')
   leltariv_eszkoz_id  = fields.Integer(u'Leltárív eszköz id')
   leltariv_ujeszkoz_id= fields.Integer(u'Leltárív új eszköz id')
+  write_date          = fields.Datetime(u'Módosítás ideje')
 
   def init(self, cr):
     tools.drop_view_if_exists(cr, self._table)
@@ -577,11 +578,11 @@ class LeltarLeltarivOsszes(models.Model):
       """CREATE or REPLACE VIEW %s as (
         WITH
           osszes AS (
-            SELECT eszkoz.id AS leltariv_eszkoz_id, 0 AS leltariv_ujeszkoz_id, eszkoz.leltariv_id, eszkoz.eszkoz_id, eszkoz.fellelheto, eszkoz.serult_cimke, eszkoz.selejtezni, eszkoz.megjegyzes
+            SELECT eszkoz.id AS leltariv_eszkoz_id, 0 AS leltariv_ujeszkoz_id, eszkoz.leltariv_id, eszkoz.eszkoz_id, eszkoz.fellelheto, eszkoz.serult_cimke, eszkoz.selejtezni, eszkoz.megjegyzes, eszkoz.write_date
             FROM leltar_leltariv_eszkoz AS eszkoz
             JOIN leltar_leltariv AS iv ON iv.id = leltariv_id AND iv.state != 'konyvelt'
             UNION ALL
-            SELECT 0 AS leltariv_eszkoz_id, eszkoz.id AS leltariv_ujeszkoz_id, eszkoz.leltariv_id, eszkoz.eszkoz_id, true AS fellelheto, eszkoz.serult_cimke, eszkoz.selejtezni, eszkoz.megjegyzes
+            SELECT 0 AS leltariv_eszkoz_id, eszkoz.id AS leltariv_ujeszkoz_id, eszkoz.leltariv_id, eszkoz.eszkoz_id, true AS fellelheto, eszkoz.serult_cimke, eszkoz.selejtezni, eszkoz.megjegyzes, eszkoz.write_date
             FROM leltar_leltariv_ujeszkoz AS eszkoz
             JOIN leltar_leltariv AS iv ON iv.id = leltariv_id AND iv.state != 'konyvelt'
           )
