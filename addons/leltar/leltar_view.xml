@@ -564,6 +564,7 @@
         <tree editable="top" create="false">
           <field name="eszkoz_id"             options="{'no_create': True, 'no_open': True}"/>
           <field name="fellelheto"/>
+          <field name="serult_cimke"/>
           <field name="selejtezni"/>
           <field name="megjegyzes"/>
           <field name="write_uid"             readonly="1"    string="Módosította"/>
@@ -580,6 +581,7 @@
       <field  name="arch" type="xml">
         <tree editable="bottom">
           <field name="eszkoz_id"             options="{'no_create': True, 'no_open': True}"/>
+          <field name="serult_cimke"/>
           <field name="selejtezni"/>
           <field name="megjegyzes"/>
           <field name="create_uid"            readonly="1"    string="Felvette"/>
@@ -587,6 +589,37 @@
           <field name="write_uid"             readonly="1"    string="Módosította"/>
           <field name="write_date"            readonly="1"    string="Módosítás ideje"/>
         </tree>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Leltárív összes eszköz (generált és új)  -->
+    <record id="view_tree_leltariv_osszes"    model="ir.ui.view">
+      <field  name="name">Leltárív összes eszköz Tree</field>
+      <field  name="model">leltar.leltariv_osszes</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <tree>
+          <field name="eszkoz_id"/>
+          <field name="leltariv_id"/>
+          <field name="fellelheto"/>
+          <field name="serult_cimke"/>
+          <field name="selejtezni"/>
+          <field name="megjegyzes"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_leltariv_osszes"    model="ir.ui.view">
+      <field  name="name">Leltárív összes eszköz Filter</field>
+      <field  name="model">leltar.leltariv_osszes</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field  name="eszkoz_id"/>
+          <field  name="leltariv_id"/>
+          <filter name="filter_fellelheto"    string="Fellelhető"               domain="[('fellelheto','=',True)]"/>
+          <filter name="filter_serult"        string="Sérült címke"             domain="[('serult_cimke','=',True)]"/>
+          <filter name="filter_selejtezni"    string="Selejtezni"               domain="[('selejtezni','=',True)]"/>
+        </search>
       </field>
     </record>
 
@@ -612,20 +645,6 @@
         <tree>
           <field name="eszkoz_id"/>
           <field name="leltariv_id"/>
-        </tree>
-      </field>
-    </record>
-
-    <!--####################################################################################################################  Leltárív selejtezésre javasolt eszközök  -->
-    <record id="view_tree_leltariv_selejt"    model="ir.ui.view">
-      <field  name="name">Leltárív selejtezésre javasolt eszközök Tree</field>
-      <field  name="model">leltar.leltariv_selejt</field>
-      <field  name="priority" eval="15"/>
-      <field  name="arch" type="xml">
-        <tree>
-          <field name="eszkoz_id"/>
-          <field name="leltariv_id"/>
-          <field name="megjegyzes"/>
         </tree>
       </field>
     </record>
@@ -667,9 +686,9 @@
 
     <act_window id="leltar_leltariv"              name="Leltárív"                     res_model="leltar.leltariv"         view_mode="tree,form"
                                                                                       context="{'search_default_filter_terv': 1}"/>
+    <act_window id="leltar_leltariv_osszes"       name="Összes eszköz"                res_model="leltar.leltariv_osszes"  view_mode="tree,form" />
     <act_window id="leltar_leltariv_dupla"        name="Duplikátumok"                 res_model="leltar.leltariv_dupla"   view_mode="tree,form" />
     <act_window id="leltar_leltariv_hiany"        name="Nincs leltározva"             res_model="leltar.leltariv_hiany"   view_mode="tree,form" />
-    <act_window id="leltar_leltariv_selejt"       name="Selejtezésre javasol"         res_model="leltar.leltariv_selejt"  view_mode="tree,form" />
     <act_window id="leltar_leltariv_mozgas"       name="Új eszköz mozgások"           res_model="leltar.leltariv_mozgas"  view_mode="tree,form" />
     <act_window id="leltar_leltariv_admin"        name="Leltár leltarív admin"        res_model="szefo.parameter"         view_mode="tree"      view_id="view_tree_leltar_leltariv_admin"/>
 
@@ -708,9 +727,9 @@
 
     <menuitem id="menu_leltar"                          name="Leltár"                   parent="menu_root"            sequence="40" />
       <menuitem id="menu_leltar_leltariv"               name="Leltárív"                 parent="menu_leltar"          sequence="10" action="leltar_leltariv" />
-      <menuitem id="menu_leltar_leltariv_dupla"         name="Duplikátumok"             parent="menu_leltar"          sequence="20" action="leltar_leltariv_dupla" />
-      <menuitem id="menu_leltar_leltariv_hiany"         name="Nincs leltározva"         parent="menu_leltar"          sequence="30" action="leltar_leltariv_hiany" />
-      <menuitem id="menu_leltar_leltariv_selejt"        name="Selejtezésre javasolt"    parent="menu_leltar"          sequence="40" action="leltar_leltariv_selejt" />
+      <menuitem id="menu_leltar_leltariv_osszes"        name="Összes eszköz"            parent="menu_leltar"          sequence="20" action="leltar_leltariv_osszes" />
+      <menuitem id="menu_leltar_leltariv_dupla"         name="Duplikátumok"             parent="menu_leltar"          sequence="30" action="leltar_leltariv_dupla" />
+      <menuitem id="menu_leltar_leltariv_hiany"         name="Nincs leltározva"         parent="menu_leltar"          sequence="40" action="leltar_leltariv_hiany" />
       <menuitem id="menu_leltar_leltariv_mozgas"        name="Új eszköz mozgások"       parent="menu_leltar"          sequence="50" action="leltar_leltariv_mozgas" />
       <menuitem id="menu_leltar_leltariv_admin"         name="Admin tevékenységek"      parent="menu_leltar"          sequence="90" action="leltar_leltariv_admin"        groups="base.group_system" />
 
