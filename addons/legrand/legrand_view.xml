@@ -1257,6 +1257,8 @@
           <field name="dolgozo_id"/>
           <field name="gylap_szefo_muv_id1"/>
           <field name="hiba_leirasa"/>
+          <field name="intezkedesek"/>
+          <field name="megjegyzes"/>
           <field name="create_date"           string="Létrehozás ideje"/>
         </tree>
       </field>

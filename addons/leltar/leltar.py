@@ -506,6 +506,7 @@ class LeltarLeltariv(models.Model):
   # virtual fields
   ujeszkozok_ids      = fields.One2many('leltar.leltariv_ujeszkoz', 'leltariv_id', u'Új eszközök a leltáríven', states={'kesz': [('readonly', True)], 'konyvelt': [('readonly', True)]})
   eszkozok_ids        = fields.One2many('leltar.leltariv_eszkoz', 'leltariv_id', u'Eszközök a leltáríven', states={'kesz': [('readonly', True)], 'konyvelt': [('readonly', True)]})
+  ismeretlen_ids      = fields.One2many('leltar.leltariv_ismeretlen', 'leltariv_id', u'Ismeretlen eszközök a leltáríven', states={'kesz': [('readonly', True)], 'konyvelt': [('readonly', True)]})
 
   @api.model
   def create(self, vals):
@@ -556,6 +557,22 @@ class LeltarLeltarivUjeszkoz(models.Model):
   serult_cimke        = fields.Boolean(u'Sérült címke', default=False)
   selejtezni          = fields.Boolean(u'Selejtezni', default=False)
   megjegyzes          = fields.Char(u'Megjegyzés')
+
+############################################################################################################################  Leltárív leltári számmal nem azonosítható eszközök  ###
+class LeltarLeltarivIsmeretlen(models.Model):
+  _name               = 'leltar.leltariv_ismeretlen'
+  name                = fields.Char(u'Eszköz', compute='_compute_name', store=True)
+  leltariv_id         = fields.Many2one('leltar.leltariv', u'Leltárív', required=True, auto_join=True)
+  kod                 = fields.Char(u'Kód', required=True)
+  megnevezes          = fields.Char(u'Megnevezes', required=True)
+  megjegyzes          = fields.Char(u'Megjegyzés')
+
+  @api.one
+  @api.depends('kod', 'megnevezes', 'megjegyzes')
+  def _compute_name(self):
+    megjegyzes = ', ' + self.megjegyzes if self.megjegyzes else ''
+    if self.kod and self.megnevezes:
+      self.name = self.kod + ' - ' + self.megnevezes + megjegyzes
 
 ############################################################################################################################  Leltárív összes eszköz (generált és új)  ###
 class LeltarLeltarivOsszes(models.Model):
