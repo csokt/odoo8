@@ -513,6 +513,8 @@
             <field name="letrehozva"/>
             <field name="leltarvezeto_id"     options="{'no_create': True, 'no_open': True}"/>
             <field name="leltarozo_id"        options="{'no_create': True, 'no_open': True}"/>
+            <field name="leltarozo2_id"       options="{'no_create': True, 'no_open': True}"/>
+            <field name="leltarozo3_id"       options="{'no_create': True, 'no_open': True}"/>
             <field name="create_date"         invisible="1"/>
           </group>
           <b>Ismeretlen eszközök</b>

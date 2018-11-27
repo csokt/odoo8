@@ -502,6 +502,8 @@ class LeltarLeltariv(models.Model):
   letrehozva          = fields.Date(u'Létrehozva',  readonly=True)
   leltarvezeto_id     = fields.Many2one('hr.employee',  u'Leltárvezető',  auto_join=True, states={'kesz': [('readonly', True)], 'konyvelt': [('readonly', True)]})
   leltarozo_id        = fields.Many2one('hr.employee',  u'Leltározó',  auto_join=True, states={'kesz': [('readonly', True)], 'konyvelt': [('readonly', True)]})
+  leltarozo2_id       = fields.Many2one('hr.employee',  u'Leltározó2', auto_join=True, states={'kesz': [('readonly', True)], 'konyvelt': [('readonly', True)]})
+  leltarozo3_id       = fields.Many2one('hr.employee',  u'Leltározó3', auto_join=True, states={'kesz': [('readonly', True)], 'konyvelt': [('readonly', True)]})
   leltarkorzet_kod    = fields.Char(u'Leltárkörzet kód', related='leltarkorzet_id.leltarkorzet_kod', readonly=True, store=True)
   # virtual fields
   ujeszkozok_ids      = fields.One2many('leltar.leltariv_ujeszkoz', 'leltariv_id', u'Új eszközök a leltáríven', states={'kesz': [('readonly', True)], 'konyvelt': [('readonly', True)]})

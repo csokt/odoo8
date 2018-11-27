@@ -322,27 +322,23 @@
               <br></br>
               <br></br>
               <div class="row text-center">
-                <div  class="col-xs-4">
+                <div  class="col-xs-3">
                   <span t-field="o.leltarvezeto_id.name"/>
                 </div>
-                <div  class="col-xs-4">
-                  <span t-field="o.leltarozo_id.name"/>
-                </div>
-                <div  class="col-xs-4">
-                  <span t-field="o.write_date"/>
+                <div  class="col-xs-9">
+                  <span t-field="o.leltarozo_id.name"/> &#160; &#160; <span t-field="o.leltarozo2_id.name"/> &#160; &#160; <span t-field="o.leltarozo3_id.name"/>
                 </div>
               </div>
               <div class="row text-center">
-                <div  class="col-xs-4">
+                <div  class="col-xs-3">
                   leltárvezető
                 </div>
-                <div  class="col-xs-4">
-                  leltározó
-                </div>
-                <div  class="col-xs-4">
-                  rögzítés dátuma
+                <div  class="col-xs-9">
+                  leltározó(k)
                 </div>
               </div>
+              <br></br>
+              Kelt: <span t-field="o.leltarkorzet_id.telephely_id.helyseg"/>, <span t-field="o.write_date"/>
             </div>
 <!--
 -->
