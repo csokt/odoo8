@@ -559,6 +559,8 @@ class LeltarLeltarivUjeszkoz(models.Model):
   serult_cimke        = fields.Boolean(u'Sérült címke', default=False)
   selejtezni          = fields.Boolean(u'Selejtezni', default=False)
   megjegyzes          = fields.Char(u'Megjegyzés')
+  # virtual fields
+  akt_leltarkorzet_id = fields.Many2one('leltar.korzet',  u'Nyilvántartás szerinti leltárkörzet',  related='eszkoz_id.akt_leltarkorzet_id' )
 
 ############################################################################################################################  Leltárív leltári számmal nem azonosítható eszközök  ###
 class LeltarLeltarivIsmeretlen(models.Model):

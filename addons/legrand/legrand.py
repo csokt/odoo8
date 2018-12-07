@@ -1502,9 +1502,9 @@ class LegrandImpex(models.Model):
     self.cikknev = self.cikk_id.cikknev if self.cikk_id else self.bom_id.cikk_id.cikknev
 
   @api.one
-  @api.depends('cikk_id', 'bom_id')
+  @api.depends('cikk_id')
   def _compute_price(self):
-    if self.gyartasi_lap_id:
-      self.price = self.env['legrand.gylap_dbjegyzek'].search([('cikk_id', '=', self.cikk_id.id), ('gyartasi_lap_id', '=', self.gyartasi_lap_id.id)]).bekerulesi_ar
-    else:
+#    if self.gyartasi_lap_id:
+#      self.price = self.env['legrand.gylap_dbjegyzek'].search([('cikk_id', '=', self.cikk_id.id), ('gyartasi_lap_id', '=', self.gyartasi_lap_id.id)]).bekerulesi_ar
+#    else:
       self.price = self.cikk_id.bekerulesi_ar

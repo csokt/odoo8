@@ -585,11 +585,10 @@
       <field  name="arch" type="xml">
         <tree editable="bottom">
           <field name="eszkoz_id"             options="{'no_create': True, 'no_open': True}"/>
+          <field name="akt_leltarkorzet_id"   options="{'no_create': True, 'no_open': True}"/>
           <field name="serult_cimke"/>
           <field name="selejtezni"/>
           <field name="megjegyzes"/>
-          <field name="create_uid"            readonly="1"    string="Felvette"/>
-          <field name="create_date"           readonly="1"    string="Létrehozás ideje"/>
           <field name="write_uid"             readonly="1"    string="Módosította"/>
           <field name="write_date"            readonly="1"    string="Módosítás ideje"/>
         </tree>
@@ -631,6 +630,19 @@
       </field>
     </record>
 
+    <record id="view_filter_leltar_leltariv_ismeretlen"    model="ir.ui.view">
+      <field  name="name">Leltárív ismeretlen eszközök Filter</field>
+      <field  name="model">leltar.leltariv_ismeretlen</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field name="leltariv_id"/>
+          <field name="kod"/>
+          <field name="megnevezes"/>
+          <field name="megjegyzes"/>
+        </search>
+      </field>
+    </record>
+
     <!--####################################################################################################################  Leltárív összes eszköz (generált és új)  -->
     <record id="view_tree_leltar_leltariv_osszes"    model="ir.ui.view">
       <field  name="name">Leltárív összes eszköz Tree</field>
@@ -644,6 +656,7 @@
           <field name="serult_cimke"/>
           <field name="selejtezni"/>
           <field name="megjegyzes"/>
+          <field name="write_date"/>
         </tree>
       </field>
     </record>
@@ -675,6 +688,17 @@
       </field>
     </record>
 
+    <record id="view_filter_leltar_leltariv_dupla"    model="ir.ui.view">
+      <field  name="name">Leltárív új eszközök duplikátumok Filter</field>
+      <field  name="model">leltar.leltariv_dupla</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field name="eszkoz_id"/>
+          <field name="leltariv_id"/>
+        </search>
+      </field>
+    </record>
+
     <!--####################################################################################################################  Leltárív nem fellelhető eszközök  -->
     <record id="view_tree_leltar_leltariv_hiany"    model="ir.ui.view">
       <field  name="name">Leltárív nem fellelhető eszközök Tree</field>
@@ -688,6 +712,17 @@
       </field>
     </record>
 
+    <record id="view_filter_leltar_leltariv_hiany"    model="ir.ui.view">
+      <field  name="name">Leltárív nem fellelhető eszközök Filter</field>
+      <field  name="model">leltar.leltariv_hiany</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field  name="eszkoz_id"/>
+          <field  name="leltariv_id"/>
+        </search>
+      </field>
+    </record>
+
     <!--####################################################################################################################  Leltárív új mozgások  -->
     <record id="view_tree_leltar_leltariv_mozgas"    model="ir.ui.view">
       <field  name="name">Leltárív új mozgások Tree</field>
@@ -698,6 +733,17 @@
           <field name="eszkoz_id"/>
           <field name="leltariv_id"/>
         </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_leltar_leltariv_mozgas"    model="ir.ui.view">
+      <field  name="name">Leltárív új mozgások Filter</field>
+      <field  name="model">leltar.leltariv_mozgas</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field name="eszkoz_id"/>
+          <field name="leltariv_id"/>
+        </search>
       </field>
     </record>
 
@@ -725,8 +771,8 @@
 
     <act_window id="leltar_leltariv"              name="Leltárív"                     res_model="leltar.leltariv"             view_mode="tree,form"
                                                                                       context="{'search_default_filter_terv': 1}"/>
-    <act_window id="leltar_leltariv_osszes"       name="Összes eszköz"                res_model="leltar.leltariv_osszes"          view_mode="tree,form" />
-    <act_window id="leltar_leltariv_ismeretlen"   name="Ismeretlen eszközök"          res_model="leltar.leltariv_ismeretlen"  view_mode="tree"      view_id="view_tree_leltar_leltariv_ismeretlen"/>
+    <act_window id="leltar_leltariv_osszes"       name="Összes eszköz"                res_model="leltar.leltariv_osszes"      view_mode="tree,form" />
+    <act_window id="leltar_leltariv_ismeretlen"   name="Ismeretlen eszközök"          res_model="leltar.leltariv_ismeretlen"  view_mode="tree,form" view_id="view_tree_leltar_leltariv_ismeretlen"/>
     <act_window id="leltar_leltariv_dupla"        name="Duplikátumok"                 res_model="leltar.leltariv_dupla"       view_mode="tree,form" />
     <act_window id="leltar_leltariv_hiany"        name="Nincs leltározva"             res_model="leltar.leltariv_hiany"       view_mode="tree,form" />
     <act_window id="leltar_leltariv_mozgas"       name="Új eszköz mozgások"           res_model="leltar.leltariv_mozgas"      view_mode="tree,form" />

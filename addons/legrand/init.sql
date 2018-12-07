@@ -1,3 +1,45 @@
+-- Legrand árlista átvétele VIR-be
+-- import impexbe
+-- id keresés
+WITH
+arak as ( select imp.id, cikk.id as cikk_id from legrand_impex as imp join legrand_cikk as cikk on cikk.cikkszam ilike imp.cikkszam where imp.create_uid = 6)
+update legrand_impex as imp set cikk_id = arak.cikk_id from arak where imp.create_uid = 6 and arak.id = imp.id
+;
+
+delete from legrand_impex as imp where imp.create_uid = 6 and imp.cikk_id is null
+;
+
+update legrand_cikk as cikk set bekerulesi_ar = imp.beepules from legrand_impex as imp where cikk.id = imp.cikk_id and imp.create_uid = 6 and imp.beepules != cikk.bekerulesi_ar
+;
+
+select imp.beepules, cikk.bekerulesi_ar from legrand_impex as imp join legrand_cikk as cikk on cikk.id = imp.cikk_id where imp.create_uid = 6 and imp.beepules != cikk.bekerulesi_ar
+;
+
+delete from legrand_impex as imp where imp.create_uid = 6
+;
+
+-- impex alapján cikktörzs árak és gyártási lap árak összevetése
+select cikk.cikkszam, cikk.cikknev, cikk.bekerulesi_ar as cikk, dbj.bekerulesi_ar as gylap from legrand_impex as imp
+  join legrand_cikk as cikk on cikk.id = imp.cikk_id
+  join legrand_gylap_dbjegyzek as dbj on dbj.cikk_id = imp.cikk_id and dbj.gyartasi_lap_id = imp.gyartasi_lap_id
+  -- where cikk.bekerulesi_ar = dbj.bekerulesi_ar
+;
+
+
+
+
+
+
+eszkoz as ( select max(id) as max_id, eszkoz_id from leltar_eszkozatvetel where regi_hasznalo_id is null group by eszkoz_id having count(*) > 1 ),
+eszkoz_elozok as ( select atvet.id as prev_id, eszkoz.* from leltar_eszkozatvetel as atvet, eszkoz where atvet.eszkoz_id = eszkoz.eszkoz_id and atvet.id < eszkoz.max_id ),
+atvet_rel as (select eszkoz_id, max_id, max(prev_id) as prev_id from eszkoz_elozok group by eszkoz_id, max_id),
+update_rel as (select atvet_rel.*, atvet.uj_hasznalo_id as prev_hasznalo_id from atvet_rel join leltar_eszkozatvetel as atvet on atvet_rel.prev_id = atvet.id)
+update leltar_eszkozatvetel set regi_hasznalo_id = prev_hasznalo_id from update_rel where id = max_id
+;
+
+
+
+
 -- összes adat törlése
 -- delete from datawh_files ;
 -- alter sequence datawh_files_id_seq RESTART WITH 1 ;
