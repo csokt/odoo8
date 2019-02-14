@@ -1268,7 +1268,7 @@ class LegrandLgrJegyzokonyv(models.Model):
 class LegrandLezerTampon(models.Model):
   _name               = 'legrand.lezer_tampon'
   _order              = 'id'
-  _rec_name           = 'muvelet'
+  _rec_name           = 'alkatresz_id'
   muvelet             = fields.Char(u'Művelet')
   termekkod           = fields.Char(u'Termékkód')
   termek_id           = fields.Many2one('legrand.cikk',  u'Termék', auto_join=True)
@@ -1277,6 +1277,70 @@ class LegrandLezerTampon(models.Model):
   pozicio             = fields.Char(u'Pozíció')
   rajz_felirat        = fields.Char(u'Rajz/Felirat')
   muvelet_db          = fields.Integer(u'Művelet db')
+  megjegyzes          = fields.Char(u'Megjegyzés')
+
+############################################################################################################################  Gylap lézer, tampon  ###
+class LegrandGylapLezerTampon(models.Model):
+  _name               = 'legrand.gylap_lezer_tampon'
+  _order              = 'gyartasi_lap_id, lezer_tampon_id'
+  gyartasi_lap_id     = fields.Many2one('legrand.gyartasi_lap', u'Gyártási lap', required=True,  auto_join=True)
+  lezer_tampon_id     = fields.Many2one('legrand.lezer_tampon', u'Alkatrész', required=True, domain="[('termek_id', '=', cikk_id)]", auto_join=True)
+  utasitas            = fields.Char(u'Utasítás')
+  mennyiseg           = fields.Integer(u'Mennyiség')
+  megjegyzes          = fields.Char(u'Megjegyzés')
+  # virtual fields
+  state               = fields.Selection([('uj',u'Új'),('mterv',u'Műveletterv'),('gyartas',u'Gyártás'),('gykesz',u'Gyártás kész'),('kesz',u'Rendelés teljesítve')],
+                        u'Állapot', related='gyartasi_lap_id.state', readonly=True)
+  gylap_lezer_sor_ids = fields.One2many('legrand.gylap_lezer_tampon_sor', 'gylap_lezer_tampon_id', u'Gylap lézer, tampon sor')
+
+  cikk_id             = fields.Many2one('legrand.cikk',  u'Termék', related='gyartasi_lap_id.cikk_id', readonly=True, auto_join=True)
+  modositott_db       = fields.Integer(u'Késztermék rendelt db', related='gyartasi_lap_id.modositott_db', readonly=True)
+  hatarido            = fields.Date(u'Határidő', related='gyartasi_lap_id.hatarido', readonly=True, store=True)
+  gyartasi_hely_id    = fields.Many2one('legrand.hely',  u'Fő gyártási hely', related='gyartasi_lap_id.gyartasi_hely_id', readonly=True, auto_join=True)
+
+  muvelet             = fields.Char(u'Művelet', related='lezer_tampon_id.muvelet', readonly=True)
+  pozicio             = fields.Char(u'Pozíció', related='lezer_tampon_id.pozicio', readonly=True)
+  rajz_felirat        = fields.Char(u'Rajz/ felirat', related='lezer_tampon_id.rajz_felirat', readonly=True)
+  muvelet_db          = fields.Integer(u'Művelet db', related='lezer_tampon_id.muvelet_db', readonly=True)
+  egyeb_info          = fields.Char(u'Egyéb info', related='lezer_tampon_id.megjegyzes', readonly=True)
+
+  osszes_db           = fields.Integer(u'Összes db', compute='_compute_db')
+  kesz_db             = fields.Integer(u'Kész db',   compute='_compute_db')
+  hiany_db            = fields.Integer(u'Hiány db',  compute='_compute_db')
+
+  legrand_manager_e   = fields.Boolean(u'Legrand Manager?',   compute='_check_user_group')
+  legrand_director_e  = fields.Boolean(u'Legrand director?',  compute='_check_user_group')
+
+  @api.multi
+  def write(self, vals):
+    if 'mennyiseg' in vals and vals['mennyiseg']:
+      sor_row = {
+        'gylap_lezer_tampon_id' : self.id,
+        'mennyiseg'             : vals['mennyiseg'],
+        'megjegyzes'            : vals['megjegyzes'] if 'megjegyzes' in vals else False
+      }
+      self.env['legrand.gylap_lezer_tampon_sor'].create(sor_row)
+    vals['mennyiseg']  = 0
+    vals['megjegyzes'] = False
+    return super(LegrandGylapLezerTampon, self).write(vals)
+
+  @api.one
+  @api.depends('modositott_db', 'gylap_lezer_sor_ids.mennyiseg')
+  def _compute_db(self):
+    self.osszes_db = self.modositott_db * self.muvelet_db
+    self.kesz_db   = sum(self.gylap_lezer_sor_ids.mapped('mennyiseg'))
+    self.hiany_db  = self.osszes_db - self.kesz_db
+
+  @api.one
+  def _check_user_group(self):
+    self.legrand_manager_e = self.env.user.has_group('legrand.group_legrand_manager')
+    self.legrand_director_e = self.env.user.has_group('legrand.group_legrand_director')
+
+############################################################################################################################  Gylap lézer, tampon sor  ###
+class LegrandGylapLezerTamponSor(models.Model):
+  _name               = 'legrand.gylap_lezer_tampon_sor'
+  gylap_lezer_tampon_id = fields.Many2one('legrand.gylap_lezer_tampon', u'Gylap lézer, tampon',  readonly=True, auto_join=True)
+  mennyiseg           = fields.Integer(u'Mennyiség')
   megjegyzes          = fields.Char(u'Megjegyzés')
 
 ############################################################################################################################  Lefoglalt  ###
@@ -1489,7 +1553,9 @@ class LegrandImpex(models.Model):
                         u'Állapot', related='gyartasi_lap_id.state', readonly=True)
   cikknev             = fields.Char(u'Cikknév', compute='_compute_cikknev')
   price               = fields.Float(u'Price', digits=(16, 3), compute='_compute_price')
-  gyartasi_hely_ids   = fields.Many2many('legrand.hely', string=u'Gyártási helyek', related='gyartasi_lap_id.gyartasi_hely_ids', readonly=True)
+  gyartasi_hely_id    = fields.Many2one('legrand.hely',  u'Fő gyártási hely', related='gyartasi_lap_id.gyartasi_hely_id', readonly=True)
+#  gyartasi_hely_ids   = fields.Many2many('legrand.hely', string=u'Gyártási helyek', related='gyartasi_lap_id.gyartasi_hely_ids', readonly=True)
+  termekcsoport       = fields.Char(u'Termékcsoport',  related='gyartasi_lap_id.termekcsoport', readonly=True)
 
   @api.one
   @api.depends('mennyiseg', 'gyartasi_lap_id')

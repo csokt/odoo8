@@ -60,16 +60,18 @@ class LegrandParameter(models.Model):
 #    raise exceptions.Warning(u'Nincs művelet!')
 #    pub(self.env, {'event': u'Gyártási lapok import elkezdése'})
 
-    Cikk      = self.env['legrand.cikk']
-    Gyartlap  = self.env['legrand.gyartasi_lap']
-    Dbjegyzek = self.env['legrand.gylap_dbjegyzek']
-    GyMuvelet = self.env['legrand.gylap_legrand_muvelet']
-    SzMuvelet = self.env['legrand.gylap_szefo_muvelet']
-    Muvelet   = self.env['legrand.muvelet']
-    GyHomogen = self.env['legrand.gylap_homogen']
-    SzHomogen = self.env['legrand.homogen']
-    Bom       = self.env['legrand.bom']
-    BomLine   = self.env['legrand.bom_line']
+    Cikk             = self.env['legrand.cikk']
+    Gyartlap         = self.env['legrand.gyartasi_lap']
+    Dbjegyzek        = self.env['legrand.gylap_dbjegyzek']
+    GyMuvelet        = self.env['legrand.gylap_legrand_muvelet']
+    SzMuvelet        = self.env['legrand.gylap_szefo_muvelet']
+    Muvelet          = self.env['legrand.muvelet']
+    GyHomogen        = self.env['legrand.gylap_homogen']
+    SzHomogen        = self.env['legrand.homogen']
+    Bom              = self.env['legrand.bom']
+    BomLine          = self.env['legrand.bom_line']
+    LezerTampon      = self.env['legrand.lezer_tampon']
+    GylapLezerTampon = self.env['legrand.gylap_lezer_tampon']
 
     # gyartasi_lapok létrehozása ##############################################
     count, maxcount = 0, 60
@@ -214,6 +216,11 @@ class LegrandParameter(models.Model):
             'legrand_beall_ido' : muv['beall_ido'],
           }
           SzMuvelet.create(muv_row)
+
+      # Gylap lézer, tampon létrehozása #########################################
+      for minta in LezerTampon.search([('termek_id', '=', gyartlap.cikk_id.id)]):
+        GylapLezerTampon.create({'gyartasi_lap_id': gyartlap.id, 'lezer_tampon_id': minta.id})
+
       doc.imported = True
       count += 1
       if count == maxcount:

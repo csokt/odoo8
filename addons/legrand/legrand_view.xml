@@ -1371,6 +1371,114 @@
       </field>
     </record>
 
+    <!--####################################################################################################################  Gylap lézer, tampon  -->
+    <record id="view_form_lezer_tampon"    model="ir.ui.view">
+      <field name="name">Gylap lézer tampon default Form</field>
+      <field name="model">legrand.gylap_lezer_tampon</field>
+      <field name="priority" eval="15"/>
+      <field name="arch" type="xml">
+        <form>
+          <sheet>
+            <group col="4">
+              <field name="gyartasi_lap_id"         attrs="{'readonly': [('create_date', '!=', False)]}"/>
+              <field name="lezer_tampon_id"         attrs="{'readonly': [('create_date', '!=', False)]}"/>
+              <field name="hatarido"/>
+              <field name="gyartasi_hely_id"        options="{'no_open': True}"/>
+              <field name="rajz_felirat"/>
+              <field name="pozicio"/>
+              <field name="egyeb_info"/>
+              <field name="modositott_db"/>
+              <field name="utasitas"                attrs="{'readonly': [('create_date', '!=', False),('legrand_manager_e', '=', False)]}"/>
+              <field name="muvelet_db"/>
+              <field name="kesz_db"/>
+              <field name="osszes_db"/>
+              <field name="hiany_db"/>
+              <field name="cikk_id"                 invisible="1"/>
+              <field name="mennyiseg"/>
+              <field name="state"/>
+              <field name="megjegyzes"/>
+              <field name="muvelet"/>
+              <field name="create_date"             invisible="1"/>
+              <field name="legrand_manager_e"       invisible="1"/>
+            </group>
+            <field name="gylap_lezer_sor_ids"/>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_tree_lezer_tampon"   model="ir.ui.view">
+      <field  name="name">Gylap lézer tampon default Tree</field>
+      <field  name="model">legrand.gylap_lezer_tampon</field>
+      <field name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <tree editable="top">
+          <field name="gyartasi_lap_id"             attrs="{'readonly': [('create_date', '!=', False)]}"/>
+          <field name="hatarido"/>
+          <field name="gyartasi_hely_id"            options="{'no_open': True}"/>
+          <field name="lezer_tampon_id"             attrs="{'readonly': [('create_date', '!=', False)]}"/>
+          <field name="rajz_felirat"/>
+          <field name="pozicio"/>
+          <field name="egyeb_info"/>
+          <field name="utasitas"                    attrs="{'readonly': [('create_date', '!=', False),('legrand_manager_e', '=', False)]}"/>
+          <field name="osszes_db"/>
+          <field name="kesz_db"/>
+          <field name="hiany_db"/>
+          <field name="mennyiseg"/>
+          <field name="megjegyzes"/>
+          <field name="muvelet_db"/>
+          <field name="state"/>
+          <field name="muvelet"/>
+          <field name="modositott_db"               invisible="1"/>
+          <field name="cikk_id"                     invisible="1"/>
+          <field name="create_date"                 invisible="1"/>
+          <field name="legrand_manager_e"           invisible="1"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_lezer_tampon"    model="ir.ui.view">
+      <field  name="name">Gylap lézer tampon Filter</field>
+      <field  name="model">legrand.gylap_lezer_tampon</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field name="gyartasi_lap_id"/>
+          <field name="gyartasi_hely_id"/>
+          <filter name="filter_szentes"     string="Szentes"                domain="[('gyartasi_hely_id.azonosito','=','szentes')]"/>
+          <filter name="filter_hmvhely"     string="Hódmezővásárhely"       domain="[('gyartasi_hely_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_berkert"     string="Bérkert"                domain="[('gyartasi_hely_id.azonosito','=','berkert')]"/>
+          <filter name="filter_mako"        string="Makó"                   domain="[('gyartasi_hely_id.azonosito','=','mako')]"/>
+          <filter name="filter_oroshaza"    string="Orosháza"               domain="[('gyartasi_hely_id.azonosito','=','oroshaza')]"/>
+          <filter name="filter_apatfalva"   string="Apátfalva"              domain="[('gyartasi_hely_id.azonosito','=','apatfalva')]"/>
+          <separator/>
+          <filter name="filter_mterv"       string="Műveletterv"            domain="[('state','=','mterv')]"/>
+          <filter name="filter_gyartas"     string="Gyártás"                domain="[('state','=','gyartas')]"/>
+          <filter name="filter_gykesz"      string="Gyártás kész"           domain="[('state','=','gykesz')]"/>
+          <filter name="filter_kesz"        string="Rendelés teljesítve"    domain="[('state','=','kesz')]"/>
+          <separator/>
+          <filter name="filter_lezer"       string="Lézer"                  domain="[('muvelet','like','lézer')]"/>
+          <filter name="filter_tampon"      string="Tampon"                 domain="[('muvelet','like','tampon')]"/>
+        </search>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Gylap lézer, tampon sor  -->
+    <record id="view_tree_lezer_tampon_sor"   model="ir.ui.view">
+      <field  name="name">Gylap lézer tampon sor default Tree</field>
+      <field  name="model">legrand.gylap_lezer_tampon_sor</field>
+      <field name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <tree editable="bottom">
+          <field name="mennyiseg"/>
+          <field name="megjegyzes"/>
+          <field name="create_uid"              readonly="1"  string="Felvette"/>
+          <field name="create_date"             readonly="1"  string="Létrehozás ideje"/>
+          <field name="write_uid"               readonly="1"  string="Módosította"/>
+          <field name="write_date"              readonly="1"  string="Módosítás ideje"/>
+        </tree>
+      </field>
+    </record>
+
     <!--####################################################################################################################  Anyagszükséglet  -->
     <record id="view_tree_anyagszukseglet"    model="ir.ui.view">
       <field  name="name">Anyagszükséglet Tree</field>
@@ -1535,7 +1643,8 @@
           <field name="sorszam"/>
           <field name="gyartasi_lap_id"/>
           <field name="gylap_state"/>
-          <field name="gyartasi_hely_ids"   widget="many2many_tags"/>
+          <field name="gyartasi_hely_id"/>
+          <field name="termekcsoport"/>
           <field name="cikk_id"/>
           <field name="bom_id"/>
           <field name="cikknev"/>
@@ -1543,7 +1652,7 @@
           <field name="db"/>
           <field name="mennyiseg"/>
           <field name="ertek"/>
-          <field name="ora"                 sum="db összesen"/>
+          <field name="ora"                 sum="óra összesen"/>
           <field name="datum"/>
           <field name="beepules"/>
           <field name="homogen_id"/>
@@ -1556,6 +1665,9 @@
         </tree>
       </field>
     </record>
+    <!--
+          <field name="gyartasi_hely_ids"   widget="many2many_tags"/>
+    -->
 
     <!--####################################################################################################################  Impex műveletek -->
     <record id="view_tree_impex_muvelet"    model="ir.ui.view">
@@ -1607,7 +1719,6 @@
                 domain="[('state','!=','uj')]"                      context="{'search_default_filter_gyartas': 1}"/>
     <act_window id="gylap_leallas"      name="Gyártás leállás"      res_model="legrand.gyartasi_lap"      view_id="view_tree_gyartasi_lap_leallas"    view_mode="tree,form"
                 domain="[('state','=','gyartas')]"                  context="{'search_default_filter_gyartas': 1}"/>
-    <act_window id="gylap_dbjegyzek"    name="Darabjegyzék"         res_model="legrand.gylap_dbjegyzek"                                               view_mode="tree,form"/>
     <act_window id="gylap_muvelet"      name="Művelet"              res_model="legrand.gylap_legrand_muvelet"                                         view_mode="tree,form"/>
     <act_window id="gylap_homogen"      name="Homogén"              res_model="legrand.gylap_homogen"                                                 view_mode="tree,form"/>
     <act_window id="szefo_muvelet"      name="Művelet"              res_model="legrand.gylap_szefo_muvelet" view_id="view_tree_szefo_muvelet"         view_mode="tree"/>
@@ -1615,6 +1726,8 @@
     <act_window id="muveletvegzes"      name="Műveletvégzés"        res_model="legrand.muveletvegzes"                                                 view_mode="tree"/>
     <act_window id="eloszereles"        name="Műveletvégzés"        res_model="legrand.eloszereles"                                                   view_mode="tree,form"/>
     <act_window id="feljegyzes"         name="Feljegyzés"           res_model="legrand.feljegyzes"                                                    view_mode="tree,form"/>
+    <act_window id="gylap_lezerez"      name="Lézerez, tamponoz"    res_model="legrand.gylap_lezer_tampon"                                            view_mode="tree,form"
+                domain="[('state','!=','uj')]"                      context="{'search_default_filter_gyartas': 1, 'search_default_filter_lezer': 1}"/>
 
     <act_window id="mozgas_kiszall"     name="Kiszállítás"          res_model="legrand.mozgasfej"                                                     view_mode="tree,form"
                 domain="[('mozgasnem','=','ki')]"                   context="{'mozgasnem':'ki'}"/>
@@ -1649,6 +1762,7 @@
       <menuitem id="menu_eloszereles"     name="Előszerelés"                  parent="menu_gyartas"               sequence="30" action="eloszereles" />
       <menuitem id="menu_feljegyzes"      name="Napi jelentés, feljegyzések"  parent="menu_gyartas"               sequence="40" action="feljegyzes" />
       <menuitem id="menu_gylap_leallas"   name="Gyártási akadályok"           parent="menu_gyartas"               sequence="50" action="gylap_leallas" />
+      <menuitem id="menu_gylap_lezerez"   name="Lézerezés, tamponozás"        parent="menu_gyartas"               sequence="60" action="gylap_lezerez" />
 
     <menuitem id="menu_szallitas_uzem"    name="Szállítás (üzem)"             parent="menu_root"                  sequence="20" />
       <menuitem id="menu_mozgas_belso"    name="Belső szállítás"              parent="menu_szallitas_uzem"        sequence="10" action="mozgas_belso"   />

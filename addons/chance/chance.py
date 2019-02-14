@@ -108,6 +108,12 @@ class ChanceMozgasfej(models.Model):
       vals['forrashely_id'], vals['celallomas_id'] = forr_id, cel_id
     return super(ChanceMozgasfej, self).create(vals)
 
+  @api.multi
+  def write(self, vals):
+    super(ChanceMozgasfej, self).write(vals)
+    self.env.cr.execute('REFRESH MATERIALIZED VIEW chance_keszlet')
+    return True
+
   @api.one
   def veglegesites(self):
     if not self.mozgassor_ids:
@@ -226,10 +232,11 @@ class ChanceKeszlet(models.Model):
   vonalkod            = fields.Char(u'Vonalkód')
 
   def init(self, cr):
+    return
     tools.drop_view_if_exists(cr, self._table)
     cr.execute(
-      """CREATE or REPLACE VIEW %s as (
-
+#      """CREATE or REPLACE VIEW %s as (
+      """CREATE MATERIALIZED VIEW %s as (
       SELECT
         row_number() over() AS id,
         keszlet.*, cikk.cikkszam, cikk.osztaly, cikk.meret, cikk.szin, cikk.megnevezes, cikk.onkoltseg, raktaron * cikk.onkoltseg AS ertek, cikk.vonalkod

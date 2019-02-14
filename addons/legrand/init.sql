@@ -1,3 +1,10 @@
+
+delete from chance_mozgassor ;
+alter sequence chance_mozgassor_id_seq RESTART WITH 1 ;
+delete from chance_mozgasfej ;
+alter sequence chance_mozgasfej_id_seq RESTART WITH 1 ;
+
+
 -- Legrand árlista átvétele VIR-be
 -- import impexbe
 -- id keresés
