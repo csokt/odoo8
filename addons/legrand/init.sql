@@ -1,3 +1,5 @@
+update legrand_cikk set cimke_e = true where cikknev ilike 'címke%' ;
+
 
 delete from chance_mozgassor ;
 alter sequence chance_mozgassor_id_seq RESTART WITH 1 ;

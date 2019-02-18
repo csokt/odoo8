@@ -36,6 +36,7 @@ class LegrandCikk(models.Model):
   alkatresz_e         = fields.Boolean(u'Alkatrész?',   default=False)
   kesztermek_e        = fields.Boolean(u'Késztermék?',  default=False)
   szefo_cikk_e        = fields.Boolean(u'SZEFO cikk?',  default=False)
+  cimke_e             = fields.Boolean(u'Címke?',       default=False)
   bekerulesi_ar       = fields.Float(u'Bekerülési ár',  digits=(16, 3))
   beepulok_ids        = fields.Many2many('legrand.bom', string=u'Beépülők', domain=[('beepul_e', '=', True)])
   active              = fields.Boolean(u'Aktív?', default=True)
@@ -897,21 +898,28 @@ class LegrandGyartasiLap(models.Model):
 ############################################################################################################################  Gylap darabjegyzék  ###
 class LegrandGylapDbjegyzek(models.Model):
   _name               = 'legrand.gylap_dbjegyzek'
-  _order              = 'cikk_id'
+  _order              = 'gyartasi_lap_id, cikk_id'
   _rec_name           = 'cikk_id'
   gyartasi_lap_id     = fields.Many2one('legrand.gyartasi_lap',  u'Gyártási lap', readonly=True, auto_join=True)
   cikk_id             = fields.Many2one('legrand.cikk',  u'Alkatrész', readonly=True, auto_join=True)
 #  cikkszam            = fields.Char(u'Cikkszám', readonly=True)
   ossz_beepules       = fields.Float(u'Össz beépülés', digits=(16, 6), readonly=True)
   bekerulesi_ar       = fields.Float(u'Bekerülési ár', digits=(16, 3), readonly=True)
+  kesz_e              = fields.Boolean(u'Kész?', readonly=True)
+  megjegyzes          = fields.Char(u'Megjegyzés')
   # calculated fields
   beepules            = fields.Float(u'Beépülés', digits=(16, 6), compute='_compute_beepules', store=True)
   ossz_bekerules      = fields.Float(u'Össz bekerülés', digits=(16, 5), compute='_compute_ossz_bekerules', store=True)
   cikk_ar             = fields.Float(u'Cikktörzs ár',  digits=(16, 3), related='cikk_id.bekerulesi_ar', store=True)
   arelteres           = fields.Float(u'Eltérés', digits=(16, 3), compute='_compute_arelteres', store=True)
   # virtual fields
+  state               = fields.Selection([('uj',u'Új'),('mterv',u'Műveletterv'),('gyartas',u'Gyártás'),('gykesz',u'Gyártás kész'),('kesz',u'Rendelés teljesítve')],
+                        u'Állapot', related='gyartasi_lap_id.state', readonly=True)
+  cimke_e             = fields.Boolean(u'Címke?',  related='cikk_id.cimke_e', readonly=True)
   cikknev             = fields.Char(u'Megnevezés', related='cikk_id.cikknev', readonly=True)
   rendelt_db          = fields.Integer(u'Rendelt termék db', related='gyartasi_lap_id.rendelt_db', readonly=True)
+  hatarido            = fields.Date(u'Határidő', related='gyartasi_lap_id.hatarido', readonly=True)
+  gyartasi_hely_id    = fields.Many2one('legrand.hely',  u'Fő gyártási hely', related='gyartasi_lap_id.gyartasi_hely_id', auto_join=True, readonly=True)
   active              = fields.Boolean(u'Aktív?', related='gyartasi_lap_id.active', readonly=True)
 
   @api.one
@@ -928,6 +936,11 @@ class LegrandGylapDbjegyzek(models.Model):
   @api.depends('cikk_id.bekerulesi_ar', 'bekerulesi_ar')
   def _compute_arelteres(self):
     self.arelteres = self.bekerulesi_ar - self.cikk_id.bekerulesi_ar
+
+  @api.one
+  def kesz(self):
+    self.kesz_e  = True
+    return True
 
 ############################################################################################################################  Gylap Legrand művelet  ###
 class LegrandGylapMuvelet(models.Model):
@@ -1295,6 +1308,7 @@ class LegrandGylapLezerTampon(models.Model):
 
   cikk_id             = fields.Many2one('legrand.cikk',  u'Termék', related='gyartasi_lap_id.cikk_id', readonly=True, auto_join=True)
   modositott_db       = fields.Integer(u'Késztermék rendelt db', related='gyartasi_lap_id.modositott_db', readonly=True)
+  carnet_e            = fields.Boolean(u'Carnet?', related='gyartasi_lap_id.carnet_e', readonly=True)
   hatarido            = fields.Date(u'Határidő', related='gyartasi_lap_id.hatarido', readonly=True, store=True)
   gyartasi_hely_id    = fields.Many2one('legrand.hely',  u'Fő gyártási hely', related='gyartasi_lap_id.gyartasi_hely_id', readonly=True, auto_join=True)
 

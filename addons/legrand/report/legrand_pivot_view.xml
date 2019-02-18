@@ -97,7 +97,6 @@
 
     <!--####################################################################################################################  Menu  items  -->
     <menuitem id="menu_kimutatas"               name="Kimutatások"                  parent="menu_root"                  sequence="110"                         />
-      <menuitem id="menu_gylap_dbjegyzek"       name="Gyártási lap darabjegyzék"    parent="menu_kimutatas"             sequence="10"   action="gylap_dbjegyzek" />
       <menuitem id="menu_szefo_muvelet"         name="Gyártási lap műveletek"       parent="menu_kimutatas"             sequence="20"   action="szefo_muvelet" />
       <menuitem id="menu_anyaghiany"            name="Anyaghiány"                   parent="menu_kimutatas"             sequence="30"   action="anyaghiany" />
       <menuitem id="menu_muveletvegzes_ertekel" name="Műveletvégzés értékelés"      parent="menu_kimutatas"             sequence="40"   action="muveletvegzes_ertekel" />
