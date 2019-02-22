@@ -759,7 +759,7 @@
           <group col="4">
             <field name="cikknev"/>
             <field name="jegyzet"/>
-            <field name="gyartasi_hely_ids"   widget="many2many_tags"/>
+            <field name="gyartasi_hely_id"    options="{'no_create': True, 'no_open': True}"/>
             <field name="utolso_feljegyzes"/>
             <field name="feljegyzes_ideje"/>
             <field name="feljegyzo_id"/>
@@ -790,7 +790,7 @@
           <field name="name"/>
           <field name="hatarido"/>
           <field name="carnet_e"/>
-          <field name="gyartasi_hely_ids"/>
+          <field name="gyartasi_hely_id"/>
           <field name="modositott_db"         string="Rendelt db"/>
           <field name="teljesitett_db"/>
           <field name="hatralek_db"/>
@@ -830,7 +830,7 @@
           <field name="name"/>
           <field name="hatarido"/>
           <field name="carnet_e"/>
-          <field name="gyartasi_hely_ids"/>
+          <field name="gyartasi_hely_id"/>
           <field name="jegyzet"/>
           <field name="modositott_db"         string="Rendelt db"/>
           <field name="cikkhiany_count"/>
@@ -870,12 +870,12 @@
           <field  name="id"                 string="Sorszám"/>
           <field  name="termekcsoport"/>
           <field  name="cikknev"/>
-          <filter name="filter_szentes"     string="Szentes"                domain="[('gyartasi_hely_ids.azonosito','=','szentes')]"/>
-          <filter name="filter_hmvhely"     string="Hódmezővásárhely"       domain="[('gyartasi_hely_ids.azonosito','=','hmvhely')]"/>
-          <filter name="filter_berkert"     string="Bérkert"                domain="[('gyartasi_hely_ids.azonosito','=','berkert')]"/>
-          <filter name="filter_mako"        string="Makó"                   domain="[('gyartasi_hely_ids.azonosito','=','mako')]"/>
-          <filter name="filter_oroshaza"    string="Orosháza"               domain="[('gyartasi_hely_ids.azonosito','=','oroshaza')]"/>
-          <filter name="filter_apatfalva"   string="Apátfalva"              domain="[('gyartasi_hely_ids.azonosito','=','apatfalva')]"/>
+          <filter name="filter_szentes"     string="Szentes"                domain="[('gyartasi_hely_id.azonosito','=','szentes')]"/>
+          <filter name="filter_hmvhely"     string="Hódmezővásárhely"       domain="[('gyartasi_hely_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_berkert"     string="Bérkert"                domain="[('gyartasi_hely_id.azonosito','=','berkert')]"/>
+          <filter name="filter_mako"        string="Makó"                   domain="[('gyartasi_hely_id.azonosito','=','mako')]"/>
+          <filter name="filter_oroshaza"    string="Orosháza"               domain="[('gyartasi_hely_id.azonosito','=','oroshaza')]"/>
+          <filter name="filter_apatfalva"   string="Apátfalva"              domain="[('gyartasi_hely_id.azonosito','=','apatfalva')]"/>
           <separator/>
           <filter name="filter_mterv"       string="Műveletterv"            domain="[('state','=','mterv')]"/>
           <filter name="filter_gyartas"     string="Gyártás"                domain="[('state','=','gyartas')]"/>
@@ -1097,6 +1097,7 @@
           <filter name="filter_gykesz"      string="Gyártás kész"           domain="[('gyartasi_lap_id.state','=','gykesz')]"/>
           <filter name="filter_kesz"        string="Rendelés teljesítve"    domain="[('gyartasi_lap_id.state','=','kesz')]"/>
           <separator/>
+          <filter name="filter_cimke_kesz"  string="Címke kész"             domain="[('kesz_e','=',True)]"/>
           <filter name="filter_nem_kesz"    string="Nem kész"               domain="[('kesz_e','=',False)]"/>
         </search>
       </field>
@@ -1468,6 +1469,7 @@
         <tree editable="top">
           <field name="gyartasi_lap_id"             attrs="{'readonly': [('create_date', '!=', False)]}"/>
           <field name="carnet_e"                    string="Car"/>
+          <field name="osszes_db"/>
           <field name="hatarido"/>
           <field name="gyartasi_hely_id"            options="{'no_open': True}"/>
           <field name="lezer_tampon_id"             attrs="{'readonly': [('create_date', '!=', False)]}"/>
@@ -1475,8 +1477,6 @@
           <field name="pozicio"/>
           <field name="egyeb_info"/>
           <field name="utasitas"                    attrs="{'readonly': [('create_date', '!=', False),('legrand_manager_e', '=', False)]}"/>
-          <field name="osszes_db"/>
-          <field name="kesz_db"/>
           <field name="hiany_db"/>
           <field name="mennyiseg"/>
           <field name="megjegyzes"/>
@@ -1722,7 +1722,6 @@
       </field>
     </record>
     <!--
-          <field name="gyartasi_hely_ids"   widget="many2many_tags"/>
     -->
 
     <!--####################################################################################################################  Impex műveletek -->

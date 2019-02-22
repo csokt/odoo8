@@ -1,3 +1,77 @@
+-- statisztika adatok beírása
+
+WITH
+mozgassor as (select sor.gyartasi_lap_id, sor.mennyiseg, date(fej.create_date) as create_date, gylap.hatarido,
+                case when date(fej.create_date) <= gylap.hatarido then sor.mennyiseg else 0 end as idoben_db,
+                case when date(fej.create_date) >  gylap.hatarido then sor.mennyiseg else 0 end as idontul_db
+  from legrand_mozgassor as sor
+  join legrand_mozgasfej as fej on fej.id = sor.mozgasfej_id and fej.mozgasnem = 'ki'
+  join legrand_gyartasi_lap as gylap on gylap.id = sor.gyartasi_lap_id),
+min_max as (select gyartasi_lap_id, min(create_date) as min_date, max(create_date) as max_date, sum(idoben_db) as idoben_db , sum(idontul_db) as idontul_db
+  from mozgassor group by gyartasi_lap_id)
+update legrand_gyartasi_lap as gylap set elso_teljesites = min_date, utolso_teljesites = max_date, hatarido_elott_db = idoben_db, hatarido_utan_db = idontul_db
+  from min_max where gylap.id = min_max.gyartasi_lap_id
+;
+
+WITH
+gylap_ids as (select distinct gyartasi_lap_id from legrand_mozgassor as sor join legrand_mozgasfej as fej on fej.id = sor.mozgasfej_id and fej.mozgasnem = 'ki'),
+stat as ( select id, round(rendelt_ora/modositott_db*hatarido_elott_db, 2) as hatarido_elott_ora, round(rendelt_ora/modositott_db*hatarido_utan_db, 2) as hatarido_utan_ora,
+            elso_teljesites - date(create_date) as elsoig_eltelt_nap, utolso_teljesites - date(create_date) as utolsoig_eltelt_nap
+          from legrand_gyartasi_lap
+          join gylap_ids on gyartasi_lap_id = id
+          where active and modositott_db != 0 and (hatarido_elott_db > 0 or hatarido_utan_db > 0)
+        )
+update legrand_gyartasi_lap as gylap
+  set hatarido_elott_ora  = stat.hatarido_elott_ora, hatarido_utan_ora   = stat.hatarido_utan_ora, elsoig_eltelt_nap   = stat.elsoig_eltelt_nap, utolsoig_eltelt_nap = stat.utolsoig_eltelt_nap
+  from stat where stat.id = gylap.id
+;
+
+
+select id, elso_teljesites, utolso_teljesites, hatarido_elott_db, hatarido_utan_db, hatarido_elott_ora, hatarido_utan_ora, elsoig_eltelt_nap, utolsoig_eltelt_nap
+from legrand_gyartasi_lap where elso_teljesites is not null limit 100
+;
+
+
+
+select termekcsoport, to_char(create_date, 'YYYY.MM') as honap, sum(rendelt_ora) as rendelt_ora, round(avg(elsoig_eltelt_nap), 1) as elsoig, round(avg(utolsoig_eltelt_nap), 1) as utolsoig
+  from legrand_gyartasi_lap where active and elsoig_eltelt_nap > 0 and hatralek_db = 0 and termekcsoport is not null
+  group by termekcsoport, to_char(create_date, 'YYYY.MM')
+  order by termekcsoport, to_char(create_date, 'YYYY.MM')
+;
+
+select termekcsoport, sum(rendelt_ora) as rendelt_ora, round(avg(elsoig_eltelt_nap), 1) as elsoig, round(avg(utolsoig_eltelt_nap), 1) as utolsoig
+  from legrand_gyartasi_lap where active and elsoig_eltelt_nap > 0 and hatralek_db = 0 and termekcsoport is not null
+  group by termekcsoport
+  order by termekcsoport
+;
+
+select termekkod, sum(rendelt_db) as rendelt_db, round(avg(elsoig_eltelt_nap), 1) as elsoig, round(avg(utolsoig_eltelt_nap), 1) as utolsoig
+  from legrand_gyartasi_lap where active and elsoig_eltelt_nap > 0 and hatralek_db = 0 and termekkod is not null
+  group by termekkod
+  order by termekkod
+;
+
+select termekcsoport, date(create_date) as felveve, round(avg(elsoig_eltelt_nap), 1) as elsoig, round(avg(utolsoig_eltelt_nap), 1) as utolsoig
+  from legrand_gyartasi_lap where active and elsoig_eltelt_nap > 0 and hatralek_db = 0 and termekcsoport is not null
+  group by termekcsoport, date(create_date)
+  order by termekcsoport, date(create_date)
+;
+
+select termekkod, date(create_date) as felveve, elsoig_eltelt_nap, utolsoig_eltelt_nap
+  from legrand_gyartasi_lap where active and elsoig_eltelt_nap > 0
+  order by termekkod, date(create_date)
+;
+
+
+
+select * from update_rel
+order by max_id desc
+limit 10
+;
+
+limit 100 ;
+
+
 update legrand_cikk set cimke_e = true where cikknev ilike 'címke%' ;
 
 

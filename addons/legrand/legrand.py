@@ -684,8 +684,7 @@ class LegrandGyartasiLap(models.Model):
   cikk_id             = fields.Many2one('legrand.cikk',  u'Termék', required=True, readonly=True, auto_join=True)
   bom_id              = fields.Many2one('legrand.bom',  u'Anyagjegyzék', required=False, domain="[('cikk_id', '=', cikk_id)]", auto_join=True, states={'kesz': [('readonly', True)]})
   cikkek_uid          = fields.Char(u'Összes cikk uid', readonly=False)
-  gyartasi_hely_ids   = fields.Many2many('legrand.hely', string=u'Fő gyártási helyek', domain=[('szefo_e', '=', True)], states={'kesz': [('readonly', True)]})
-  gyartasi_hely_id    = fields.Many2one('legrand.hely',  u'Fő gyártási hely', compute='_compute_gyartasi_hely_id', store=True, auto_join=True)
+  gyartasi_hely_id    = fields.Many2one('legrand.hely', u'Fő gyártási hely', domain=[('szefo_e', '=', True)], states={'kesz': [('readonly', True)]})
   javitas_e           = fields.Boolean(u'Javítás?', default=False, states={'kesz': [('readonly', True)]})
   raklap              = fields.Char(u'Raklap',      readonly=True)
   raklap_min          = fields.Char(u'Raklap min',  readonly=True)
@@ -707,6 +706,15 @@ class LegrandGyartasiLap(models.Model):
   aktivitas           = fields.Char(u'Gyártás aktivitás', compute='_compute_aktivitas', store=True)
   leallas_felelos     = fields.Selection([('Szefo',u'Szefo'),('Legrand',u'Legrand'),('vis maior',u'vis maior')], u'Felelős', readonly=True, states={'gyartas': [('readonly', False)]})
   active              = fields.Boolean(u'Aktív?', default=True)
+  # statistics
+  elso_teljesites     = fields.Date(u'Első teljesítés napja')
+  utolso_teljesites   = fields.Date(u'Utolsó teljesítés napja')
+  hatarido_elott_db   = fields.Integer(u'Határidő előtt teljesített db')
+  hatarido_utan_db    = fields.Integer(u'Határidő után teljesített db')
+  hatarido_elott_ora  = fields.Float(u'Határidő előtt teljesített óra',  digits=(16, 2))
+  hatarido_utan_ora   = fields.Float(u'Határidő után teljesített óra',   digits=(16, 2))
+  elsoig_eltelt_nap   = fields.Integer(u'Első teljesítésig eltelt nap')
+  utolsoig_eltelt_nap = fields.Integer(u'Utolsó teljesítésig eltelt nap')
   # virtual fields
   cikknev             = fields.Char(u'Terméknév', related='cikk_id.cikknev', readonly=True)
   utolso_feljegyzes   = fields.Char(u'Utolsó feljegyzés', compute='_compute_utolso_feljegyzes')
@@ -741,14 +749,6 @@ class LegrandGyartasiLap(models.Model):
   @api.depends('rendelesszam', 'cikk_id')
   def _compute_name(self):
     self.name = str(self.id)+' '+self.rendelesszam+' -> '+self.cikk_id.cikkszam
-
-  @api.one
-  @api.depends('gyartasi_hely_ids')
-  def _compute_gyartasi_hely_id(self):
-    if self.gyartasi_hely_ids:
-      self.gyartasi_hely_id = self.gyartasi_hely_ids[0].id
-    else:
-      self.gyartasi_hely_id = False
 
   @api.one
   @api.depends('teljesitett_db', 'carnet_db')
@@ -1568,7 +1568,6 @@ class LegrandImpex(models.Model):
   cikknev             = fields.Char(u'Cikknév', compute='_compute_cikknev')
   price               = fields.Float(u'Price', digits=(16, 3), compute='_compute_price')
   gyartasi_hely_id    = fields.Many2one('legrand.hely',  u'Fő gyártási hely', related='gyartasi_lap_id.gyartasi_hely_id', readonly=True)
-#  gyartasi_hely_ids   = fields.Many2many('legrand.hely', string=u'Gyártási helyek', related='gyartasi_lap_id.gyartasi_hely_ids', readonly=True)
   termekcsoport       = fields.Char(u'Termékcsoport',  related='gyartasi_lap_id.termekcsoport', readonly=True)
 
   @api.one
