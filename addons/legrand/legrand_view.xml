@@ -728,7 +728,7 @@
             <field name="id"                  string="Sorszám"/>
             <field name="rendelesszam"/>
             <field name="cikk_id"/>
-            <field name="bom_id"              required="1"/>
+            <field name="bom_id"              required="1"    options="{'no_create': True, 'no_open': True}"/>
 
             <field name="rendelt_db"          />
             <field name="modositott_db"       />
@@ -962,6 +962,7 @@
           <field name="ossz_ido"/>
           <field name="beall_ido"/>
           <field name="korrekcios_ido"/>
+          <field name="gyartasi_hely_id"      options="{'no_create': True, 'no_open': True}"/>
           <field name="state"                 invisible="1"/>
         </tree>
       </field>
@@ -981,6 +982,7 @@
           <field name="termekcsalad"/>
           <field name="hatarido"/>
           <field name="gyartasi_hely_id"/>
+          <field name="state"                 invisible="1"/>
         </tree>
       </field>
     </record>

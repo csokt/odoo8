@@ -55,8 +55,7 @@
      <field name="model">legrand.gylap_homogen</field>
      <field name="arch" type="xml">
        <graph string="Homogén értékelés"  type="pivot" stacked="True">
-         <field name="gyartasi_lap_id"    type="row"/>
-         <field name="homogen_id"         type="col"/>
+         <field name="gyartasi_hely_id"   type="row"/>
          <field name="szamlazhato_ora"    type="measure"/>
        </graph>
      </field>

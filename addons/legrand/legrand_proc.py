@@ -60,6 +60,7 @@ class LegrandParameter(models.Model):
 #    raise exceptions.Warning(u'Nincs művelet!')
 #    pub(self.env, {'event': u'Gyártási lapok import elkezdése'})
 
+    Hely             = self.env['legrand.hely']
     Cikk             = self.env['legrand.cikk']
     Gyartlap         = self.env['legrand.gyartasi_lap']
     Dbjegyzek        = self.env['legrand.gylap_dbjegyzek']
@@ -75,6 +76,7 @@ class LegrandParameter(models.Model):
 
     # gyartasi_lapok létrehozása ##############################################
     count, maxcount = 0, 60
+    szentes_hely_id = Hely.search([('azonosito', '=', 'szentes')], limit=1).id
     for doc in self.env['datawh.documents'].search([('doctype', '=', u'Gyártási lap'), ('reject', '=', False), ('imported', '=', False)]):
 #    for doc in self.env['datawh.documents'].search([]):
       gylap = yaml.load(doc.document)
@@ -194,6 +196,8 @@ class LegrandParameter(models.Model):
           'sajat'           : szhom.sajat_homogen,
           'homogen_id'      : szhom.id,
         }
+        if hom['homogen'] in ['7121', '7123', '7127', '7128']:
+          hom_row['gyartasi_hely_id'] = szentes_hely_id
         GyHomogen.create(hom_row)
 
       # gylap_szefo_muvelet feltöltés ###############################################

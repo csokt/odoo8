@@ -1,3 +1,20 @@
+
+update legrand_gylap_homogen set gyartasi_hely_id = 5 where homogen_id in (3,4,8,26)
+;
+
+WITH
+gylaphomogen as (
+  select gyhom.id, gylap.gyartasi_hely_id, sajat
+    from legrand_gylap_homogen as gyhom
+    join legrand_gyartasi_lap  as gylap on gylap.id = gyhom.gyartasi_lap_id
+    where gyhom.gyartasi_hely_id is null and gyhom.sajat
+  )
+update legrand_gylap_homogen
+  set gyartasi_hely_id  = gylaphomogen.gyartasi_hely_id
+  from gylaphomogen where gylaphomogen.id = legrand_gylap_homogen.id
+;
+
+
 -- statisztika adatok beírása
 
 WITH
@@ -26,6 +43,7 @@ update legrand_gyartasi_lap as gylap
   from stat where stat.id = gylap.id
 ;
 
+-- statisztika adatok lekérdezése
 
 select id, elso_teljesites, utolso_teljesites, hatarido_elott_db, hatarido_utan_db, hatarido_elott_ora, hatarido_utan_ora, elsoig_eltelt_nap, utolsoig_eltelt_nap
 from legrand_gyartasi_lap where elso_teljesites is not null limit 100
@@ -62,6 +80,7 @@ select termekkod, date(create_date) as felveve, elsoig_eltelt_nap, utolsoig_elte
   order by termekkod, date(create_date)
 ;
 
+-- statisztika adatok lekérdezése vége
 
 
 select * from update_rel

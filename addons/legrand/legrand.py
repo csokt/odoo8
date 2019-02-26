@@ -730,6 +730,16 @@ class LegrandGyartasiLap(models.Model):
   gylap_dbjegyzek_ids = fields.One2many('legrand.gylap_dbjegyzek',      'gyartasi_lap_id', u'Legrand darabjegyzék', readonly=True, auto_join=True)
   gylap_muvelet_ids   = fields.One2many('legrand.gylap_legrand_muvelet','gyartasi_lap_id', u'Műveleti utasítás',    readonly=True, auto_join=True)
 
+  @api.multi
+  def write(self, vals):
+    if 'gyartasi_hely_id' in vals and vals['gyartasi_hely_id']:
+      homogen_ids = self.gylap_homogen_ids.filtered(lambda r: not r.gyartasi_hely_id.id and r.sajat)
+      homogen_ids.write({'gyartasi_hely_id': vals['gyartasi_hely_id']})
+    if 'bom_id' in vals and vals['bom_id']:
+      sor_ids = self.bom_id.mozgassor_ids.filtered(lambda r: r.gyartasi_lap_id.id == self.id)
+      sor_ids.write({'bom_id': vals['bom_id']})
+    return super(LegrandGyartasiLap, self).write(vals)
+
   @api.one
   @api.depends('state', 'leallas_ok')
   def _compute_aktivitas(self):
@@ -969,8 +979,10 @@ class LegrandGylapHomogen(models.Model):
   beall_ido           = fields.Float(u'Beállítási idő',   digits=(16, 3), readonly=True)
   korrekcios_ido      = fields.Float(u'Korrekciós idő',   digits=(16, 3))
   sajat               = fields.Boolean(u'Saját homogén?', default=True,   readonly=True)
+  gyartasi_hely_id    = fields.Many2one('legrand.hely', u'Gyártási hely', domain=[('szefo_e', '=', True)], states={'kesz': [('readonly', True)]})
   rendelt_ora         = fields.Float(u'Rendelt óra',      digits=(16, 5), compute='_compute_rendelt_ora',     store=True)
   teljesitett_ora     = fields.Float(u'Teljesített óra',  digits=(16, 5), compute='_compute_teljesitett_ora', store=True)
+  hatralek_ora        = fields.Float(u'Hátralék óra',     digits=(16, 5), compute='_compute_hatralek_ora',    store=True)
   szamlazott_ora      = fields.Float(u'Számlázott óra',   digits=(16, 5), compute='_compute_szamlazott_ora',  store=True)
   szamlazhato_ora     = fields.Float(u'Számlázható óra',  digits=(16, 5), compute='_compute_szamlazhato_ora', store=True)
   state               = fields.Selection([('uj',u'Új'),('mterv',u'Műveletterv'),('gyartas',u'Gyártás'),('gykesz',u'Gyártás kész'),('kesz',u'Rendelés teljesítve')],
@@ -980,7 +992,7 @@ class LegrandGylapHomogen(models.Model):
   termekkod           = fields.Char(u'Tételkód', related='gyartasi_lap_id.termekkod', readonly=True)
   szamlazhato_db      = fields.Integer(u'Számlázható', related='gyartasi_lap_id.szamlazhato_db', readonly=True)
   hatarido            = fields.Date(u'Határidő', related='gyartasi_lap_id.hatarido', readonly=True)
-  gyartasi_hely_id    = fields.Many2one('legrand.hely',  u'Fő gyártási hely', related='gyartasi_lap_id.gyartasi_hely_id', auto_join=True, readonly=True)
+#  gyartasi_hely_id    = fields.Many2one('legrand.hely',  u'Fő gyártási hely', related='gyartasi_lap_id.gyartasi_hely_id', auto_join=True, readonly=True)
   active              = fields.Boolean(u'Aktív?', related='gyartasi_lap_id.active', readonly=True)
 
   @api.one
@@ -1003,6 +1015,11 @@ class LegrandGylapHomogen(models.Model):
     korrekcios_ido  = self.korrekcios_ido * self.gyartasi_lap_id.teljesitett_db / self.gyartasi_lap_id.rendelt_db
     beall_ido       = self.beall_ido if self.gyartasi_lap_id.teljesitett_db > 0 else 0.0
     self.teljesitett_ora = ossz_ido + beall_ido + korrekcios_ido
+
+  @api.one
+  @api.depends('rendelt_ora', 'teljesitett_ora')
+  def _compute_hatralek_ora(self):
+    self.hatralek_ora = self.rendelt_ora - self.teljesitett_ora
 
   @api.one
   @api.depends('ossz_ido', 'beall_ido', 'korrekcios_ido', 'gyartasi_lap_id.rendelt_db', 'gyartasi_lap_id.szamlazott_db')
