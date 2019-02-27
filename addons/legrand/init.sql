@@ -1,46 +1,59 @@
 
-update legrand_gylap_homogen set gyartasi_hely_id = 5 where homogen_id in (3,4,8,26)
-;
-
-WITH
-gylaphomogen as (
-  select gyhom.id, gylap.gyartasi_hely_id, sajat
-    from legrand_gylap_homogen as gyhom
-    join legrand_gyartasi_lap  as gylap on gylap.id = gyhom.gyartasi_lap_id
-    where gyhom.gyartasi_hely_id is null and gyhom.sajat
-  )
-update legrand_gylap_homogen
-  set gyartasi_hely_id  = gylaphomogen.gyartasi_hely_id
-  from gylaphomogen where gylaphomogen.id = legrand_gylap_homogen.id
-;
-
-
 -- statisztika adatok beírása
 
 WITH
-mozgassor as (select sor.gyartasi_lap_id, sor.mennyiseg, date(fej.create_date) as create_date, gylap.hatarido,
-                case when date(fej.create_date) <= gylap.hatarido then sor.mennyiseg else 0 end as idoben_db,
-                case when date(fej.create_date) >  gylap.hatarido then sor.mennyiseg else 0 end as idontul_db
-  from legrand_mozgassor as sor
-  join legrand_mozgasfej as fej on fej.id = sor.mozgasfej_id and fej.mozgasnem = 'ki'
-  join legrand_gyartasi_lap as gylap on gylap.id = sor.gyartasi_lap_id),
-min_max as (select gyartasi_lap_id, min(create_date) as min_date, max(create_date) as max_date, sum(idoben_db) as idoben_db , sum(idontul_db) as idontul_db
-  from mozgassor group by gyartasi_lap_id)
-update legrand_gyartasi_lap as gylap set elso_teljesites = min_date, utolso_teljesites = max_date, hatarido_elott_db = idoben_db, hatarido_utan_db = idontul_db
-  from min_max where gylap.id = min_max.gyartasi_lap_id
+mozgassor AS (
+  SELECT sor.gyartasi_lap_id,
+         sor.mennyiseg,
+         date(fej.create_date) AS create_date,
+         gylap.hatarido,
+         CASE WHEN date(fej.create_date) <= gylap.hatarido THEN sor.mennyiseg ELSE 0 END AS idoben_db,
+         CASE WHEN date(fej.create_date) >  gylap.hatarido THEN sor.mennyiseg ELSE 0 END AS idontul_db
+  FROM legrand_mozgassor AS sor
+  JOIN legrand_mozgasfej AS fej ON fej.id = sor.mozgasfej_id AND fej.mozgasnem = 'ki'
+  JOIN legrand_gyartasi_lap AS gylap ON gylap.id = sor.gyartasi_lap_id
+  ),
+min_max AS (
+  SELECT gyartasi_lap_id,
+         min(create_date) AS min_date,
+         max(create_date) AS max_date,
+         sum(idoben_db) AS idoben_db ,
+         sum(idontul_db) AS idontul_db
+  FROM mozgassor
+  GROUP BY gyartasi_lap_id
+  )
+UPDATE legrand_gyartasi_lap AS gylap
+  SET elso_teljesites   = min_date,
+      utolso_teljesites = max_date,
+      hatarido_elott_db = idoben_db,
+      hatarido_utan_db  = idontul_db
+  FROM min_max
+  WHERE gylap.id = min_max.gyartasi_lap_id
 ;
 
 WITH
-gylap_ids as (select distinct gyartasi_lap_id from legrand_mozgassor as sor join legrand_mozgasfej as fej on fej.id = sor.mozgasfej_id and fej.mozgasnem = 'ki'),
-stat as ( select id, round(rendelt_ora/modositott_db*hatarido_elott_db, 2) as hatarido_elott_ora, round(rendelt_ora/modositott_db*hatarido_utan_db, 2) as hatarido_utan_ora,
-            elso_teljesites - date(create_date) as elsoig_eltelt_nap, utolso_teljesites - date(create_date) as utolsoig_eltelt_nap
-          from legrand_gyartasi_lap
-          join gylap_ids on gyartasi_lap_id = id
-          where active and modositott_db != 0 and (hatarido_elott_db > 0 or hatarido_utan_db > 0)
-        )
-update legrand_gyartasi_lap as gylap
-  set hatarido_elott_ora  = stat.hatarido_elott_ora, hatarido_utan_ora   = stat.hatarido_utan_ora, elsoig_eltelt_nap   = stat.elsoig_eltelt_nap, utolsoig_eltelt_nap = stat.utolsoig_eltelt_nap
-  from stat where stat.id = gylap.id
+gylap_ids AS (
+  SELECT distinct gyartasi_lap_id
+  FROM legrand_mozgassor AS sor
+  JOIN legrand_mozgasfej AS fej ON fej.id = sor.mozgasfej_id AND fej.mozgasnem = 'ki'
+  ),
+stat AS (
+  SELECT id,
+         round(rendelt_ora/modositott_db*hatarido_elott_db, 2) AS hatarido_elott_ora,
+         round(rendelt_ora/modositott_db*hatarido_utan_db, 2) AS hatarido_utan_ora,
+         elso_teljesites - date(create_date) AS elsoig_eltelt_nap,
+         utolso_teljesites - date(create_date) AS utolsoig_eltelt_nap
+  FROM legrand_gyartasi_lap
+  JOIN gylap_ids ON gyartasi_lap_id = id
+  WHERE active AND modositott_db != 0 AND (hatarido_elott_db > 0 or hatarido_utan_db > 0)
+  )
+UPDATE legrand_gyartasi_lap AS gylap
+  SET hatarido_elott_ora  = stat.hatarido_elott_ora,
+      hatarido_utan_ora   = stat.hatarido_utan_ora,
+      elsoig_eltelt_nap   = stat.elsoig_eltelt_nap,
+      utolsoig_eltelt_nap = stat.utolsoig_eltelt_nap
+  FROM stat
+  WHERE stat.id = gylap.id
 ;
 
 -- statisztika adatok lekérdezése

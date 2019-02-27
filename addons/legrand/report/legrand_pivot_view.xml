@@ -56,6 +56,10 @@
      <field name="arch" type="xml">
        <graph string="Homogén értékelés"  type="pivot" stacked="True">
          <field name="gyartasi_hely_id"   type="row"/>
+         <field name="rendelt_ora"        type="measure"/>
+         <field name="teljesitett_ora"    type="measure"/>
+         <field name="hatralek_ora"       type="measure"/>
+         <field name="szamlazott_ora"     type="measure"/>
          <field name="szamlazhato_ora"    type="measure"/>
        </graph>
      </field>
@@ -85,12 +89,12 @@
     <act_window id="anyaghiany_log"             name="Anyaghiány log"               res_model="legrand.anyaghiany_log"                                              view_mode="tree"/>
 
     <act_window id="gylap_ertekel"              name="Gyártási lap értékelés"       res_model="legrand.gyartasi_lap"    view_id="view_graph_gylap_ertekel"          view_mode="graph"
-                context="{'search_default_szamlazhato':1}"/>
+                domain="[('state','!=','uj')]"                                      context="{'search_default_szamlazhato':1}"/>
 
     <act_window id="muveletvegzes_ertekel"      name="Műveletvégzés értékelés"      res_model="legrand.muveletvegzes"   view_id="view_graph_muveletvegzes_ertekel"  view_mode="graph" />
 
     <act_window id="homogen_ertekel"            name="Homogén értékelés"            res_model="legrand.gylap_homogen"   view_id="view_graph_homogen_ertekel"        view_mode="graph"
-                domain="[('sajat','=',True)]"   context="{'search_default_szamlazhato':1}"/>
+                domain="[('sajat','=',True), ('state','!=','uj')]"                  context="{'search_default_filter_mterv':1, 'search_default_filter_gyartas':1, 'search_default_filter_gykesz':1}"/>
 
     <act_window id="jelenlet_ertekel"           name="Jelenlét értékelés"           res_model="legrand.jelenlet"        view_id="view_graph_jelenlet_ertekel"       view_mode="graph" />
 

@@ -996,7 +996,12 @@
           <field name="rendelesszam"/>
           <field name="termekkod"/>
           <field name="homogen_id"/>
-          <filter name="szamlazhato" string="Számlázható" domain="[('szamlazhato_db','>',0)]"/>
+          <filter name="filter_mterv"       string="Műveletterv"            domain="[('state','=','mterv')]"/>
+          <filter name="filter_gyartas"     string="Gyártás"                domain="[('state','=','gyartas')]"/>
+          <filter name="filter_gykesz"      string="Gyártás kész"           domain="[('state','=','gykesz')]"/>
+          <filter name="filter_kesz"        string="Rendelés teljesítve"    domain="[('state','=','kesz')]"/>
+          <separator/>
+          <filter name="szamlazhato"        string="Számlázható"            domain="[('szamlazhato_db','>',0)]"/>
         </search>
       </field>
     </record>
