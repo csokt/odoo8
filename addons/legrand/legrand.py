@@ -190,12 +190,14 @@ class LegrandMozgasfej(models.Model):
       vals['forrashely_id'], vals['celallomas_id'] = forr_id, cel_id
     new = super(LegrandMozgasfej, self).create(vals)
     self.env.cr.execute('REFRESH MATERIALIZED VIEW legrand_keszlet')
+    self.env.cr.execute('REFRESH MATERIALIZED VIEW legrand_vall_keszlet')
     return new
 
   @api.multi
   def write(self, vals):
     super(LegrandMozgasfej, self).write(vals)
     self.env.cr.execute('REFRESH MATERIALIZED VIEW legrand_keszlet')
+    self.env.cr.execute('REFRESH MATERIALIZED VIEW legrand_vall_keszlet')
     return True
 
   @api.one
@@ -540,9 +542,11 @@ class LegrandVallKeszlet(models.Model):
   cikknev             = fields.Char(u'Cikknév', related='cikk_id.cikknev', readonly=True)
 
   def init(self, cr):
+    return
     tools.drop_view_if_exists(cr, self._table)
     cr.execute(
-      """CREATE or REPLACE VIEW %s as (
+#      """CREATE or REPLACE VIEW %s as (
+      """CREATE MATERIALIZED VIEW %s as (
         SELECT
           cikk_id AS id,
           cikk_id,
@@ -992,7 +996,6 @@ class LegrandGylapHomogen(models.Model):
   termekkod           = fields.Char(u'Tételkód', related='gyartasi_lap_id.termekkod', readonly=True)
   szamlazhato_db      = fields.Integer(u'Számlázható', related='gyartasi_lap_id.szamlazhato_db', readonly=True)
   hatarido            = fields.Date(u'Határidő', related='gyartasi_lap_id.hatarido', readonly=True)
-#  gyartasi_hely_id    = fields.Many2one('legrand.hely',  u'Fő gyártási hely', related='gyartasi_lap_id.gyartasi_hely_id', auto_join=True, readonly=True)
   active              = fields.Boolean(u'Aktív?', related='gyartasi_lap_id.active', readonly=True)
 
   @api.one
