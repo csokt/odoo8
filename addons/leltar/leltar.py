@@ -113,12 +113,15 @@ class LeltarParameter(models.Model):
       raise exceptions.Warning(u'Körzet nem lehet zárolva!')
     if self.env['leltar.leltariv'].search([('state', '=', 'terv')]):
       raise exceptions.Warning(u'Leltárív nem lehet Tervezet állapotban!')
+    if self.env['leltar.leltariv_osszes'].search([('selejtezni','=',True), '|', ('megjegyzes','=',''), ('megjegyzes','=',False)]):
+      raise exceptions.Warning(u'Selejtezéshez meg kell jelölni az okot!')
 
-    for selejt in self.env['leltar.leltariv_selejt'].search([]):
+    for selejt in self.env['leltar.leltariv_osszes'].search([('selejtezni','=',True)]):
       selejt.eszkoz_id.write({'selejt_ok': selejt.megjegyzes, 'selejtezni': True})
 
     for mozgas in self.env['leltar.leltariv_mozgas'].search([]):
-      self.env['leltar.eszkozmozgas'].create({'eszkoz_id': mozgas.eszkoz_id.id, 'hova_leltarkorzet_id': mozgas.leltariv_id.leltarkorzet_id.id, 'megerkezett': True, 'megjegyzes': u'leltár' })
+      if mozgas.akt_leltarkorzet_id.id != mozgas.leltariv_id.leltarkorzet_id.id:
+        self.env['leltar.eszkozmozgas'].create({'eszkoz_id': mozgas.eszkoz_id.id, 'hova_leltarkorzet_id': mozgas.leltariv_id.leltarkorzet_id.id, 'megerkezett': True, 'megjegyzes': u'leltár' })
 
     self.env['leltar.leltariv'].search([('state', '!=', 'konyvelt')]).write({'state': 'konyvelt'})
 
@@ -570,6 +573,8 @@ class LeltarLeltarivIsmeretlen(models.Model):
   kod                 = fields.Char(u'Kód', required=True)
   megnevezes          = fields.Char(u'Megnevezes', required=True)
   megjegyzes          = fields.Char(u'Megjegyzés')
+  # virtual fields
+  state               = fields.Selection([('terv',u'Tervezet'),('kesz',u'Kész'),('konyvelt',u'Könyvelt')], u'Állapot', related='leltariv_id.state' )
 
   @api.one
   @api.depends('kod', 'megnevezes', 'megjegyzes')
@@ -685,6 +690,8 @@ class LeltarLeltarivMozgas(models.Model):
   _order              = 'eszkoz_id'
   eszkoz_id           = fields.Many2one('leltar.eszkoz', u'Eszköz',     required=True, auto_join=True)
   leltariv_id         = fields.Many2one('leltar.leltariv', u'Leltárív', required=True, auto_join=True)
+  # virtual fields
+  akt_leltarkorzet_id = fields.Many2one('leltar.korzet',  u'Nyilvántartás szerinti leltárkörzet',  related='eszkoz_id.akt_leltarkorzet_id' )
 
   def init(self, cr):
     tools.drop_view_if_exists(cr, self._table)

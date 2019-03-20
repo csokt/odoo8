@@ -731,6 +731,7 @@
       <field  name="arch" type="xml">
         <tree>
           <field name="eszkoz_id"/>
+          <field name="akt_leltarkorzet_id"/>
           <field name="leltariv_id"/>
         </tree>
       </field>
@@ -772,7 +773,8 @@
     <act_window id="leltar_leltariv"              name="Leltárív"                     res_model="leltar.leltariv"             view_mode="tree,form"
                                                                                       context="{'search_default_filter_terv': 1}"/>
     <act_window id="leltar_leltariv_osszes"       name="Összes eszköz"                res_model="leltar.leltariv_osszes"      view_mode="tree,form" />
-    <act_window id="leltar_leltariv_ismeretlen"   name="Ismeretlen eszközök"          res_model="leltar.leltariv_ismeretlen"  view_mode="tree,form" view_id="view_tree_leltar_leltariv_ismeretlen"/>
+    <act_window id="leltar_leltariv_ismeretlen"   name="Ismeretlen eszközök"          res_model="leltar.leltariv_ismeretlen"  view_mode="tree,form" view_id="view_tree_leltar_leltariv_ismeretlen"
+                domain="[('state','!=','konyvelt')]" />
     <act_window id="leltar_leltariv_dupla"        name="Duplikátumok"                 res_model="leltar.leltariv_dupla"       view_mode="tree,form" />
     <act_window id="leltar_leltariv_hiany"        name="Nincs leltározva"             res_model="leltar.leltariv_hiany"       view_mode="tree,form" />
     <act_window id="leltar_leltariv_mozgas"       name="Új eszköz mozgások"           res_model="leltar.leltariv_mozgas"      view_mode="tree,form" />

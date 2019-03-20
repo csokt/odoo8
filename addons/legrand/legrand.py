@@ -934,6 +934,8 @@ class LegrandGylapDbjegyzek(models.Model):
   rendelt_db          = fields.Integer(u'Rendelt termék db', related='gyartasi_lap_id.rendelt_db', readonly=True)
   hatarido            = fields.Date(u'Határidő', related='gyartasi_lap_id.hatarido', readonly=True)
   gyartasi_hely_id    = fields.Many2one('legrand.hely',  u'Fő gyártási hely', related='gyartasi_lap_id.gyartasi_hely_id', auto_join=True, readonly=True)
+  rendelt_ora         = fields.Float(u'Rendelt óra', digits=(16, 2), compute='_compute_ora')
+  hatralek_ora        = fields.Float(u'Hátralék óra', digits=(16, 2), compute='_compute_ora')
   active              = fields.Boolean(u'Aktív?', related='gyartasi_lap_id.active', readonly=True)
 
   @api.one
@@ -950,6 +952,12 @@ class LegrandGylapDbjegyzek(models.Model):
   @api.depends('cikk_id.bekerulesi_ar', 'bekerulesi_ar')
   def _compute_arelteres(self):
     self.arelteres = self.bekerulesi_ar - self.cikk_id.bekerulesi_ar
+
+  @api.one
+  @api.depends('gyartasi_lap_id')
+  def _compute_ora(self):
+    self.rendelt_ora = sum(self.gyartasi_lap_id.gylap_homogen_ids.filtered(lambda r: r.homogen_id.homogen == '7127').mapped('rendelt_ora'))
+    self.hatralek_ora = 0 if self.kesz_e else self.rendelt_ora
 
   @api.one
   def kesz(self):
@@ -1338,9 +1346,12 @@ class LegrandGylapLezerTampon(models.Model):
   muvelet_db          = fields.Integer(u'Művelet db', related='lezer_tampon_id.muvelet_db', readonly=True)
   egyeb_info          = fields.Char(u'Egyéb info', related='lezer_tampon_id.megjegyzes', readonly=True)
 
-  osszes_db           = fields.Integer(u'Összes db', compute='_compute_db')
-  kesz_db             = fields.Integer(u'Kész db',   compute='_compute_db')
-  hiany_db            = fields.Integer(u'Hiány db',  compute='_compute_db')
+  osszes_db           = fields.Integer(u'Összes db', compute='_compute_db', store=True)
+  kesz_db             = fields.Integer(u'Kész db',   compute='_compute_db', store=True)
+  hiany_db            = fields.Integer(u'Hiány db',  compute='_compute_db', store=True)
+
+  rendelt_ora         = fields.Float(u'Rendelt óra', digits=(16, 2), compute='_compute_ora')
+  hatralek_ora        = fields.Float(u'Hátralék óra', digits=(16, 2), compute='_compute_ora')
 
   legrand_manager_e   = fields.Boolean(u'Legrand Manager?',   compute='_check_user_group')
   legrand_director_e  = fields.Boolean(u'Legrand director?',  compute='_check_user_group')
@@ -1359,11 +1370,17 @@ class LegrandGylapLezerTampon(models.Model):
     return super(LegrandGylapLezerTampon, self).write(vals)
 
   @api.one
-  @api.depends('modositott_db', 'gylap_lezer_sor_ids.mennyiseg')
+  @api.depends('modositott_db', 'muvelet_db', 'gylap_lezer_sor_ids.mennyiseg')
   def _compute_db(self):
     self.osszes_db = self.modositott_db * self.muvelet_db
     self.kesz_db   = sum(self.gylap_lezer_sor_ids.mapped('mennyiseg'))
     self.hiany_db  = self.osszes_db - self.kesz_db
+
+  @api.one
+  @api.depends('gyartasi_lap_id')
+  def _compute_ora(self):
+    self.rendelt_ora = sum(self.gyartasi_lap_id.gylap_homogen_ids.filtered(lambda r: r.homogen_id.homogen == '7121').mapped('rendelt_ora'))
+    self.hatralek_ora = self.rendelt_ora * self.hiany_db / self.osszes_db if self.osszes_db else 0
 
   @api.one
   def _check_user_group(self):

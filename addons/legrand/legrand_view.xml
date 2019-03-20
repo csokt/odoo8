@@ -1080,6 +1080,8 @@
           <field name="megjegyzes"/>
           <field name="write_uid"               string="Módosította"      attrs="{'invisible': [('kesz_e','=',False)]}"   readonly="1"/>
           <field name="write_date"              string="Módosítás ideje"  attrs="{'invisible': [('kesz_e','=',False)]}"   readonly="1"/>
+          <field name="rendelt_ora"/>
+          <field name="hatralek_ora"/>
           <field name="state"/>
         </tree>
       </field>
@@ -1488,6 +1490,8 @@
           <field name="mennyiseg"/>
           <field name="megjegyzes"/>
           <field name="muvelet_db"/>
+          <field name="rendelt_ora"/>
+          <field name="hatralek_ora"/>
           <field name="state"/>
           <field name="muvelet"/>
           <field name="modositott_db"               invisible="1"/>
@@ -1505,6 +1509,7 @@
         <search>
           <field name="gyartasi_lap_id"/>
           <field name="gyartasi_hely_id"/>
+          <field name="lezer_tampon_id"/>
           <filter name="filter_szentes"     string="Szentes"                domain="[('gyartasi_hely_id.azonosito','=','szentes')]"/>
           <filter name="filter_hmvhely"     string="Hódmezővásárhely"       domain="[('gyartasi_hely_id.azonosito','=','hmvhely')]"/>
           <filter name="filter_berkert"     string="Bérkert"                domain="[('gyartasi_hely_id.azonosito','=','berkert')]"/>
@@ -1521,6 +1526,9 @@
           <separator/>
           <filter name="filter_lezer"       string="Lézer"                  domain="[('muvelet','like','lézer')]"/>
           <filter name="filter_tampon"      string="Tampon"                 domain="[('muvelet','like','tampon')]"/>
+          <separator/>
+          <filter name="filter_lezer_kesz"  string="Lézer kész"             domain="[('hiany_db','=',0)]"/>
+          <filter name="filter_nem_kesz"    string="Nem kész"               domain="[('hiany_db','!=',0)]"/>
         </search>
       </field>
     </record>
