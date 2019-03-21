@@ -1069,19 +1069,18 @@
       <field  name="arch" type="xml">
         <tree>
           <field name="gyartasi_lap_id"/>
-          <field name="rendelt_db"              string="Rendelt db"/>
+          <field name="rendelt_db"                  string="Rendelt db"/>
           <field name="cikk_id"/>
           <field name="cikknev"/>
-          <field name="ossz_beepules"           string="Beépülés"         digits="(8, 0)"/>
+          <field name="ossz_beepules"               string="Beépülés"         digits="(8, 0)"/>
           <field name="hatarido"/>
           <field name="gyartasi_hely_id"/>
           <field name="kesz_e"/>
-          <button name="kesz"     type="object" string="Kész"             attrs="{'invisible': [('kesz_e','=',True)]}"    confirm="Címkenyomtatás elkészült."/>
+          <button name="kesz"       type="object"   string="Kész"             attrs="{'invisible': [('kesz_e','=',True)]}"    confirm="Címkenyomtatás elkészült."/>
           <field name="megjegyzes"/>
-          <field name="write_uid"               string="Módosította"      attrs="{'invisible': [('kesz_e','=',False)]}"   readonly="1"/>
-          <field name="write_date"              string="Módosítás ideje"  attrs="{'invisible': [('kesz_e','=',False)]}"   readonly="1"/>
-          <field name="rendelt_ora"/>
-          <field name="hatralek_ora"/>
+          <field name="write_uid"                   string="Módosította"      attrs="{'invisible': [('kesz_e','=',False)]}"   readonly="1"/>
+          <field name="write_date"                  string="Módosítás ideje"  attrs="{'invisible': [('kesz_e','=',False)]}"   readonly="1"/>
+          <field name="hatralek_ora"                sum="hátralék"/>
           <field name="state"/>
         </tree>
       </field>
@@ -1490,8 +1489,7 @@
           <field name="mennyiseg"/>
           <field name="megjegyzes"/>
           <field name="muvelet_db"/>
-          <field name="rendelt_ora"/>
-          <field name="hatralek_ora"/>
+          <field name="hatralek_ora"                sum="hátralék"/>
           <field name="state"/>
           <field name="muvelet"/>
           <field name="modositott_db"               invisible="1"/>
