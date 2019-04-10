@@ -1,0 +1,71 @@
+<?xml version="1.0"?>
+<openerp>
+  <data>
+    <!--####################################################################################################################  Mecmor  -->
+    <record id="view_form_mecmor"    model="ir.ui.view">
+      <field name="name">Kötöde Form</field>
+      <field name="model">kotode.mecmor</field>
+      <field name="arch" type="xml">
+        <form>
+          <group col="4">
+            <field name="datum"/>
+            <field name="gep"/>
+            <field name="kod"/>
+            <field name="adat1"/>
+            <field name="adat2"/>
+            <field name="adat3"/>
+            <field name="muszak"/>
+            <field name="kodintervallum"/>
+            <field name="azonosito"/>
+          </group>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_tree_mecmor"    model="ir.ui.view">
+      <field  name="name">Kötöde Tree</field>
+      <field  name="model">kotode.mecmor</field>
+      <field  name="arch" type="xml">
+        <tree>
+          <field name="datum"/>
+          <field name="gep"/>
+          <field name="kod"/>
+          <field name="adat1"/>
+          <field name="adat2"/>
+          <field name="adat3"/>
+          <field name="muszak"/>
+          <field name="kodintervallum"/>
+          <field name="azonosito"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_graph_mecmor_ertekel" model="ir.ui.view">
+     <field name="name">kotode.mecmor_ertekel.graph</field>
+     <field name="model">kotode.mecmor</field>
+     <field name="arch" type="xml">
+       <graph string="Jelenlét értékelés" type="pivot">
+         <field name="datum"              type="row"/>
+         <field name="muszak"             type="col"/>
+       </graph>
+     </field>
+    </record>
+
+
+    <!--####################################################################################################################  Actions  -->
+    <act_window id="mecmor"               name="Mecmor"               res_model="kotode.mecmor"                                                       view_mode="tree,form"/>
+    <act_window id="mecmor_ertekel"       name="Mecmor értékelés"     res_model="kotode.mecmor"        view_id="view_graph_mecmor_ertekel"            view_mode="graph" />
+
+    <!--####################################################################################################################  Menu  items  -->
+    <menuitem id="menu_root"              name="Kötöde"                       sequence="64"                       groups="group_kotode_viewer" />
+
+    <menuitem id="menu_korkoto"           name="Körkötő"                      parent="menu_root"                  sequence="10" />
+      <menuitem id="menu_mecmor"          name="Mecmor"                       parent="menu_korkoto"               sequence="10" action="mecmor" />
+
+    <menuitem id="menu_kimutatas"         name="Kimutatások"                  parent="menu_root"                  sequence="90"                         />
+      <menuitem id="menu_mecmor_ertekel"  name="Mecmor értékelés"             parent="menu_kimutatas"             sequence="10" action="mecmor_ertekel" />
+
+<!--
+-->
+  </data>
+</openerp>

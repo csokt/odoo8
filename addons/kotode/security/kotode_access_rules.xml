@@ -1,0 +1,39 @@
+<?xml version="1.0" ?>
+<openerp>
+    <data noupdate="1">
+        <record id="module_category_kotode" model="ir.module.category">
+            <field name="name">Kötöde</field>
+            <field name="sequence">16</field>
+        </record>
+
+        <record id="group_kotode_viewer" model="res.groups">
+            <field name="name">Viewer</field>
+            <field name="category_id" ref="module_category_kotode"/>
+        </record>
+
+        <record id="group_kotode_user" model="res.groups">
+            <field name="name">User</field>
+            <field name="category_id" ref="module_category_kotode"/>
+            <field name="implied_ids" eval="[(4, ref('group_kotode_viewer'))]"/>
+        </record>
+
+        <record id="group_kotode_manager" model="res.groups">
+            <field name="name">Manager</field>
+            <field name="category_id" ref="module_category_kotode"/>
+            <field name="implied_ids" eval="[(4, ref('group_kotode_user'))]"/>
+        </record>
+
+        <record id="group_kotode_director" model="res.groups">
+            <field name="name">Director</field>
+            <field name="category_id" ref="module_category_kotode"/>
+            <field name="implied_ids" eval="[(4, ref('group_kotode_manager'))]"/>
+        </record>
+
+        <record id="group_kotode_admin" model="res.groups">
+            <field name="name">Admin</field>
+            <field name="category_id" ref="module_category_kotode"/>
+            <field name="implied_ids" eval="[(4, ref('group_kotode_director'))]"/>
+            <field name="users" eval="[(4, ref('base.user_root'))]"/>
+        </record>
+    </data>
+</openerp>

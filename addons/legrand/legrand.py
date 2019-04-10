@@ -1368,7 +1368,7 @@ class LegrandGylapLezerTampon(models.Model):
       }
       self.env['legrand.gylap_lezer_tampon_sor'].create(sor_row)
     vals['mennyiseg']  = 0
-    vals['megjegyzes'] = False
+    # vals['megjegyzes'] = False
     return super(LegrandGylapLezerTampon, self).write(vals)
 
   @api.one
@@ -1607,6 +1607,7 @@ class LegrandImpex(models.Model):
 #  # computed fields
   ora                 = fields.Float(u'Óra', digits=(16, 2), compute='_compute_ora', store=True)
 #  # virtual fields
+  carnet_e            = fields.Boolean(u'Carnet?', related='gyartasi_lap_id.carnet_e', readonly=True)
   gylap_state         = fields.Selection([('uj',u'Új'),('mterv',u'Műveletterv'),('gyartas',u'Gyártás'),('gykesz',u'Gyártás kész'),('kesz',u'Rendelés teljesítve')],
                         u'Állapot', related='gyartasi_lap_id.state', readonly=True)
   cikknev             = fields.Char(u'Cikknév', compute='_compute_cikknev')

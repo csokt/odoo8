@@ -892,6 +892,7 @@
           <filter name="filter_csokkentve"  string="Csökkentve/Visszavonva" domain="[('csokkentve_e','=',True)]"/>
           <filter name="filter_leallas"     string="Gyártás áll"            domain="[('aktivitas','=','áll')]"/>
           <group expand="0" string="Csoportosítás">
+            <filter name="group_gyhely"     string="Gyártási hely"          context="{'group_by': 'gyartasi_hely_id'}"/>
             <filter name="group_termek"     string="Termék"                 context="{'group_by': 'termekkod'}"/>
           </group>
         </search>
@@ -1711,6 +1712,7 @@
         <tree editable="bottom">
           <field name="sorszam"/>
           <field name="gyartasi_lap_id"/>
+          <field name="carnet_e"/>
           <field name="gylap_state"/>
           <field name="gyartasi_hely_id"/>
           <field name="termekcsoport"/>
