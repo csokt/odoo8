@@ -3,7 +3,7 @@
   <data>
     <!--####################################################################################################################  Mecmor  -->
     <record id="view_form_mecmor"    model="ir.ui.view">
-      <field name="name">Kötöde Form</field>
+      <field name="name">Mecmor Form</field>
       <field name="model">kotode.mecmor</field>
       <field name="arch" type="xml">
         <form>
@@ -23,7 +23,7 @@
     </record>
 
     <record id="view_tree_mecmor"    model="ir.ui.view">
-      <field  name="name">Kötöde Tree</field>
+      <field  name="name">Mecmor Tree</field>
       <field  name="model">kotode.mecmor</field>
       <field  name="arch" type="xml">
         <tree>
@@ -35,8 +35,27 @@
           <field name="adat3"/>
           <field name="muszak"/>
           <field name="kodintervallum"/>
-          <field name="azonosito"/>
         </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_view_tree_mecmor"    model="ir.ui.view">
+      <field  name="name">Mecmor Filter</field>
+      <field  name="model">kotode.mecmor</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field  name="datum"/>
+          <filter name="filter_mecmor1"     string="mecmor1"                domain="[('gep','=','mecmor1')]"/>
+          <filter name="filter_mecmor2"     string="mecmor1"                domain="[('gep','=','mecmor2')]"/>
+          <filter name="filter_mecmor3"     string="mecmor1"                domain="[('gep','=','mecmor3')]"/>
+          <filter name="filter_mecmor4"     string="mecmor1"                domain="[('gep','=','mecmor4')]"/>
+          <filter name="filter_mecmor5"     string="mecmor1"                domain="[('gep','=','mecmor5')]"/>
+          <filter name="filter_mecmor6"     string="mecmor1"                domain="[('gep','=','mecmor6')]"/>
+          <separator/>
+          <filter name="filter_muszak1"     string="műszak1"                domain="[('muszak','=','műszak1')]"/>
+          <filter name="filter_muszak2"     string="műszak2"                domain="[('muszak','=','műszak2')]"/>
+          <filter name="filter_muszak3"     string="műszak3"                domain="[('muszak','=','műszak3')]"/>
+        </search>
       </field>
     </record>
 

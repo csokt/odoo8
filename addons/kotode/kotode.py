@@ -5,6 +5,7 @@ from openerp import tools, models, fields, api, exceptions
 ############################################################################################################################  Mecmor  ###
 class Mecmor(models.Model):
   _name               = 'kotode.mecmor'
+  _order              = 'datum'
   datum               = fields.Datetime(u'Dátum')
   gep                 = fields.Char(u'Gép')
   kod                 = fields.Char(u'Kód')
