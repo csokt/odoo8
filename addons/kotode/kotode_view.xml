@@ -8,6 +8,7 @@
       <field name="arch" type="xml">
         <form>
           <group col="4">
+            <field name="cimke"/>
             <field name="datum"/>
             <field name="gep"/>
             <field name="kod"/>
@@ -15,7 +16,7 @@
             <field name="adat2"/>
             <field name="adat3"/>
             <field name="muszak"/>
-            <field name="kodintervallum"/>
+            <field name="eltelt_ido"/>
             <field name="azonosito"/>
           </group>
         </form>
@@ -27,6 +28,7 @@
       <field  name="model">kotode.mecmor</field>
       <field  name="arch" type="xml">
         <tree>
+          <field name="cimke"/>
           <field name="datum"/>
           <field name="gep"/>
           <field name="kod"/>
@@ -34,7 +36,7 @@
           <field name="adat2"/>
           <field name="adat3"/>
           <field name="muszak"/>
-          <field name="kodintervallum"/>
+          <field name="eltelt_ido"/>
         </tree>
       </field>
     </record>
@@ -45,16 +47,31 @@
       <field  name="arch" type="xml">
         <search>
           <field  name="datum"/>
-          <filter name="filter_mecmor1"     string="mecmor1"                domain="[('gep','=','mecmor1')]"/>
-          <filter name="filter_mecmor2"     string="mecmor1"                domain="[('gep','=','mecmor2')]"/>
-          <filter name="filter_mecmor3"     string="mecmor1"                domain="[('gep','=','mecmor3')]"/>
-          <filter name="filter_mecmor4"     string="mecmor1"                domain="[('gep','=','mecmor4')]"/>
-          <filter name="filter_mecmor5"     string="mecmor1"                domain="[('gep','=','mecmor5')]"/>
-          <filter name="filter_mecmor6"     string="mecmor1"                domain="[('gep','=','mecmor6')]"/>
+          <filter name="filter_szedes"      string="Szedés"                 domain="[('cimke','=','szedes')]"/>
+          <filter name="filter_allas"       string="Szedés állás"           domain="[('cimke','=','allas')]"/>
+          <filter name="filter_hiba"        string="Hiba"                   domain="[('cimke','=','hiba')]"/>
           <separator/>
-          <filter name="filter_muszak1"     string="műszak1"                domain="[('muszak','=','műszak1')]"/>
-          <filter name="filter_muszak2"     string="műszak2"                domain="[('muszak','=','műszak2')]"/>
-          <filter name="filter_muszak3"     string="műszak3"                domain="[('muszak','=','műszak3')]"/>
+          <filter name="filter_mecmor1"     string="Mecmor1"                domain="[('gep','=','mecmor1')]"/>
+          <filter name="filter_mecmor2"     string="Mecmor2"                domain="[('gep','=','mecmor2')]"/>
+          <filter name="filter_mecmor3"     string="Mecmor3"                domain="[('gep','=','mecmor3')]"/>
+          <filter name="filter_mecmor4"     string="Mecmor4"                domain="[('gep','=','mecmor4')]"/>
+          <filter name="filter_mecmor5"     string="Mecmor5"                domain="[('gep','=','mecmor5')]"/>
+          <filter name="filter_mecmor6"     string="Mecmor6"                domain="[('gep','=','mecmor6')]"/>
+          <separator/>
+          <filter name="filter_muszak1"     string="Műszak1"                domain="[('muszak','=','műszak1')]"/>
+          <filter name="filter_muszak2"     string="Műszak2"                domain="[('muszak','=','műszak2')]"/>
+          <filter name="filter_muszak3_1"   string="Műszak3/1"              domain="[('muszak','=','műszak3/1')]"/>
+          <filter name="filter_muszak3_2"   string="Műszak3/2"              domain="[('muszak','=','műszak3/2')]"/>
+          <separator/>
+          <filter name="filter_2perc"       string="2 perc"                domain="[('eltelt_ido','>',120)]"/>
+          <filter name="filter_5perc"       string="5 perc"                domain="[('eltelt_ido','>',300)]"/>
+          <separator/>
+          <filter domain="[('datum','&lt;=', datetime.datetime.combine(context_today()-datetime.timedelta(days=1), datetime.time(23,59,59))),
+                           ('datum','&gt;=', datetime.datetime.combine(context_today()-datetime.timedelta(days=1), datetime.time(0,0,0)))]"
+                  string="Tegnap" help="Tegnap rögzített adatok"/>
+          <filter domain="[('datum','&lt;=', datetime.datetime.combine(context_today(), datetime.time(23,59,59))),
+                           ('datum','&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0)))]"
+                  string="Ma" help="A mai napon rögzített adatok"/>
         </search>
       </field>
     </record>
@@ -73,7 +90,8 @@
 
     <!--####################################################################################################################  Actions  -->
     <act_window id="mecmor"               name="Mecmor"               res_model="kotode.mecmor"                                                       view_mode="tree,form"/>
-    <act_window id="mecmor_ertekel"       name="Mecmor értékelés"     res_model="kotode.mecmor"        view_id="view_graph_mecmor_ertekel"            view_mode="graph" />
+    <act_window id="mecmor_ertekel"       name="Mecmor értékelés"     res_model="kotode.mecmor"        view_id="view_graph_mecmor_ertekel"            view_mode="graph"
+                                                                      context="{'search_default_filter_szedes':1}"/>
 
     <!--####################################################################################################################  Menu  items  -->
     <menuitem id="menu_root"              name="Kötöde"                       sequence="64"                       groups="group_kotode_viewer" />

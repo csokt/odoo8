@@ -362,7 +362,8 @@
           <field  name="bom_id"/>
           <filter name="filter_depo"      string="Depó"                       domain="[('|'),('forrashely_id.azonosito','=','depo'),      ('celallomas_id.azonosito','=','depo')]"/>
           <filter name="filter_szentes"   string="Szentes"                    domain="[('|'),('forrashely_id.azonosito','=','szentes'),   ('celallomas_id.azonosito','=','szentes')]"/>
-          <filter name="filter_hmvhely"   string="Hódmezővásárhely"           domain="[('|'),('forrashely_id.azonosito','=','hmvhely'),   ('celallomas_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_hmvhely"   string="Hmvhely Bocskai"            domain="[('|'),('forrashely_id.azonosito','=','hmvhely'),   ('celallomas_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_hmvhpet"   string="Hmvhely Petőfi"             domain="[('|'),('forrashely_id.azonosito','=','hmvhpet'),   ('celallomas_id.azonosito','=','hmvhpet')]"/>
           <filter name="filter_berkert"   string="Bérkert"                    domain="[('|'),('forrashely_id.azonosito','=','berkert'),   ('celallomas_id.azonosito','=','berkert')]"/>
           <filter name="filter_mako"      string="Makó"                       domain="[('|'),('forrashely_id.azonosito','=','mako'),      ('celallomas_id.azonosito','=','mako')]"/>
           <filter name="filter_oroshaza"  string="Orosháza"                   domain="[('|'),('forrashely_id.azonosito','=','oroshaza'),  ('celallomas_id.azonosito','=','oroshaza')]"/>
@@ -414,7 +415,8 @@
           <field  name="bom_id"/>
           <field  name="gyartasi_lap_id"/>
           <filter name="filter_szentes"         string="Szentes"                domain="[('hely_id.azonosito','=','szentes')]"/>
-          <filter name="filter_hmvhely"         string="Hódmezővásárhely"       domain="[('hely_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_hmvhely"         string="Hmvhely Bocskai"        domain="[('hely_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_hmvhpet"         string="Hmvhely Petőfi"         domain="[('hely_id.azonosito','=','hmvhpet')]"/>
           <filter name="filter_berkert"         string="Bérkert"                domain="[('hely_id.azonosito','=','berkert')]"/>
           <filter name="filter_mako"            string="Makó"                   domain="[('hely_id.azonosito','=','mako')]"/>
           <filter name="filter_oroshaza"        string="Orosháza"               domain="[('hely_id.azonosito','=','oroshaza')]"/>
@@ -459,7 +461,8 @@
           <field  name="celallomas_id"/>
           <filter name="filter_depo"      string="Depó"                       domain="[('|'),('forrashely_id.azonosito','=','depo'),      ('celallomas_id.azonosito','=','depo')]"/>
           <filter name="filter_szentes"   string="Szentes"                    domain="[('|'),('forrashely_id.azonosito','=','szentes'),   ('celallomas_id.azonosito','=','szentes')]"/>
-          <filter name="filter_hmvhely"   string="Hódmezővásárhely"           domain="[('|'),('forrashely_id.azonosito','=','hmvhely'),   ('celallomas_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_hmvhely"   string="Hmvhely Bocskai"            domain="[('|'),('forrashely_id.azonosito','=','hmvhely'),   ('celallomas_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_hmvhpet"   string="Hmvhely Petőfi"             domain="[('|'),('forrashely_id.azonosito','=','hmvhpet'),   ('celallomas_id.azonosito','=','hmvhpet')]"/>
           <filter name="filter_berkert"   string="Bérkert"                    domain="[('|'),('forrashely_id.azonosito','=','berkert'),   ('celallomas_id.azonosito','=','berkert')]"/>
           <filter name="filter_mako"      string="Makó"                       domain="[('|'),('forrashely_id.azonosito','=','mako'),      ('celallomas_id.azonosito','=','mako')]"/>
           <filter name="filter_oroshaza"  string="Orosháza"                   domain="[('|'),('forrashely_id.azonosito','=','oroshaza'),  ('celallomas_id.azonosito','=','oroshaza')]"/>
@@ -516,7 +519,8 @@
           <field  name="hely_id"/>
           <field  name="state"/>
           <filter name="filter_szentes"   string="Szentes"              domain="[('hely_id.azonosito','=','szentes')]"/>
-          <filter name="filter_hmvhely"   string="Hódmezővásárhely"     domain="[('hely_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_hmvhely"   string="Hmvhely Bocskai"      domain="[('hely_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_hmvhpet"   string="Hmvhely Petőfi"       domain="[('hely_id.azonosito','=','hmvhpet')]"/>
           <filter name="filter_berkert"   string="Bérkert"              domain="[('hely_id.azonosito','=','berkert')]"/>
           <filter name="filter_mako"      string="Makó"                 domain="[('hely_id.azonosito','=','mako')]"/>
           <filter name="filter_oroshaza"  string="Orosháza"             domain="[('hely_id.azonosito','=','oroshaza')]"/>
@@ -559,7 +563,8 @@
           <field  name="cikk_id"/>
           <filter name="filter_depo"        string="Depó"                 domain="[('hely_id.azonosito','=','depo')]"/>
           <filter name="filter_szentes"     string="Szentes"              domain="[('hely_id.azonosito','=','szentes')]"/>
-          <filter name="filter_hmvhely"     string="Hódmezővásárhely"     domain="[('hely_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_hmvhely"     string="Hmvhely Bocskai"      domain="[('hely_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_hmvhpet"     string="Hmvhely Petőfi"       domain="[('hely_id.azonosito','=','hmvhpet')]"/>
           <filter name="filter_berkert"     string="Bérkert"              domain="[('hely_id.azonosito','=','berkert')]"/>
           <filter name="filter_mako"        string="Makó"                 domain="[('hely_id.azonosito','=','mako')]"/>
           <filter name="filter_oroshaza"    string="Orosháza"             domain="[('hely_id.azonosito','=','oroshaza')]"/>
@@ -618,7 +623,8 @@
           <field  name="bom_id"/>
           <filter name="filter_depo"        string="Depó"                 domain="[('hely_id.azonosito','=','depo')]"/>
           <filter name="filter_szentes"     string="Szentes"              domain="[('hely_id.azonosito','=','szentes')]"/>
-          <filter name="filter_hmvhely"     string="Hódmezővásárhely"     domain="[('hely_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_hmvhely"     string="Hmvhely Bocskai"      domain="[('hely_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_hmvhpet"     string="Hmvhely Petőfi"       domain="[('hely_id.azonosito','=','hmvhpet')]"/>
           <filter name="filter_berkert"     string="Bérkert"              domain="[('hely_id.azonosito','=','berkert')]"/>
           <filter name="filter_mako"        string="Makó"                 domain="[('hely_id.azonosito','=','mako')]"/>
           <filter name="filter_oroshaza"    string="Orosháza"             domain="[('hely_id.azonosito','=','oroshaza')]"/>
@@ -669,7 +675,8 @@
           <field name="szemely_id"/>
           <filter name="filter_depo"      string="Depó"                 domain="[('hely_id.azonosito','=','depo')]"/>
           <filter name="filter_szentes"   string="Szentes"              domain="[('hely_id.azonosito','=','szentes')]"/>
-          <filter name="filter_hmvhely"   string="Hódmezővásárhely"     domain="[('hely_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_hmvhely"   string="Hmvhely Bocskai"      domain="[('hely_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_hmvhpet"   string="Hmvhely Petőfi"       domain="[('hely_id.azonosito','=','hmvhpet')]"/>
           <filter name="filter_berkert"   string="Bérkert"              domain="[('hely_id.azonosito','=','berkert')]"/>
           <filter name="filter_mako"      string="Makó"                 domain="[('hely_id.azonosito','=','mako')]"/>
           <filter name="filter_oroshaza"  string="Orosháza"             domain="[('hely_id.azonosito','=','oroshaza')]"/>
@@ -871,7 +878,8 @@
           <field  name="termekcsoport"/>
           <field  name="cikknev"/>
           <filter name="filter_szentes"     string="Szentes"                domain="[('gyartasi_hely_id.azonosito','=','szentes')]"/>
-          <filter name="filter_hmvhely"     string="Hódmezővásárhely"       domain="[('gyartasi_hely_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_hmvhely"     string="Hmvhely Bocskai"        domain="[('gyartasi_hely_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_hmvhpet"     string="Hmvhely Petőfi"         domain="[('gyartasi_hely_id.azonosito','=','hmvhpet')]"/>
           <filter name="filter_berkert"     string="Bérkert"                domain="[('gyartasi_hely_id.azonosito','=','berkert')]"/>
           <filter name="filter_mako"        string="Makó"                   domain="[('gyartasi_hely_id.azonosito','=','mako')]"/>
           <filter name="filter_oroshaza"    string="Orosháza"               domain="[('gyartasi_hely_id.azonosito','=','oroshaza')]"/>
@@ -1095,7 +1103,8 @@
           <field  name="gyartasi_lap_id"/>
           <field  name="cikk_id"/>
           <filter name="filter_szentes"     string="Szentes"                domain="[('gyartasi_hely_id.azonosito','=','szentes')]"/>
-          <filter name="filter_hmvhely"     string="Hódmezővásárhely"       domain="[('gyartasi_hely_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_hmvhely"     string="Hmvhely Bocskai"        domain="[('gyartasi_hely_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_hmvhpet"     string="Hmvhely Petőfi"         domain="[('gyartasi_hely_id.azonosito','=','hmvhpet')]"/>
           <filter name="filter_berkert"     string="Bérkert"                domain="[('gyartasi_hely_id.azonosito','=','berkert')]"/>
           <filter name="filter_mako"        string="Makó"                   domain="[('gyartasi_hely_id.azonosito','=','mako')]"/>
           <filter name="filter_oroshaza"    string="Orosháza"               domain="[('gyartasi_hely_id.azonosito','=','oroshaza')]"/>
@@ -1164,7 +1173,8 @@
           <separator/>
           <filter name="filter_depo"      string="Depó"                 domain="[('hely_id.azonosito','=','depo')]"/>
           <filter name="filter_szentes"   string="Szentes"              domain="[('hely_id.azonosito','=','szentes')]"/>
-          <filter name="filter_hmvhely"   string="Hódmezővásárhely"     domain="[('hely_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_hmvhely"   string="Hmvhely Bocskai"      domain="[('hely_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_hmvhpet"   string="Hmvhely Petőfi"       domain="[('hely_id.azonosito','=','hmvhpet')]"/>
           <filter name="filter_berkert"   string="Bérkert"              domain="[('hely_id.azonosito','=','berkert')]"/>
           <filter name="filter_mako"      string="Makó"                 domain="[('hely_id.azonosito','=','mako')]"/>
           <filter name="filter_oroshaza"  string="Orosháza"             domain="[('hely_id.azonosito','=','oroshaza')]"/>
@@ -1510,7 +1520,8 @@
           <field name="gyartasi_hely_id"/>
           <field name="lezer_tampon_id"/>
           <filter name="filter_szentes"     string="Szentes"                domain="[('gyartasi_hely_id.azonosito','=','szentes')]"/>
-          <filter name="filter_hmvhely"     string="Hódmezővásárhely"       domain="[('gyartasi_hely_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_hmvhely"     string="Hmvhely Bocskai"        domain="[('gyartasi_hely_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_hmvhpet"     string="Hmvhely Petőfi"         domain="[('gyartasi_hely_id.azonosito','=','hmvhpet')]"/>
           <filter name="filter_berkert"     string="Bérkert"                domain="[('gyartasi_hely_id.azonosito','=','berkert')]"/>
           <filter name="filter_mako"        string="Makó"                   domain="[('gyartasi_hely_id.azonosito','=','mako')]"/>
           <filter name="filter_oroshaza"    string="Orosháza"               domain="[('gyartasi_hely_id.azonosito','=','oroshaza')]"/>
@@ -1675,7 +1686,8 @@
           <field  name="gyartasi_lap_id"/>
           <field  name="termekcsoport"/>
           <filter name="filter_szentes"     string="Szentes"                domain="[('gyartasi_hely_id.azonosito','=','szentes')]"/>
-          <filter name="filter_hmvhely"     string="Hódmezővásárhely"       domain="[('gyartasi_hely_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_hmvhely"     string="Hmvhely Bocskai"        domain="[('gyartasi_hely_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_hmvhpet"     string="Hmvhely Petőfi"         domain="[('gyartasi_hely_id.azonosito','=','hmvhpet')]"/>
           <filter name="filter_berkert"     string="Szeged"                 domain="[('gyartasi_hely_id.azonosito','=','berkert')]"/>
           <filter name="filter_mako"        string="Makó"                   domain="[('gyartasi_hely_id.azonosito','=','mako')]"/>
           <filter name="filter_oroshaza"    string="Orosháza"               domain="[('gyartasi_hely_id.azonosito','=','oroshaza')]"/>
