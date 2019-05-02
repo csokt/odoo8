@@ -1437,14 +1437,15 @@
       <field  name="model">legrand.lezer_tampon</field>
       <field  name="arch" type="xml">
         <search>
-          <field name="muvelet"/>
           <field name="termek_id"/>
+          <field name="alkatresz_id"/>
+          <field name="muvelet"/>
         </search>
       </field>
     </record>
 
     <!--####################################################################################################################  Gylap lézer, tampon  -->
-    <record id="view_form_lezer_tampon"    model="ir.ui.view">
+    <record id="view_form_gylap_lezer_tampon"    model="ir.ui.view">
       <field name="name">Gylap lézer tampon default Form</field>
       <field name="model">legrand.gylap_lezer_tampon</field>
       <field name="priority" eval="15"/>
@@ -1480,7 +1481,7 @@
       </field>
     </record>
 
-    <record id="view_tree_lezer_tampon"   model="ir.ui.view">
+    <record id="view_tree_gylap_lezer_tampon"   model="ir.ui.view">
       <field  name="name">Gylap lézer tampon default Tree</field>
       <field  name="model">legrand.gylap_lezer_tampon</field>
       <field name="priority" eval="15"/>
@@ -1511,7 +1512,7 @@
       </field>
     </record>
 
-    <record id="view_filter_lezer_tampon"    model="ir.ui.view">
+    <record id="view_filter_gylap_lezer_tampon"    model="ir.ui.view">
       <field  name="name">Gylap lézer tampon Filter</field>
       <field  name="model">legrand.gylap_lezer_tampon</field>
       <field  name="arch" type="xml">

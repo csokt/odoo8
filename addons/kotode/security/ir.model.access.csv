@@ -1,2 +1,14 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_kotode_mecmor_group_viewer,kotode.mecmor.viewer,model_kotode_mecmor,group_kotode_viewer,1,0,0,0
+
+access_kotode_kotogep_group_viewer,kotode.kotogep.viewer,model_kotode_kotogep,group_kotode_viewer,1,0,0,0
+access_kotode_kotogep_group_manager,kotode.kotogep.manager,model_kotode_kotogep,group_kotode_manager,1,1,1,0
+
+access_kotode_dolgozo_group_viewer,kotode.dolgozo.viewer,model_kotode_dolgozo,group_kotode_viewer,1,0,0,0
+access_kotode_dolgozo_group_manager,kotode.dolgozo.manager,model_kotode_dolgozo,group_kotode_manager,1,1,1,0
+
+access_kotode_beosztas_group_viewer,kotode.beosztas.viewer,model_kotode_beosztas,group_kotode_viewer,1,0,0,0
+access_kotode_beosztas_group_manager,kotode.beosztas.manager,model_kotode_beosztas,group_kotode_manager,1,1,1,0
+
+access_kotode_kotogep_log_group_viewer,kotode.kotogep_log.viewer,model_kotode_kotogep_log,group_kotode_viewer,1,0,0,0
+access_kotode_kotogep_log_group_manager,kotode.kotogep_log.manager,model_kotode_kotogep_log,group_kotode_manager,1,1,0,0
