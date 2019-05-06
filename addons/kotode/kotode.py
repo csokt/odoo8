@@ -21,9 +21,9 @@ class Mecmor(models.Model):
 ############################################################################################################################  Kötőgép  ###
 class Kotogep(models.Model):
   _name               = 'kotode.kotogep'
-  _rec_name           = 'azonosito'
   _order              = 'azonosito'
   _sql_constraints    = [('azonosito_unique', 'unique(azonosito)', 'Ez az azonosító már létezik!')]
+  name                = fields.Char(u'Név', required=True)
   azonosito           = fields.Char(u'Azonosító', required=True)
   tipus               = fields.Selection([('regi',u'Régi'),('uj',u'Új')], u'Típus', required=True)
   finomsag            = fields.Char(u'Finomság', required=True)
@@ -51,10 +51,18 @@ class Beosztas(models.Model):
 class KotogepLog(models.Model):
   _name               = 'kotode.kotogep_log'
   _order              = 'id'
-  jelzes              = fields.Selection([('termel',u'Termel'),('all',u'Áll'),('hiba',u'Hibával áll'),('online',u'Elérhető'),('offline',u'Nem elérhető')], u'Jelzés', index=True)
+  jelzes              = fields.Selection([('termel',u'Termel'),('all',u'Áll'),('hiba',u'Hibával áll'),('online',u'Elérhető'),('offline',u'Nem elérhető')], u'Jelzés')
   datum               = fields.Datetime(u'Dátum', index=True)
   uzem                = fields.Selection([('kor',u'Körkötő'),('sik',u'Síkkötő')], u'Üzem')
   gep                 = fields.Char(u'Gép', index=True)
   muszak              = fields.Char(u'Műszak')
   idotartam           = fields.Integer(u'Időtartam mp')
   idotartam_perc      = fields.Float(u'Időtartam perc')
+  idotartam_ora       = fields.Float(u'Időtartam óra')
+
+############################################################################################################################  MQTT log  ###
+class MqttLog(models.Model):
+  _name               = 'kotode.mqtt_log'
+  _order              = 'id desc'
+  topic               = fields.Char(u'Topic')
+  payload             = fields.Char(u'Payload')

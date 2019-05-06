@@ -107,6 +107,7 @@
               <field name="muszak"/>
               <field name="idotartam"/>
               <field name="idotartam_perc"/>
+              <field name="idotartam_ora"/>
             </group>
           </sheet>
         </form>
@@ -125,6 +126,7 @@
           <field name="muszak"/>
           <field name="idotartam"/>
           <field name="idotartam_perc"/>
+          <field name="idotartam_ora"/>
         </tree>
       </field>
     </record>
@@ -168,10 +170,23 @@
      </field>
     </record>
 
+    <!--####################################################################################################################  MQTT log  -->
+    <record id="view_tree_mqtt_log"    model="ir.ui.view">
+      <field  name="name">Kötőgép log Tree</field>
+      <field  name="model">kotode.mqtt_log</field>
+      <field  name="arch" type="xml">
+        <tree>
+          <field name="create_date"/>
+          <field name="topic"/>
+          <field name="payload"/>
+        </tree>
+      </field>
+    </record>
 
     <!--####################################################################################################################  Actions  -->
     <act_window id="mecmor"               name="Mecmor"               res_model="kotode.mecmor"                                                       view_mode="tree,form"/>
     <act_window id="kotogep_log"          name="Kötőgépek"            res_model="kotode.kotogep_log"                                                  view_mode="tree,form"/>
+    <act_window id="mqtt_log"             name="MQTT"                 res_model="kotode.mqtt_log"                                                  view_mode="tree,form"/>
 
     <act_window id="kotogep"              name="Kötőgépek"            res_model="kotode.kotogep"                                                      view_mode="tree,form"/>
     <act_window id="dolgozo"              name="Dolgozók"             res_model="kotode.dolgozo"                                                      view_mode="tree,form"/>
@@ -187,6 +202,7 @@
     <menuitem id="menu_log"               name="Logok"                        parent="menu_root"                  sequence="10" />
       <menuitem id="menu_kotogep_log"     name="Kötőgépek"                    parent="menu_log"                   sequence="10" action="kotogep_log" />
       <menuitem id="menu_mecmor"          name="Mecmor"                       parent="menu_log"                   sequence="20" action="mecmor" />
+      <menuitem id="menu_mqtt_log"        name="MQTT"                         parent="menu_log"                   sequence="30" action="mqtt_log" />
 
     <menuitem id="menu_kimutatas"         name="Kimutatások"                  parent="menu_root"                  sequence="20"                         />
       <menuitem id="menu_kotogep_ertekel" name="Kötőgép értékelés"            parent="menu_kimutatas"             sequence="10" action="kotogep_ertekel" />
