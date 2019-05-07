@@ -170,6 +170,83 @@
      </field>
     </record>
 
+    <!--####################################################################################################################  Státusz log  -->
+    <record id="view_form_status_log"    model="ir.ui.view">
+      <field name="name">Státusz log Form</field>
+      <field name="model">kotode.status_log</field>
+      <field name="arch" type="xml">
+        <form>
+          <sheet>
+            <group col="4">
+              <field name="jelzes"/>
+              <field name="datum"/>
+              <field name="uzem"/>
+              <field name="gep"/>
+              <field name="muszak"/>
+              <field name="idotartam"/>
+              <field name="idotartam_perc"/>
+              <field name="idotartam_ora"/>
+            </group>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_tree_status_log"    model="ir.ui.view">
+      <field  name="name">Státusz log Tree</field>
+      <field  name="model">kotode.status_log</field>
+      <field  name="arch" type="xml">
+        <tree>
+          <field name="jelzes"/>
+          <field name="datum"/>
+          <field name="uzem"/>
+          <field name="gep"/>
+          <field name="muszak"/>
+          <field name="idotartam"/>
+          <field name="idotartam_perc"/>
+          <field name="idotartam_ora"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_view_tree_status_log"    model="ir.ui.view">
+      <field  name="name">Státusz log Filter</field>
+      <field  name="model">kotode.status_log</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field  name="gep"/>
+          <filter name="filter_online"      string="Elérhető"               domain="[('jelzes','=','online')]"/>
+          <filter name="filter_offline"     string="Nem elérhető"           domain="[('jelzes','=','offline')]"/>
+          <separator/>
+          <filter name="filter_kor"         string="Körkötő"                domain="[('uzem','=','kor')]"/>
+          <filter name="filter_sik"         string="Síkkötő"                domain="[('uzem','=','sik')]"/>
+          <separator/>
+          <filter name="filter_muszak1"     string="Műszak1"                domain="[('muszak','=','műszak1')]"/>
+          <filter name="filter_muszak2"     string="Műszak2"                domain="[('muszak','=','műszak2')]"/>
+          <filter name="filter_muszak3_1"   string="Műszak3/1"              domain="[('muszak','=','műszak3/1')]"/>
+          <filter name="filter_muszak3_2"   string="Műszak3/2"              domain="[('muszak','=','műszak3/2')]"/>
+          <separator/>
+          <filter domain="[('datum','&lt;=', datetime.datetime.combine(context_today()-datetime.timedelta(days=1), datetime.time(23,59,59))),
+                           ('datum','&gt;=', datetime.datetime.combine(context_today()-datetime.timedelta(days=1), datetime.time(0,0,0)))]"
+                  string="Tegnap" help="Tegnap rögzített adatok"/>
+          <filter domain="[('datum','&lt;=', datetime.datetime.combine(context_today(), datetime.time(23,59,59))),
+                           ('datum','&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0)))]"
+                  string="Ma" help="A mai napon rögzített adatok"/>
+        </search>
+      </field>
+    </record>
+
+    <record id="view_graph_status_ertekel" model="ir.ui.view">
+     <field name="name">kotode.status_log_ertekel.graph</field>
+     <field name="model">kotode.status_log</field>
+     <field name="arch" type="xml">
+       <graph string="Státusz értékelés"  type="pivot">
+         <field name="datum"              type="row"/>
+         <field name="muszak"             type="col"/>
+       </graph>
+     </field>
+    </record>
+
     <!--####################################################################################################################  MQTT log  -->
     <record id="view_tree_mqtt_log"    model="ir.ui.view">
       <field  name="name">Kötőgép log Tree</field>
@@ -186,27 +263,32 @@
     <!--####################################################################################################################  Actions  -->
     <act_window id="mecmor"               name="Mecmor"               res_model="kotode.mecmor"                                                       view_mode="tree,form"/>
     <act_window id="kotogep_log"          name="Kötőgépek"            res_model="kotode.kotogep_log"                                                  view_mode="tree,form"/>
-    <act_window id="mqtt_log"             name="MQTT"                 res_model="kotode.mqtt_log"                                                  view_mode="tree,form"/>
+    <act_window id="status_log"           name="Státusz"              res_model="kotode.status_log"                                                   view_mode="tree,form"/>
+    <act_window id="mqtt_log"             name="MQTT"                 res_model="kotode.mqtt_log"                                                     view_mode="tree,form"/>
 
     <act_window id="kotogep"              name="Kötőgépek"            res_model="kotode.kotogep"                                                      view_mode="tree,form"/>
     <act_window id="dolgozo"              name="Dolgozók"             res_model="kotode.dolgozo"                                                      view_mode="tree,form"/>
     <act_window id="beosztas"             name="Beosztások"           res_model="kotode.beosztas"                                                     view_mode="tree,form"/>
 
     <act_window id="kotogep_ertekel"      name="Kötőgép értékelés"    res_model="kotode.kotogep_log"    view_id="view_graph_kotogep_ertekel"          view_mode="graph"
-                                                                      context="{'search_default_filter_termel':1}"/>
+                                                                      context="{'search_default_filter_sik':1}"/>
+    <act_window id="status_ertekel"       name="Státusz értékelés"    res_model="kotode.status_log"     view_id="view_graph_status_ertekel"           view_mode="graph"
+                                                                      context="{'search_default_filter_sik':1}"/>
     <act_window id="mecmor_ertekel"       name="Mecmor értékelés"     res_model="kotode.mecmor"         view_id="view_graph_mecmor_ertekel"           view_mode="graph"
                                                                       context="{'search_default_filter_szedes':1}"/>
     <!--####################################################################################################################  Menu  items  -->
     <menuitem id="menu_root"              name="Kötöde"                       sequence="64"                       groups="group_kotode_viewer" />
 
     <menuitem id="menu_log"               name="Logok"                        parent="menu_root"                  sequence="10" />
-      <menuitem id="menu_kotogep_log"     name="Kötőgépek"                    parent="menu_log"                   sequence="10" action="kotogep_log" />
-      <menuitem id="menu_mecmor"          name="Mecmor"                       parent="menu_log"                   sequence="20" action="mecmor" />
-      <menuitem id="menu_mqtt_log"        name="MQTT"                         parent="menu_log"                   sequence="30" action="mqtt_log" />
+      <menuitem id="menu_kotogep_log"     name="Kötőgép"                      parent="menu_log"                   sequence="10" action="kotogep_log" />
+      <menuitem id="menu_status_log"      name="Státusz"                      parent="menu_log"                   sequence="20" action="status_log" />
+      <menuitem id="menu_mecmor"          name="Mecmor"                       parent="menu_log"                   sequence="30" action="mecmor" />
+      <menuitem id="menu_mqtt_log"        name="MQTT"                         parent="menu_log"                   sequence="40" action="mqtt_log" />
 
     <menuitem id="menu_kimutatas"         name="Kimutatások"                  parent="menu_root"                  sequence="20"                         />
       <menuitem id="menu_kotogep_ertekel" name="Kötőgép értékelés"            parent="menu_kimutatas"             sequence="10" action="kotogep_ertekel" />
-      <menuitem id="menu_mecmor_ertekel"  name="Mecmor értékelés"             parent="menu_kimutatas"             sequence="20" action="mecmor_ertekel" />
+      <menuitem id="menu_status_ertekel"  name="Státusz értékelés"            parent="menu_kimutatas"             sequence="20" action="status_ertekel" />
+      <menuitem id="menu_mecmor_ertekel"  name="Mecmor értékelés"             parent="menu_kimutatas"             sequence="30" action="mecmor_ertekel" />
 
     <menuitem id="menu_torzsadat"         name="Törzsadatok"                  parent="menu_root"                  sequence="30" />
       <menuitem id="menu_kotogep"         name="Kötőgépek"                    parent="menu_torzsadat"             sequence="10" action="kotogep" />

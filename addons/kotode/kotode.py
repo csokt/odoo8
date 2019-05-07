@@ -51,14 +51,29 @@ class Beosztas(models.Model):
 class KotogepLog(models.Model):
   _name               = 'kotode.kotogep_log'
   _order              = 'id'
-  jelzes              = fields.Selection([('termel',u'Termel'),('all',u'Áll'),('hiba',u'Hibával áll'),('online',u'Elérhető'),('offline',u'Nem elérhető')], u'Jelzés')
-  datum               = fields.Datetime(u'Dátum', index=True)
+  jelzes              = fields.Selection([('termel',u'Termel'),('all',u'Áll'),('hiba',u'Hibával áll')], u'Jelzés')
+  datum               = fields.Datetime(u'Dátum')
   uzem                = fields.Selection([('kor',u'Körkötő'),('sik',u'Síkkötő')], u'Üzem')
-  gep                 = fields.Char(u'Gép', index=True)
-  muszak              = fields.Char(u'Műszak')
+  gep                 = fields.Char(u'Gép')
+  muszak              = fields.Selection([('1',u'Műszak1'),('2',u'Műszak2'),('3/1',u'Műszak3/1'),('3/2',u'Műszak3/2')], u'Műszak')
   idotartam           = fields.Integer(u'Időtartam mp')
   idotartam_perc      = fields.Float(u'Időtartam perc')
   idotartam_ora       = fields.Float(u'Időtartam óra')
+  mqtt_log_id         = fields.Integer(u'MQTT log ID', index=True)
+
+############################################################################################################################  Státusz log  ###
+class StatusLog(models.Model):
+  _name               = 'kotode.status_log'
+  _order              = 'id'
+  jelzes              = fields.Selection([('online',u'Elérhető'),('offline',u'Nem elérhető')], u'Jelzés')
+  datum               = fields.Datetime(u'Dátum')
+  uzem                = fields.Selection([('kor',u'Körkötő'),('sik',u'Síkkötő')], u'Üzem')
+  gep                 = fields.Char(u'Gép')
+  muszak              = fields.Selection([('1',u'Műszak1'),('2',u'Műszak2'),('3/1',u'Műszak3/1'),('3/2',u'Műszak3/2')], u'Műszak')
+  idotartam           = fields.Integer(u'Időtartam mp')
+  idotartam_perc      = fields.Float(u'Időtartam perc')
+  idotartam_ora       = fields.Float(u'Időtartam óra')
+  mqtt_log_id         = fields.Integer(u'MQTT log ID', index=True)
 
 ############################################################################################################################  MQTT log  ###
 class MqttLog(models.Model):
