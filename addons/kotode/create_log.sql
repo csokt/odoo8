@@ -1,8 +1,12 @@
+--------------------------
 -- kotode_mqtt_log törlése
+--------------------------
 delete from kotode_mqtt_log ;
 alter sequence kotode_mqtt_log_id_seq RESTART WITH 1 ;
 
+---------------------------
 -- kotode_kotogep_log írása
+---------------------------
 delete from kotode_kotogep_log ;
 alter sequence kotode_kotogep_log_id_seq RESTART WITH 1 ;
 
@@ -15,7 +19,7 @@ log1 AS (
   FROM kotode_mqtt_log JOIN last_id ON lastid < id
 ),
 log AS (
-  SELECT log1.*, gep.name AS gepnev, gep.uzem,
+  SELECT log1.*, gep.id AS kotogep_id, gep.name AS gepnev, gep.uzem,
   CASE WHEN ora < 6 THEN '3/2'
        WHEN ora < 14 THEN '1'
        WHEN ora < 22 THEN '2'
@@ -47,8 +51,8 @@ log AS (
   FROM log1
   JOIN kotode_kotogep AS gep ON gep.azonosito = log1.gepazonosito
 )
-INSERT INTO kotode_kotogep_log (jelzes, datum, uzem, gepazonosito, gep, muszak, mqtt_log_id)
-SELECT jelzes, datum, uzem, gepazonosito, gepnev, muszak, id FROM log WHERE jelzes IS NOT NULL order by id
+INSERT INTO kotode_kotogep_log (jelzes, datum, uzem, kotogep_id, gepazonosito, gep, muszak, mqtt_log_id)
+SELECT jelzes, datum, uzem, kotogep_id, gepazonosito, gepnev, muszak, id FROM log WHERE jelzes IS NOT NULL order by id
 ;
 
 WITH
@@ -61,8 +65,9 @@ UPDATE kotode_kotogep_log AS log SET idotartam = ido.sec, idotartam_perc = ido.s
 FROM ido WHERE ido.id = log.id
 ;
 
-
+--------------------------
 -- kotode_status_log írása
+--------------------------
 delete from kotode_status_log ;
 alter sequence kotode_status_log_id_seq RESTART WITH 1 ;
 

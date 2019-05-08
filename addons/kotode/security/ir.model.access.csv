@@ -1,6 +1,9 @@
 id,name,model_id:id,group_id:id,perm_read,perm_write,perm_create,perm_unlink
 access_kotode_mecmor_group_viewer,kotode.mecmor.viewer,model_kotode_mecmor,group_kotode_viewer,1,0,0,0
 
+access_kotode_megjegyzes_group_viewer,kotode.megjegyzes.viewer,model_kotode_megjegyzes,group_kotode_viewer,1,0,0,0
+access_kotode_megjegyzes_group_manager,kotode.megjegyzes.manager,model_kotode_megjegyzes,group_kotode_manager,1,1,1,0
+
 access_kotode_kotogep_group_viewer,kotode.kotogep.viewer,model_kotode_kotogep,group_kotode_viewer,1,0,0,0
 access_kotode_kotogep_group_manager,kotode.kotogep.manager,model_kotode_kotogep,group_kotode_manager,1,1,1,0
 

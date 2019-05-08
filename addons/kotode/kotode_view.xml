@@ -92,6 +92,45 @@
     </record>
 
 
+    <!--####################################################################################################################  Kötőgép  -->
+    <record id="view_form_kotogep"    model="ir.ui.view">
+      <field name="name">Kotogep Form</field>
+      <field name="model">kotode.kotogep</field>
+      <field name="arch" type="xml">
+        <form>
+          <sheet>
+            <group col="4">
+              <field name="name"/>
+              <field name="azonosito"/>
+              <field name="tipus"/>
+              <field name="finomsag"/>
+              <field name="uzem"/>
+              <field name="sor"/>
+              <field name="active"/>
+            </group>
+            <field name="kotogep_log_ids"/>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_tree_kotogep"    model="ir.ui.view">
+      <field  name="name">Kotogep Tree</field>
+      <field  name="model">kotode.kotogep</field>
+      <field  name="arch" type="xml">
+        <tree>
+          <field name="name"/>
+          <field name="azonosito"/>
+          <field name="tipus"/>
+          <field name="finomsag"/>
+          <field name="uzem"/>
+          <field name="sor"/>
+          <field name="active"/>
+          <field name="kotogep_log_ids"/>
+        </tree>
+      </field>
+    </record>
+
     <!--####################################################################################################################  Kötőgép log  -->
     <record id="view_form_kotogep_log"    model="ir.ui.view">
       <field name="name">Kötőgép log Form</field>
@@ -109,6 +148,7 @@
               <field name="idotartam"/>
               <field name="idotartam_perc"/>
               <field name="idotartam_ora"/>
+              <field name="megjegyzes_id"/>
             </group>
           </sheet>
         </form>
@@ -129,6 +169,7 @@
           <field name="idotartam"/>
           <field name="idotartam_perc"/>
           <field name="idotartam_ora"/>
+          <field name="megjegyzes_id"/>
         </tree>
       </field>
     </record>
@@ -273,6 +314,7 @@
     <act_window id="kotogep"              name="Kötőgépek"            res_model="kotode.kotogep"                                                      view_mode="tree,form"/>
     <act_window id="dolgozo"              name="Dolgozók"             res_model="kotode.dolgozo"                                                      view_mode="tree,form"/>
     <act_window id="beosztas"             name="Beosztások"           res_model="kotode.beosztas"                                                     view_mode="tree,form"/>
+    <act_window id="megjegyzes"           name="Megjegyzések"         res_model="kotode.megjegyzes"                                                   view_mode="tree,form"/>
 
     <act_window id="kotogep_ertekel"      name="Kötőgép értékelés"    res_model="kotode.kotogep_log"    view_id="view_graph_kotogep_ertekel"          view_mode="graph"
                                                                       context="{'search_default_filter_sik':1}"/>
@@ -298,6 +340,7 @@
       <menuitem id="menu_kotogep"         name="Kötőgépek"                    parent="menu_torzsadat"             sequence="10" action="kotogep" />
       <menuitem id="menu_dolgozo"         name="Dolgozók"                     parent="menu_torzsadat"             sequence="20" action="dolgozo" />
       <menuitem id="menu_beosztas"        name="Beosztások"                   parent="menu_torzsadat"             sequence="30" action="beosztas" />
+      <menuitem id="menu_megjegyzes"      name="Megjegyzések"                 parent="menu_torzsadat"             sequence="40" action="megjegyzes" />
 
 <!--
 -->
