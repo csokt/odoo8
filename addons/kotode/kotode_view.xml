@@ -103,6 +103,7 @@
               <field name="jelzes"/>
               <field name="datum"/>
               <field name="uzem"/>
+              <field name="gepazonosito"/>
               <field name="gep"/>
               <field name="muszak"/>
               <field name="idotartam"/>
@@ -122,6 +123,7 @@
           <field name="jelzes"/>
           <field name="datum"/>
           <field name="uzem"/>
+          <field name="gepazonosito"/>
           <field name="gep"/>
           <field name="muszak"/>
           <field name="idotartam"/>
@@ -181,6 +183,7 @@
               <field name="jelzes"/>
               <field name="datum"/>
               <field name="uzem"/>
+              <field name="gepazonosito"/>
               <field name="gep"/>
               <field name="muszak"/>
               <field name="idotartam"/>
@@ -200,6 +203,7 @@
           <field name="jelzes"/>
           <field name="datum"/>
           <field name="uzem"/>
+          <field name="gepazonosito"/>
           <field name="gep"/>
           <field name="muszak"/>
           <field name="idotartam"/>
