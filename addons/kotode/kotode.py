@@ -80,6 +80,7 @@ class StatusLog(models.Model):
   jelzes              = fields.Selection([('online',u'Elérhető'),('offline',u'Nem elérhető')], u'Jelzés')
   datum               = fields.Datetime(u'Dátum')
   uzem                = fields.Selection([('kor',u'Körkötő'),('sik',u'Síkkötő')], u'Üzem')
+  kotogep_id          = fields.Many2one('kotode.kotogep',  u'Kötőgép')
   gepazonosito        = fields.Char(u'Gép azonosító')
   gep                 = fields.Char(u'Gép')
   muszak              = fields.Selection([('1',u'Műszak1'),('2',u'Műszak2'),('3/1',u'Műszak3/1'),('3/2',u'Műszak3/2')], u'Műszak')

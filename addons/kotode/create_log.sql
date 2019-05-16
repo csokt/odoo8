@@ -61,7 +61,7 @@ SELECT jelzes, datum, uzem, kotogep_id, gepazonosito, gepnev, muszak, id FROM lo
 WITH
 ido AS (
   SELECT t1.id, extract('epoch' from t2.datum - t1.datum) AS sec FROM kotode_kotogep_log AS t1
-  JOIN kotode_kotogep_log AS t2 ON t2.id = t1.id + 1
+  JOIN kotode_kotogep_log AS t2 ON t2.id = (SELECT MIN(id) FROM kotode_kotogep_log WHERE id > t1.id AND kotogep_id = t1.kotogep_id)
   WHERE t1.idotartam IS NULL
 )
 UPDATE kotode_kotogep_log AS log SET idotartam = ido.sec, idotartam_perc = ido.sec / 60,  idotartam_ora = ido.sec / 3600
@@ -80,7 +80,7 @@ log1 AS (
   FROM kotode_mqtt_log JOIN last_id ON lastid < id
 ),
 log AS (
-  SELECT log1.*, gep.name AS gepnev, gep.uzem,
+  SELECT log1.*, gep.id AS kotogep_id, gep.name AS gepnev, gep.uzem,
   CASE WHEN ora < 6 THEN '3/2'
        WHEN ora < 14 THEN '1'
        WHEN ora < 22 THEN '2'
@@ -92,14 +92,14 @@ log AS (
   FROM log1
   JOIN kotode_kotogep AS gep ON gep.azonosito = log1.gepazonosito
 )
-INSERT INTO kotode_status_log (jelzes, datum, uzem, gepazonosito, gep, muszak, mqtt_log_id)
-SELECT jelzes, datum, uzem, gepazonosito, gepnev, muszak, id FROM log WHERE jelzes IS NOT NULL order by id
+INSERT INTO kotode_status_log (jelzes, datum, uzem, kotogep_id, gepazonosito, gep, muszak, mqtt_log_id)
+SELECT jelzes, datum, uzem, kotogep_id, gepazonosito, gepnev, muszak, id FROM log WHERE jelzes IS NOT NULL order by id
 ;
 
 WITH
 ido AS (
   SELECT t1.id, extract('epoch' from t2.datum - t1.datum) AS sec FROM kotode_status_log AS t1
-  JOIN kotode_status_log AS t2 ON t2.id = t1.id + 1
+  JOIN kotode_status_log AS t2 ON t2.id = (SELECT MIN(id) FROM kotode_status_log WHERE id > t1.id AND kotogep_id = t1.kotogep_id)
   WHERE t1.idotartam IS NULL
 )
 UPDATE kotode_status_log AS log SET idotartam = ido.sec, idotartam_perc = ido.sec / 60,  idotartam_ora = ido.sec / 3600

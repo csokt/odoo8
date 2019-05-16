@@ -45,7 +45,7 @@
       </field>
     </record>
 
-    <record id="view_filter_view_tree_mecmor"    model="ir.ui.view">
+    <record id="view_filter_mecmor"    model="ir.ui.view">
       <field  name="name">Mecmor Filter</field>
       <field  name="model">kotode.mecmor</field>
       <field  name="arch" type="xml">
@@ -70,6 +70,9 @@
           <filter name="filter_2perc"       string="2 perc"                domain="[('eltelt_ido','>',120)]"/>
           <filter name="filter_5perc"       string="5 perc"                domain="[('eltelt_ido','>',300)]"/>
           <separator/>
+          <filter domain="[('datum','&lt;=', datetime.datetime.combine(context_today(), datetime.time(23,59,59))),
+                           ('datum','&gt;=', datetime.datetime.combine(context_today()-datetime.timedelta(days=7), datetime.time(0,0,0)))]"
+                  string="Elmúlt hét" help="Elmúlt héten rögzített adatok"/>
           <filter domain="[('datum','&lt;=', datetime.datetime.combine(context_today()-datetime.timedelta(days=1), datetime.time(23,59,59))),
                            ('datum','&gt;=', datetime.datetime.combine(context_today()-datetime.timedelta(days=1), datetime.time(0,0,0)))]"
                   string="Tegnap" help="Tegnap rögzített adatok"/>
@@ -174,7 +177,7 @@
       </field>
     </record>
 
-    <record id="view_filter_view_tree_kotogep_log"    model="ir.ui.view">
+    <record id="view_filter_kotogep_log"    model="ir.ui.view">
       <field  name="name">Kötőgép log Filter</field>
       <field  name="model">kotode.kotogep_log</field>
       <field  name="arch" type="xml">
@@ -193,6 +196,9 @@
           <filter name="filter_muszak3_1"   string="Műszak3/1"              domain="[('muszak','=','3/1')]"/>
           <filter name="filter_muszak3_2"   string="Műszak3/2"              domain="[('muszak','=','3/2')]"/>
           <separator/>
+          <filter domain="[('datum','&lt;=', datetime.datetime.combine(context_today(), datetime.time(23,59,59))),
+                           ('datum','&gt;=', datetime.datetime.combine(context_today()-datetime.timedelta(days=7), datetime.time(0,0,0)))]"
+                  string="Elmúlt hét" help="Elmúlt héten rögzített adatok"/>
           <filter domain="[('datum','&lt;=', datetime.datetime.combine(context_today()-datetime.timedelta(days=1), datetime.time(23,59,59))),
                            ('datum','&gt;=', datetime.datetime.combine(context_today()-datetime.timedelta(days=1), datetime.time(0,0,0)))]"
                   string="Tegnap" help="Tegnap rögzített adatok"/>
@@ -257,7 +263,7 @@
       </field>
     </record>
 
-    <record id="view_filter_view_tree_status_log"    model="ir.ui.view">
+    <record id="view_filter_status_log"    model="ir.ui.view">
       <field  name="name">Státusz log Filter</field>
       <field  name="model">kotode.status_log</field>
       <field  name="arch" type="xml">
@@ -274,6 +280,9 @@
           <filter name="filter_muszak3_1"   string="Műszak3/1"              domain="[('muszak','=','3/1')]"/>
           <filter name="filter_muszak3_2"   string="Műszak3/2"              domain="[('muszak','=','3/2')]"/>
           <separator/>
+          <filter domain="[('datum','&lt;=', datetime.datetime.combine(context_today(), datetime.time(23,59,59))),
+                           ('datum','&gt;=', datetime.datetime.combine(context_today()-datetime.timedelta(days=7), datetime.time(0,0,0)))]"
+                  string="Elmúlt hét" help="Elmúlt héten rögzített adatok"/>
           <filter domain="[('datum','&lt;=', datetime.datetime.combine(context_today()-datetime.timedelta(days=1), datetime.time(23,59,59))),
                            ('datum','&gt;=', datetime.datetime.combine(context_today()-datetime.timedelta(days=1), datetime.time(0,0,0)))]"
                   string="Tegnap" help="Tegnap rögzített adatok"/>
@@ -305,6 +314,30 @@
           <field name="topic"/>
           <field name="payload"/>
         </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_mqtt_log"    model="ir.ui.view">
+      <field  name="name">MQTT log Filter</field>
+      <field  name="model">kotode.mqtt_log</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field  name="topic"/>
+          <field  name="payload"/>
+          <filter name="filter_green"       string="Zöld"                   domain="[('topic','like','green')]"/>
+          <filter name="filter_yellow"      string="Sárga"                  domain="[('topic','like','yellow')]"/>
+          <filter name="filter_red"         string="Piros"                  domain="[('topic','like','red')]"/>
+          <separator/>
+          <filter domain="[('create_date','&lt;=', datetime.datetime.combine(context_today(), datetime.time(23,59,59))),
+                           ('create_date','&gt;=', datetime.datetime.combine(context_today()-datetime.timedelta(days=7), datetime.time(0,0,0)))]"
+                  string="Elmúlt hét" help="Elmúlt héten rögzített adatok"/>
+          <filter domain="[('create_date','&lt;=', datetime.datetime.combine(context_today()-datetime.timedelta(days=1), datetime.time(23,59,59))),
+                           ('create_date','&gt;=', datetime.datetime.combine(context_today()-datetime.timedelta(days=1), datetime.time(0,0,0)))]"
+                  string="Tegnap" help="Tegnap rögzített adatok"/>
+          <filter domain="[('create_date','&lt;=', datetime.datetime.combine(context_today(), datetime.time(23,59,59))),
+                           ('create_date','&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0)))]"
+                  string="Ma" help="A mai napon rögzített adatok"/>
+        </search>
       </field>
     </record>
 
