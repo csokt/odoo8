@@ -183,14 +183,15 @@
           <filter name="filter_termel"      string="Termel"                 domain="[('jelzes','=','termel')]"/>
           <filter name="filter_all"         string="Áll"                    domain="[('jelzes','=','all')]"/>
           <filter name="filter_hiba"        string="Hibával áll"            domain="[('jelzes','=','hiba')]"/>
+          <filter name="filter_ki"          string="Kikapcsolva"            domain="[('jelzes','=','ki')]"/>
           <separator/>
           <filter name="filter_kor"         string="Körkötő"                domain="[('uzem','=','kor')]"/>
           <filter name="filter_sik"         string="Síkkötő"                domain="[('uzem','=','sik')]"/>
           <separator/>
-          <filter name="filter_muszak1"     string="Műszak1"                domain="[('muszak','=','műszak1')]"/>
-          <filter name="filter_muszak2"     string="Műszak2"                domain="[('muszak','=','műszak2')]"/>
-          <filter name="filter_muszak3_1"   string="Műszak3/1"              domain="[('muszak','=','műszak3/1')]"/>
-          <filter name="filter_muszak3_2"   string="Műszak3/2"              domain="[('muszak','=','műszak3/2')]"/>
+          <filter name="filter_muszak1"     string="Műszak1"                domain="[('muszak','=','1')]"/>
+          <filter name="filter_muszak2"     string="Műszak2"                domain="[('muszak','=','2')]"/>
+          <filter name="filter_muszak3_1"   string="Műszak3/1"              domain="[('muszak','=','3/1')]"/>
+          <filter name="filter_muszak3_2"   string="Műszak3/2"              domain="[('muszak','=','3/2')]"/>
           <separator/>
           <filter domain="[('datum','&lt;=', datetime.datetime.combine(context_today()-datetime.timedelta(days=1), datetime.time(23,59,59))),
                            ('datum','&gt;=', datetime.datetime.combine(context_today()-datetime.timedelta(days=1), datetime.time(0,0,0)))]"
@@ -208,7 +209,9 @@
      <field name="arch" type="xml">
        <graph string="Kötőgép értékelés"  type="pivot">
          <field name="datum"              type="row"/>
+         <field name="jelzes"             type="row"/>
          <field name="muszak"             type="col"/>
+         <field name="idotartam_ora"      type="measure"/>
        </graph>
      </field>
     </record>
@@ -266,10 +269,10 @@
           <filter name="filter_kor"         string="Körkötő"                domain="[('uzem','=','kor')]"/>
           <filter name="filter_sik"         string="Síkkötő"                domain="[('uzem','=','sik')]"/>
           <separator/>
-          <filter name="filter_muszak1"     string="Műszak1"                domain="[('muszak','=','műszak1')]"/>
-          <filter name="filter_muszak2"     string="Műszak2"                domain="[('muszak','=','műszak2')]"/>
-          <filter name="filter_muszak3_1"   string="Műszak3/1"              domain="[('muszak','=','műszak3/1')]"/>
-          <filter name="filter_muszak3_2"   string="Műszak3/2"              domain="[('muszak','=','műszak3/2')]"/>
+          <filter name="filter_muszak1"     string="Műszak1"                domain="[('muszak','=','1')]"/>
+          <filter name="filter_muszak2"     string="Műszak2"                domain="[('muszak','=','2')]"/>
+          <filter name="filter_muszak3_1"   string="Műszak3/1"              domain="[('muszak','=','3/1')]"/>
+          <filter name="filter_muszak3_2"   string="Műszak3/2"              domain="[('muszak','=','3/2')]"/>
           <separator/>
           <filter domain="[('datum','&lt;=', datetime.datetime.combine(context_today()-datetime.timedelta(days=1), datetime.time(23,59,59))),
                            ('datum','&gt;=', datetime.datetime.combine(context_today()-datetime.timedelta(days=1), datetime.time(0,0,0)))]"

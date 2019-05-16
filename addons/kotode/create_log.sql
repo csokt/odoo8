@@ -1,15 +1,18 @@
---------------------------
--- kotode_mqtt_log törlése
---------------------------
-delete from kotode_mqtt_log ;
-alter sequence kotode_mqtt_log_id_seq RESTART WITH 1 ;
+------------------------------------
+-- mqtt,kotogep,status logok törlése
+------------------------------------
+-- delete from kotode_mqtt_log ;
+-- alter sequence kotode_mqtt_log_id_seq RESTART WITH 1 ;
+
+delete from kotode_kotogep_log ;
+alter sequence kotode_kotogep_log_id_seq RESTART WITH 1 ;
+
+delete from kotode_status_log ;
+alter sequence kotode_status_log_id_seq RESTART WITH 1 ;
 
 ---------------------------
 -- kotode_kotogep_log írása
 ---------------------------
-delete from kotode_kotogep_log ;
-alter sequence kotode_kotogep_log_id_seq RESTART WITH 1 ;
-
 WITH
 last_id AS (
   SELECT COALESCE(MAX(mqtt_log_id), 0) AS lastid FROM kotode_kotogep_log
@@ -68,9 +71,6 @@ FROM ido WHERE ido.id = log.id
 --------------------------
 -- kotode_status_log írása
 --------------------------
-delete from kotode_status_log ;
-alter sequence kotode_status_log_id_seq RESTART WITH 1 ;
-
 WITH
 last_id AS (
   SELECT COALESCE(MAX(mqtt_log_id), 0) AS lastid FROM kotode_status_log
