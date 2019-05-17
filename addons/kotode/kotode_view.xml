@@ -101,21 +101,47 @@
       <field name="model">kotode.kotogep</field>
       <field name="arch" type="xml">
         <form>
-          <sheet>
-            <group col="4">
+          <header>
+            <button name="ma"                   type="object" string="Mai nap"/>
+            <button name="vissza1"              type="object" string="Egy nappal korábban"/>
+            <button name="vissza7"              type="object" string="Egy héttel korábban"/>
+            <button name="masol"                type="object" string="Megjegyzés másol"         class="oe_highlight"/>
+          </header>
+            <group col="8">
+              <field name="megjegyzes_id"/>
+              <field name="min_log_id"/>
+              <field name="max_log_id"/>
+              <field name="active"/>
               <field name="name"/>
               <field name="azonosito"/>
               <field name="tipus"/>
               <field name="finomsag"/>
               <field name="uzem"/>
               <field name="sor"/>
-              <field name="active"/>
             </group>
-            <field name="kotogep_log_ids"/>
+          <div>
+          <sheet>
+            <field name="kotogep_log_ids">
+              <tree>
+                <field name="id"/>
+                <field name="jelzes"/>
+                <field name="datum"/>
+                <field name="muszak"/>
+                <field name="idotartam"/>
+                <field name="idotartam_perc"/>
+                <field name="idotartam_ora"/>
+                <field name="megjegyzes_id"/>
+                <button name="elso"             type="object" string="Első"/>
+                <button name="utolso"           type="object" string="Utolsó"/>
+              </tree>
+            </field>
           </sheet>
+          </div>
         </form>
       </field>
     </record>
+            <!-- <field name="kotogep_log_ids"  widget="many2many_tags"   domain="[('muszak', '=', '2')]" /> -->
+            <!-- <field name="kotogep_log_ids"     domain="{[('id', '&gt;=', 10), ('id', '&lt;=', 20)]}" /> -->
 
     <record id="view_tree_kotogep"    model="ir.ui.view">
       <field  name="name">Kotogep Tree</field>

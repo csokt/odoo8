@@ -16,6 +16,8 @@ access_kotode_beosztas_group_manager,kotode.beosztas.manager,model_kotode_beoszt
 access_kotode_kotogep_log_group_viewer,kotode.kotogep_log.viewer,model_kotode_kotogep_log,group_kotode_viewer,1,0,0,0
 access_kotode_kotogep_log_group_manager,kotode.kotogep_log.manager,model_kotode_kotogep_log,group_kotode_manager,1,1,0,0
 
+access_kotode_kotogep_log_view_group_viewer,kotode.kotogep_log_view.viewer,model_kotode_kotogep_log_view,group_kotode_viewer,1,0,0,0
+
 access_kotode_status_log_group_viewer,kotode.status_log.viewer,model_kotode_status_log,group_kotode_viewer,1,0,0,0
 
 access_kotode_mqtt_log_group_viewer,kotode.mqtt_log.viewer,model_kotode_mqtt_log,group_kotode_viewer,1,0,0,0
