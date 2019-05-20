@@ -102,9 +102,10 @@
       <field name="arch" type="xml">
         <form>
           <header>
-            <button name="ma"                   type="object" string="Mai nap"/>
-            <button name="vissza1"              type="object" string="Egy nappal korábban"/>
-            <button name="vissza7"              type="object" string="Egy héttel korábban"/>
+            <button name="vissza0"              type="object" string="Mai nap"/>
+            <button name="vissza2"              type="object" string="Utolsó két nap"/>
+            <button name="vissza7"              type="object" string="Utolsó hét nap"/>
+            <button name="vissza30"             type="object" string="Utolsó harminc nap"/>
             <button name="masol"                type="object" string="Megjegyzés másol"         class="oe_highlight"/>
           </header>
             <group col="8">
@@ -231,6 +232,9 @@
           <filter domain="[('datum','&lt;=', datetime.datetime.combine(context_today(), datetime.time(23,59,59))),
                            ('datum','&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0)))]"
                   string="Ma" help="A mai napon rögzített adatok"/>
+          <separator/>
+          <filter name="filter_megjegyzes"  string="Megjegyzések"           domain="[('megjegyzes_id','!=',False)]"/>
+          <filter name="filter_nincs_megj"  string="Nincs megjegyzés"       domain="[('megjegyzes_id','=',False)]"/>
         </search>
       </field>
     </record>
@@ -379,7 +383,7 @@
     <act_window id="megjegyzes"           name="Megjegyzések"         res_model="kotode.megjegyzes"                                                   view_mode="tree,form"/>
 
     <act_window id="kotogep_ertekel"      name="Kötőgép értékelés"    res_model="kotode.kotogep_log"    view_id="view_graph_kotogep_ertekel"          view_mode="graph"
-                                                                      context="{'search_default_filter_sik':1}"/>
+                                                                      context="{'search_default_filter_sik':1, 'search_default_filter_nincs_megj':1}"/>
     <act_window id="status_ertekel"       name="Státusz értékelés"    res_model="kotode.status_log"     view_id="view_graph_status_ertekel"           view_mode="graph"
                                                                       context="{'search_default_filter_sik':1}"/>
     <act_window id="mecmor_ertekel"       name="Mecmor értékelés"     res_model="kotode.mecmor"         view_id="view_graph_mecmor_ertekel"           view_mode="graph"

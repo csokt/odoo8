@@ -43,23 +43,38 @@ class Kotogep(models.Model):
   # virtual fields
   kotogep_log_ids     = fields.One2many('kotode.kotogep_log_view', 'kotogep_id', u'Logok')
 
+  # @api.one
+  def vissza(self, napok):
+    import pytz
+    import datetime
+
+    now = datetime.datetime.now(pytz.timezone('Europe/Budapest'))
+    today_beginning = datetime.datetime(now.year, now.month, now.day)
+    kezd = fields.Datetime.to_string(today_beginning - datetime.timedelta(days=napok) - now.tzinfo.utcoffset(now))
+    min_log_id = self.env['kotode.kotogep_log'].search([('datum','>=',kezd), ('kotogep_id','=',self.id)], limit=1, order='id').id
+    max_log_id = self.env['kotode.kotogep_log'].search([('kotogep_id','=',self.id)], limit=1, order='id desc').id
+    self.min_log_id = min_log_id
+    self.max_log_id = max_log_id
+    # return True
+
   @api.one
-  def ma(self):
-    # import datetime
-    # dt = datetime.datetime
-    kezd = fields.Date.datetime.datetime.combine(fields.Date.context_today(), fields.Date.datetime.time(0,0,0))
-    # kezd = fields.Date.context_today(self)
-    raise exceptions.Warning(type(kezd))
-    log_id = self.env['kotode.kotogep_log'].search([('datum','>',kezd)], limit=1, order='datum, id').id
-    raise exceptions.Warning(log_id)
+  def vissza0(self):
+    self.vissza(0)
     return True
 
   @api.one
-  def vissza1(self):
+  def vissza2(self):
+    self.vissza(2)
     return True
 
   @api.one
   def vissza7(self):
+    self.vissza(7)
+    return True
+
+  @api.one
+  def vissza30(self):
+    self.vissza(30)
     return True
 
   @api.one
@@ -67,8 +82,8 @@ class Kotogep(models.Model):
     log_view_ids = self.kotogep_log_ids.mapped('id')
     log_ids = self.env['kotode.kotogep_log'].search([('id','in',log_view_ids)])
     log_ids.write({'megjegyzes_id': self.megjegyzes_id.id})
-    if len(self.kotogep_log_ids) > 10:
-      raise exceptions.Warning(u'Maximum tíz sor módosítható egyidejűleg!')
+    if len(self.kotogep_log_ids) > 100:
+      raise exceptions.Warning(u'Maximum száz sor módosítható egyidejűleg!')
     return True
 
 ############################################################################################################################  Dolgozó  ###
