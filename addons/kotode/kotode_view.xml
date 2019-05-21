@@ -2,30 +2,6 @@
 <openerp>
   <data>
     <!--####################################################################################################################  Mecmor  -->
-    <record id="view_form_mecmor"    model="ir.ui.view">
-      <field name="name">Mecmor Form</field>
-      <field name="model">kotode.mecmor</field>
-      <field name="arch" type="xml">
-        <form>
-          <sheet>
-            <group col="4">
-              <field name="cimke"/>
-              <field name="datum"/>
-              <field name="gep"/>
-              <field name="kod"/>
-              <field name="adat1"/>
-              <field name="adat2"/>
-              <field name="adat3"/>
-              <field name="muszak"/>
-              <field name="eltelt_ido"/>
-              <field name="eltelt_ido_perc"/>
-              <field name="azonosito"/>
-            </group>
-          </sheet>
-        </form>
-      </field>
-    </record>
-
     <record id="view_tree_mecmor"    model="ir.ui.view">
       <field  name="name">Mecmor Tree</field>
       <field  name="model">kotode.mecmor</field>
@@ -89,7 +65,9 @@
      <field name="arch" type="xml">
        <graph string="Mecmor értékelés"   type="pivot">
          <field name="datum"              type="row"/>
+         <field name="cimke"              type="row"/>
          <field name="muszak"             type="col"/>
+         <field name="eltelt_ido_perc"    type="measure"/>
        </graph>
      </field>
     </record>
@@ -128,6 +106,7 @@
                 <field name="jelzes"/>
                 <field name="datum"/>
                 <field name="muszak"/>
+                <field name="muszak3"/>
                 <field name="idotartam"/>
                 <field name="idotartam_perc"/>
                 <field name="idotartam_ora"/>
@@ -141,8 +120,6 @@
         </form>
       </field>
     </record>
-            <!-- <field name="kotogep_log_ids"  widget="many2many_tags"   domain="[('muszak', '=', '2')]" /> -->
-            <!-- <field name="kotogep_log_ids"     domain="{[('id', '&gt;=', 10), ('id', '&lt;=', 20)]}" /> -->
 
     <record id="view_tree_kotogep"    model="ir.ui.view">
       <field  name="name">Kotogep Tree</field>
@@ -162,29 +139,6 @@
     </record>
 
     <!--####################################################################################################################  Kötőgép log  -->
-    <record id="view_form_kotogep_log"    model="ir.ui.view">
-      <field name="name">Kötőgép log Form</field>
-      <field name="model">kotode.kotogep_log</field>
-      <field name="arch" type="xml">
-        <form>
-          <sheet>
-            <group col="4">
-              <field name="jelzes"/>
-              <field name="datum"/>
-              <field name="uzem"/>
-              <field name="gepazonosito"/>
-              <field name="gep"/>
-              <field name="muszak"/>
-              <field name="idotartam"/>
-              <field name="idotartam_perc"/>
-              <field name="idotartam_ora"/>
-              <field name="megjegyzes_id"/>
-            </group>
-          </sheet>
-        </form>
-      </field>
-    </record>
-
     <record id="view_tree_kotogep_log"    model="ir.ui.view">
       <field  name="name">Kötőgép log Tree</field>
       <field  name="model">kotode.kotogep_log</field>
@@ -196,6 +150,7 @@
           <field name="gepazonosito"/>
           <field name="gep"/>
           <field name="muszak"/>
+          <field name="muszak3"/>
           <field name="idotartam"/>
           <field name="idotartam_perc"/>
           <field name="idotartam_ora"/>
@@ -220,6 +175,8 @@
           <separator/>
           <filter name="filter_muszak1"     string="Műszak1"                domain="[('muszak','=','1')]"/>
           <filter name="filter_muszak2"     string="Műszak2"                domain="[('muszak','=','2')]"/>
+          <filter name="filter_muszak3"     string="Műszak3"                domain="[('muszak','=','3')]"/>
+          <separator/>
           <filter name="filter_muszak3_1"   string="Műszak3/1"              domain="[('muszak','=','3/1')]"/>
           <filter name="filter_muszak3_2"   string="Műszak3/2"              domain="[('muszak','=','3/2')]"/>
           <separator/>
@@ -253,28 +210,6 @@
     </record>
 
     <!--####################################################################################################################  Státusz log  -->
-    <record id="view_form_status_log"    model="ir.ui.view">
-      <field name="name">Státusz log Form</field>
-      <field name="model">kotode.status_log</field>
-      <field name="arch" type="xml">
-        <form>
-          <sheet>
-            <group col="4">
-              <field name="jelzes"/>
-              <field name="datum"/>
-              <field name="uzem"/>
-              <field name="gepazonosito"/>
-              <field name="gep"/>
-              <field name="muszak"/>
-              <field name="idotartam"/>
-              <field name="idotartam_perc"/>
-              <field name="idotartam_ora"/>
-            </group>
-          </sheet>
-        </form>
-      </field>
-    </record>
-
     <record id="view_tree_status_log"    model="ir.ui.view">
       <field  name="name">Státusz log Tree</field>
       <field  name="model">kotode.status_log</field>
@@ -286,6 +221,7 @@
           <field name="gepazonosito"/>
           <field name="gep"/>
           <field name="muszak"/>
+          <field name="muszak3"/>
           <field name="idotartam"/>
           <field name="idotartam_perc"/>
           <field name="idotartam_ora"/>
@@ -307,6 +243,8 @@
           <separator/>
           <filter name="filter_muszak1"     string="Műszak1"                domain="[('muszak','=','1')]"/>
           <filter name="filter_muszak2"     string="Műszak2"                domain="[('muszak','=','2')]"/>
+          <filter name="filter_muszak3"     string="Műszak3"                domain="[('muszak','=','3')]"/>
+          <separator/>
           <filter name="filter_muszak3_1"   string="Műszak3/1"              domain="[('muszak','=','3/1')]"/>
           <filter name="filter_muszak3_2"   string="Műszak3/2"              domain="[('muszak','=','3/2')]"/>
           <separator/>
@@ -372,10 +310,10 @@
     </record>
 
     <!--####################################################################################################################  Actions  -->
-    <act_window id="mecmor"               name="Mecmor"               res_model="kotode.mecmor"                                                       view_mode="tree,form"/>
-    <act_window id="kotogep_log"          name="Kötőgépek"            res_model="kotode.kotogep_log"                                                  view_mode="tree,form"/>
-    <act_window id="status_log"           name="Státusz"              res_model="kotode.status_log"                                                   view_mode="tree,form"/>
-    <act_window id="mqtt_log"             name="MQTT"                 res_model="kotode.mqtt_log"                                                     view_mode="tree,form"/>
+    <act_window id="mecmor"               name="Mecmor"               res_model="kotode.mecmor"                                                       view_mode="tree"/>
+    <act_window id="kotogep_log"          name="Kötőgépek"            res_model="kotode.kotogep_log"                                                  view_mode="tree"/>
+    <act_window id="status_log"           name="Státusz"              res_model="kotode.status_log"                                                   view_mode="tree"/>
+    <act_window id="mqtt_log"             name="MQTT"                 res_model="kotode.mqtt_log"                                                     view_mode="tree"/>
 
     <act_window id="kotogep"              name="Kötőgépek"            res_model="kotode.kotogep"                                                      view_mode="tree,form"/>
     <act_window id="dolgozo"              name="Dolgozók"             res_model="kotode.dolgozo"                                                      view_mode="tree,form"/>
@@ -386,8 +324,8 @@
                                                                       context="{'search_default_filter_sik':1, 'search_default_filter_nincs_megj':1}"/>
     <act_window id="status_ertekel"       name="Státusz értékelés"    res_model="kotode.status_log"     view_id="view_graph_status_ertekel"           view_mode="graph"
                                                                       context="{'search_default_filter_sik':1}"/>
-    <act_window id="mecmor_ertekel"       name="Mecmor értékelés"     res_model="kotode.mecmor"         view_id="view_graph_mecmor_ertekel"           view_mode="graph"
-                                                                      context="{'search_default_filter_szedes':1}"/>
+    <act_window id="mecmor_ertekel"       name="Mecmor értékelés"     res_model="kotode.mecmor"         view_id="view_graph_mecmor_ertekel"           view_mode="graph"/>
+
     <!--####################################################################################################################  Menu  items  -->
     <menuitem id="menu_root"              name="Kötöde"                       sequence="64"                       groups="group_kotode_viewer" />
 

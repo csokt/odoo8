@@ -23,11 +23,14 @@ log1 AS (
 ),
 log AS (
   SELECT log1.*, gep.id AS kotogep_id, gep.name AS gepnev, gep.uzem,
-  CASE WHEN ora < 6 THEN '3/2'
+  CASE WHEN ora < 6 THEN '3'
        WHEN ora < 14 THEN '1'
        WHEN ora < 22 THEN '2'
-  ELSE '3/1'
+  ELSE '3'
   END AS muszak,
+  CASE WHEN ora < 6 THEN '3/2'
+       WHEN ora >= 22 THEN '3/1'
+  END AS muszak3,
   CASE source
     WHEN 'status' THEN
       CASE payload
@@ -54,8 +57,8 @@ log AS (
   FROM log1
   JOIN kotode_kotogep AS gep ON gep.azonosito = log1.gepazonosito
 )
-INSERT INTO kotode_kotogep_log (jelzes, datum, uzem, kotogep_id, gepazonosito, gep, muszak, mqtt_log_id)
-SELECT jelzes, datum, uzem, kotogep_id, gepazonosito, gepnev, muszak, id FROM log WHERE jelzes IS NOT NULL order by id
+INSERT INTO kotode_kotogep_log (jelzes, datum, uzem, kotogep_id, gepazonosito, gep, muszak, muszak3, mqtt_log_id)
+SELECT jelzes, datum, uzem, kotogep_id, gepazonosito, gepnev, muszak, muszak3, id FROM log WHERE jelzes IS NOT NULL order by id
 ;
 
 WITH
@@ -81,19 +84,22 @@ log1 AS (
 ),
 log AS (
   SELECT log1.*, gep.id AS kotogep_id, gep.name AS gepnev, gep.uzem,
-  CASE WHEN ora < 6 THEN '3/2'
+  CASE WHEN ora < 6 THEN '3'
        WHEN ora < 14 THEN '1'
        WHEN ora < 22 THEN '2'
-  ELSE '3/1'
+  ELSE '3'
   END AS muszak,
+  CASE WHEN ora < 6 THEN '3/2'
+       WHEN ora >= 22 THEN '3/1'
+  END AS muszak3,
   CASE source
     WHEN 'status' THEN payload
   END AS jelzes
   FROM log1
   JOIN kotode_kotogep AS gep ON gep.azonosito = log1.gepazonosito
 )
-INSERT INTO kotode_status_log (jelzes, datum, uzem, kotogep_id, gepazonosito, gep, muszak, mqtt_log_id)
-SELECT jelzes, datum, uzem, kotogep_id, gepazonosito, gepnev, muszak, id FROM log WHERE jelzes IS NOT NULL order by id
+INSERT INTO kotode_status_log (jelzes, datum, uzem, kotogep_id, gepazonosito, gep, muszak, muszak3, mqtt_log_id)
+SELECT jelzes, datum, uzem, kotogep_id, gepazonosito, gepnev, muszak, muszak3, id FROM log WHERE jelzes IS NOT NULL order by id
 ;
 
 WITH
