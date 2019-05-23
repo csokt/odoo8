@@ -38,6 +38,11 @@ log AS (
       END
     WHEN 'sensor' THEN
     CASE sensor
+      WHEN 'pulse' THEN
+        CASE payload
+          WHEN '1.00' THEN 'termel'
+          WHEN '0.00' THEN 'all'
+        END
       WHEN 'green' THEN
         CASE payload
           WHEN '1.0' THEN 'termel'

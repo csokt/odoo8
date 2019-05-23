@@ -204,6 +204,7 @@
          <field name="datum"              type="row"/>
          <field name="jelzes"             type="row"/>
          <field name="muszak"             type="col"/>
+         <field name="gep"                type="col"/>
          <field name="idotartam_ora"      type="measure"/>
        </graph>
      </field>
