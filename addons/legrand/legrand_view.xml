@@ -768,6 +768,7 @@
             <field name="jegyzet"/>
             <field name="gyartasi_hely_id"    options="{'no_create': True, 'no_open': True}"/>
             <field name="utolso_feljegyzes"/>
+            <field name="gyartas_szunetel_e"/>
             <field name="feljegyzes_ideje"/>
             <field name="feljegyzo_id"/>
             <field name="leallas_ok"/>
@@ -858,6 +859,7 @@
           <field name="hatralek_db"/>
           <field name="hatralek_ora"          sum="hátralék óra"/>
           <field name="utolso_feljegyzes"/>
+          <field name="gyartas_szunetel_e"/>
           <field name="feljegyzes_ideje"/>
           <field name="feljegyzo_id"/>
           <field name="aktivitas"/>
@@ -898,6 +900,7 @@
           <separator/>
           <filter name="filter_carnet"      string="Carnet"                 domain="[('carnet_e','=',True)]"/>
           <filter name="filter_csokkentve"  string="Csökkentve/Visszavonva" domain="[('csokkentve_e','=',True)]"/>
+          <filter name="filter_szunetel"    string="Gyártás szünetel"       domain="[('gyartas_szunetel_e','=',True)]"/>
           <filter name="filter_leallas"     string="Gyártás áll"            domain="[('aktivitas','=','áll')]"/>
           <group expand="0" string="Csoportosítás">
             <filter name="group_gyhely"     string="Gyártási hely"          context="{'group_by': 'gyartasi_hely_id'}"/>
@@ -1150,6 +1153,7 @@
           <field name="cikk_id"/>
           <field name="cikknev"/>
           <field name="feljegyzes"/>
+          <field name="gyartas_szunetel_e"/>
           <field name="create_uid"          readonly="1"    string="Felvette"/>
           <field name="create_date"         readonly="1"    string="Létrehozás ideje"/>
         </tree>

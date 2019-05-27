@@ -706,6 +706,7 @@ class LegrandGyartasiLap(models.Model):
   szamlazott_ora      = fields.Float(u'Számlázott óra',   digits=(16, 2), compute='_compute_szamlazott_ora',  store=True)
   szamlazhato_ora     = fields.Float(u'Számlázható óra',  digits=(16, 2), compute='_compute_szamlazhato_ora', store=True)
   termekcsoport       = fields.Char(u'Termékcsoport',     related='cikk_id.termekcsoport',    readonly=True,  store=True)
+  gyartas_szunetel_e  = fields.Boolean(u'Gyártás szünetel?', readonly=True, states={'gyartas': [('readonly', False)]})
   leallas_ok          = fields.Char(u'Gyártás leállásának oka', readonly=True, states={'gyartas': [('readonly', False)]})
   aktivitas           = fields.Char(u'Gyártás aktivitás', compute='_compute_aktivitas', store=True)
   leallas_felelos     = fields.Selection([('Szefo',u'Szefo'),('Legrand',u'Legrand'),('vis maior',u'vis maior')], u'Felelős', readonly=True, states={'gyartas': [('readonly', False)]})
@@ -1179,8 +1180,16 @@ class LegrandFeljegyzes(models.Model):
   gyartasi_lap_id     = fields.Many2one('legrand.gyartasi_lap',  u'Gyártási lap', auto_join=True)
   cikk_id             = fields.Many2one('legrand.cikk',  u'Cikkszám', auto_join=True)
   feljegyzes          = fields.Char(u'Feljegyzés', required=True)
+  gyartas_szunetel_e  = fields.Boolean(u'Gyártás szünetel?')
   # virtual fields
   cikknev             = fields.Char(u'Cikknév', related='cikk_id.cikknev', readonly=True)
+
+  @api.model
+  def create(self, vals):
+    fej = super(LegrandFeljegyzes, self).create(vals)
+    if fej.gyartas_szunetel_e:
+      fej.gyartasi_lap_id.gyartas_szunetel_e = fej.gyartas_szunetel_e
+    return fej
 
   @api.onchange('gyartasi_lap_id')
   def onchange_gyartasi_lap_id(self):
