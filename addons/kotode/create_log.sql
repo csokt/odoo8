@@ -36,28 +36,7 @@ log AS (
       CASE payload
         WHEN 'offline' THEN 'ki'
       END
-    WHEN 'sensor' THEN
-    CASE sensor
-      WHEN 'pulse' THEN
-        CASE payload
-          WHEN '1.00' THEN 'termel'
-          WHEN '0.00' THEN 'all'
-        END
-      WHEN 'green' THEN
-        CASE payload
-          WHEN '1.0' THEN 'termel'
-          WHEN '0.5' THEN 'all'
-        END
-      WHEN 'yellow' THEN
-        CASE payload
-          WHEN '1.0' THEN 'all'
-        END
-      WHEN 'red' THEN
-        CASE payload
-          WHEN '1.0' THEN 'hiba'
-          WHEN '0.5' THEN 'hiba'
-        END
-    END
+    WHEN 'sensor' THEN payload
   END AS jelzes
   FROM log1
   JOIN kotode_kotogep AS gep ON gep.azonosito = log1.gepazonosito
