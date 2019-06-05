@@ -1186,10 +1186,11 @@ class LegrandFeljegyzes(models.Model):
 
   @api.model
   def create(self, vals):
-    fej = super(LegrandFeljegyzes, self).create(vals)
-    if fej.gyartas_szunetel_e:
-      fej.gyartasi_lap_id.gyartas_szunetel_e = fej.gyartas_szunetel_e
-    return fej
+    felj = super(LegrandFeljegyzes, self).create(vals)
+    if felj.gyartas_szunetel_e:
+      # felj.gyartasi_lap_id.gyartas_szunetel_e = felj.gyartas_szunetel_e
+      self.env.cr.execute("UPDATE legrand_gyartasi_lap SET gyartas_szunetel_e = true WHERE id = " + str(felj.gyartasi_lap_id.id))
+    return felj
 
   @api.onchange('gyartasi_lap_id')
   def onchange_gyartasi_lap_id(self):

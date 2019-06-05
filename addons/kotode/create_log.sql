@@ -36,7 +36,10 @@ log AS (
       CASE payload
         WHEN 'offline' THEN 'ki'
       END
-    WHEN 'sensor' THEN payload
+    WHEN 'sensor' THEN
+      CASE sensor
+        WHEN 'machine' THEN payload
+      END
   END AS jelzes
   FROM log1
   JOIN kotode_kotogep AS gep ON gep.azonosito = log1.gepazonosito
