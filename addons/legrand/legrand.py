@@ -690,6 +690,7 @@ class LegrandGyartasiLap(models.Model):
   cikkek_uid          = fields.Char(u'Összes cikk uid', readonly=False)
   gyartasi_hely_id    = fields.Many2one('legrand.hely', u'Fő gyártási hely', domain=[('szefo_e', '=', True)], states={'kesz': [('readonly', True)]})
   javitas_e           = fields.Boolean(u'Javítás?', default=False, states={'kesz': [('readonly', True)]})
+  szallito            = fields.Char(u'Szállító',    readonly=True)
   raklap              = fields.Char(u'Raklap',      readonly=True)
   raklap_min          = fields.Char(u'Raklap min',  readonly=True)
   raklap_max          = fields.Char(u'Raklap max',  readonly=True)
@@ -1004,11 +1005,21 @@ class LegrandGylapHomogen(models.Model):
   state               = fields.Selection([('uj',u'Új'),('mterv',u'Műveletterv'),('gyartas',u'Gyártás'),('gykesz',u'Gyártás kész'),('kesz',u'Rendelés teljesítve')],
                                         u'Gy.lap állapot', related='gyartasi_lap_id.state', readonly=True, store=True)
   # virtual fields
+  sorszam             = fields.Integer(u'Sorszám', compute='_compute_sorszam')
   rendelesszam        = fields.Char(u'Rendelésszám', related='gyartasi_lap_id.rendelesszam', readonly=True)
   termekkod           = fields.Char(u'Tételkód', related='gyartasi_lap_id.termekkod', readonly=True)
+  termeknev           = fields.Char(u'Terméknév', related='gyartasi_lap_id.cikknev', readonly=True)
+  termekcsoport       = fields.Char(u'Termékcsoport', related='gyartasi_lap_id.termekcsoport', readonly=True)
+  rendelt_db          = fields.Integer(u'Rendelt db', related='gyartasi_lap_id.rendelt_db', readonly=True)
   szamlazhato_db      = fields.Integer(u'Számlázható', related='gyartasi_lap_id.szamlazhato_db', readonly=True)
   hatarido            = fields.Date(u'Határidő', related='gyartasi_lap_id.hatarido', readonly=True)
+  dummy               = fields.Char(u'Dummy', compute='_compute_dummy')
   active              = fields.Boolean(u'Aktív?', related='gyartasi_lap_id.active', readonly=True)
+
+  @api.one
+  @api.depends('gyartasi_lap_id')
+  def _compute_sorszam(self):
+    self.sorszam = self.gyartasi_lap_id.id
 
   @api.one
   @api.depends('gyartasi_lap_id', 'homogen_id')
@@ -1048,6 +1059,11 @@ class LegrandGylapHomogen(models.Model):
   @api.depends('szamlazott_ora', 'teljesitett_ora')
   def _compute_szamlazhato_ora(self):
     self.szamlazhato_ora = self.teljesitett_ora - self.szamlazott_ora
+
+  @api.one
+  @api.depends('gyartasi_lap_id')
+  def _compute_dummy(self):
+    self.dummy = ''
 
   @api.one
   def toggle_sajat(self):
@@ -1264,6 +1280,8 @@ class LegrandMeoJegyzokonyv(models.Model):
   javitasi_ido        = fields.Float(u'Javításra fordított idő', digits=(16, 2))
   dolgozo_megjegyzese = fields.Char(u'Dolgozó megjegyzése')
   megjegyzes          = fields.Char(u'Megjegyzés')
+  logisztikai_hiba_e  = fields.Boolean(u'Logisztikai hiba?')
+  szerelesi_hiba_e    = fields.Boolean(u'Szerelési hiba?')
   muszakvezeto_id     = fields.Many2one('nexon.szemely', u'Műszakvezető', auto_join=True)
   gyartaskozi_ell_id  = fields.Many2one('nexon.szemely', u'Gyártásközi ellenőr', auto_join=True)
   keszaru_ell_id      = fields.Many2one('nexon.szemely', u'Készáru ellenőr', auto_join=True)
@@ -1382,7 +1400,7 @@ class LegrandGylapLezerTampon(models.Model):
     return super(LegrandGylapLezerTampon, self).write(vals)
 
   @api.one
-  @api.depends('modositott_db', 'muvelet_db', 'gylap_lezer_sor_ids.mennyiseg')
+  @api.depends('gyartasi_lap_id.modositott_db', 'lezer_tampon_id.muvelet_db', 'gylap_lezer_sor_ids.mennyiseg')
   def _compute_db(self):
     self.osszes_db = self.modositott_db * self.muvelet_db
     self.kesz_db   = sum(self.gylap_lezer_sor_ids.mapped('mennyiseg'))

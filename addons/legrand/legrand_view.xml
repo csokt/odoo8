@@ -761,6 +761,8 @@
             <field name="raktar"              />
             <field name="aktivitas"           />
             <field name="leallas_felelos"     />
+
+            <field name="szallito"            />
             <field name="active"              groups="legrand.group_legrand_director"/>
           </group>
           <group col="4">
@@ -823,6 +825,7 @@
           <field name="hatarido"/>
           <field name="jegyzet"/>
           <field name="modositott_db"         string="Rendelt db"/>
+          <field name="gyartasi_hely_id"/>
           <field name="bom_id"/>
           <field name="check_cikkek_uid"/>
           <field name="state"                 invisible="1"/>
@@ -994,6 +997,30 @@
           <field name="termekcsalad"/>
           <field name="hatarido"/>
           <field name="gyartasi_hely_id"/>
+          <field name="state"                 invisible="1"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_tree_gylap_homogen_excel"    model="ir.ui.view">
+      <field  name="name">Ellenőrző excel Tree</field>
+      <field  name="model">legrand.gylap_homogen</field>
+      <field  name="arch" type="xml">
+        <tree create="false" edit="false">
+          <field name="sorszam"/>
+          <field name="rendelesszam"/>
+          <field name="termekkod"/>
+          <field name="rendelt_db"/>
+          <field name="rendelt_ora"/>
+          <field name="dummy"                 string="Egységár"/>
+          <field name="dummy"                 string="Összbér"/>
+          <field name="homogen_id"/>
+          <field name="termekcsalad"/>
+          <field name="hatarido"/>
+          <field name="termeknev"/>
+          <field name="gyartasi_hely_id"/>
+          <field name="termekcsoport"/>
+          <field name="beall_ido"/>
           <field name="state"                 invisible="1"/>
         </tree>
       </field>
@@ -1299,6 +1326,8 @@
             <field name="write_date"            invisible="1"/>
             <field name="gylap_szefo_muv_id1"/>
             <field name="gylap_szefo_muv_id2"/>
+            <field name="logisztikai_hiba_e"/>
+            <field name="szerelesi_hiba_e"/>
           </group>
           <group col="2">
             <field name="hiba_leirasa"/>
@@ -1808,6 +1837,11 @@
                 domain="[('state','=','gyartas')]"                  context="{'search_default_filter_gyartas': 1}"/>
     <act_window id="gylap_muvelet"      name="Művelet"              res_model="legrand.gylap_legrand_muvelet"                                         view_mode="tree,form"/>
     <act_window id="gylap_homogen"      name="Homogén"              res_model="legrand.gylap_homogen"                                                 view_mode="tree,form"/>
+
+    <act_window id="gylap_homogen_xls"  name="Excel export"         res_model="legrand.gylap_homogen"     view_id="view_tree_gylap_homogen_excel"     view_mode="tree"
+                domain="[('gyartasi_lap_id.state','=','uj'),('sajat','=',True)]"/>
+
+
     <act_window id="szefo_muvelet"      name="Művelet"              res_model="legrand.gylap_szefo_muvelet" view_id="view_tree_szefo_muvelet"         view_mode="tree"/>
     <act_window id="gylap_dbjegyzek"    name="Darabjegyzék"         res_model="legrand.gylap_dbjegyzek"   view_id="view_tree_gylap_dbjegyzek"         view_mode="tree"/>
     <act_window id="muveletvegzes"      name="Műveletvégzés"        res_model="legrand.muveletvegzes"                                                 view_mode="tree"/>
@@ -1884,7 +1918,8 @@
       <menuitem id="menu_documents"       name="Dokumentumok"                 parent="menu_gyartas_elok"          sequence="10" action="szefo.datawh_legrand"   groups="group_legrand_director" />
       <menuitem id="menu_gylap_import"    name="Gyártási lap import"          parent="menu_gyartas_elok"          sequence="20" action="gylap_import"           groups="group_legrand_director" />
       <menuitem id="menu_gylap_uj"        name="Műveletterv készítés"         parent="menu_gyartas_elok"          sequence="30" action="gylap_uj"               groups="group_legrand_director" />
-      <menuitem id="menu_gylap_mterv"     name="Gyártás indítás"              parent="menu_gyartas_elok"          sequence="40" action="gylap_mterv" />
+      <menuitem id="menu_gylap_hom_xls"   name="Excel export"                 parent="menu_gyartas_elok"          sequence="40" action="gylap_homogen_xls"      groups="group_legrand_director" />
+      <menuitem id="menu_gylap_mterv"     name="Gyártás indítás"              parent="menu_gyartas_elok"          sequence="50" action="gylap_mterv" />
 
     <menuitem id="menu_segedlet"          name="Segédeszközök"                parent="menu_root"                  sequence="70"                                 groups="group_legrand_user"/>
       <menuitem id="menu_impex"           name="Impex"                        parent="menu_segedlet"              sequence="10" action="impex"          />

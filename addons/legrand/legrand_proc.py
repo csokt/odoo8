@@ -145,6 +145,7 @@ class LegrandParameter(models.Model):
         'kiadas_ideje'  : fej['kiadas_ideje'],
         'hatarido_str'  : fej['hatarido_str'],
         'hatarido'      : hatarido,
+        'szallito'      : fej['szallito'],
         'jegyzet'       : fej['jegyzet'],
         'raklap'        : fej['raklap'],
         'raklap_min'    : fej['raklap_min'],
