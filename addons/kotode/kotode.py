@@ -41,7 +41,19 @@ class Kotogep(models.Model):
   megjegyzes_id       = fields.Many2one('kotode.megjegyzes',  u'Megjegyzés')
   active              = fields.Boolean(u'Aktív?', default=True)
   # virtual fields
+  allapot             = fields.Selection([('online',u'Elérhető'),('offline',u'Nem elérhető')], u'Állapot', compute='_compute_allapot')
+  jelzes              = fields.Selection([('termel',u'Termel'),('all',u'Áll'),('hiba',u'Hibával áll'),('ki',u'Kikapcsolva')], u'Jelzés', compute='_compute_jelzes')
   kotogep_log_ids     = fields.One2many('kotode.kotogep_log_view', 'kotogep_id', u'Logok')
+  status_log_ids      = fields.One2many('kotode.status_log', 'kotogep_id', u'Státusz logok')
+
+  @api.one
+  def _compute_allapot(self):
+    self.allapot = self.env['kotode.status_log'].search([('kotogep_id', '=', self.id)], order='id desc', limit=1).jelzes
+    # self.allapot = self.status_log_ids[-1].jelzes if len(self.status_log_ids) else False
+
+  @api.one
+  def _compute_jelzes(self):
+    self.jelzes = self.env['kotode.kotogep_log'].search([('kotogep_id', '=', self.id)], order='id desc', limit=1).jelzes
 
   # @api.one
   def vissza(self, napok):
@@ -180,7 +192,7 @@ class KotogepLogView(models.Model):
 class StatusLog(models.Model):
   _name               = 'kotode.status_log'
   _order              = 'id'
-  jelzes              = fields.Selection([('online',u'Elérhető'),('offline',u'Nem elérhető')], u'Jelzés')
+  jelzes              = fields.Selection([('online',u'Elérhető'),('offline',u'Nem elérhető')], u'Állapot')
   datum               = fields.Datetime(u'Dátum')
   uzem                = fields.Selection([('kor',u'Körkötő'),('sik',u'Síkkötő')], u'Üzem')
   kotogep_id          = fields.Many2one('kotode.kotogep',  u'Kötőgép')
@@ -199,3 +211,33 @@ class MqttLog(models.Model):
   _order              = 'id'
   topic               = fields.Char(u'Topic')
   payload             = fields.Char(u'Payload')
+
+class Munkaszunet(models.TransientModel):
+  _name               = 'kotode.munkaszunet'
+  kezd                = fields.Datetime(u'Kezdő idő', required=True)
+  zar                 = fields.Datetime(u'Záró idő', required=True)
+  idotartam           = fields.Char(u'Időtartam', readonly=True)
+  sorok               = fields.Integer(u'Módosított sorok száma', readonly=True)
+  megjegyzes_id       = fields.Many2one('kotode.megjegyzes',  u'Megjegyzés')
+
+  @api.onchange('kezd', 'zar')
+  def onchange_kezd_zar(self):
+    if self.kezd and self.zar:
+      # self.idotartam = (fields.Datetime.from_string(self.zar) - fields.Datetime.from_string(self.kezd)).total_seconds()
+      self.idotartam = fields.Datetime.from_string(self.zar) - fields.Datetime.from_string(self.kezd)
+      records = self.env['kotode.kotogep_log'].search([('datum','>=',self.kezd), ('datum','<',self.zar)])
+      self.sorok = len(records)
+
+  @api.multi
+  def munkaszunet_ir(self):
+    self.ensure_one()
+    if self.kezd >= self.zar: raise exceptions.Warning(u'A kezdő idő legyen a záró idő előtt!')
+    records = self.env['kotode.kotogep_log'].search([('datum','>=',self.kezd), ('datum','<',self.zar)])
+    # raise exceptions.Warning(len(records))
+    records.write({'megjegyzes_id' : self.megjegyzes_id.id})
+    return {
+      'type':       'ir.actions.act_window',
+      'res_model':  'kotode.kotogep_log',
+      'view_mode':  'tree',
+    }
+

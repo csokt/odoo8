@@ -124,7 +124,7 @@ class LegrandParameter(models.Model):
       gylap_cikkek_uid = calc_cikkek_uid(gylap['darabjegyzek'], 'cikkszam')
       bom  = Bom.search([('cikk_id', '=', cikk.id), ('cikkek_uid', '=', gylap_cikkek_uid)], limit=1)
       if not len(bom) or javitas_e:
-        verzio = '['+fej['rendelesszam']+']' if javitas_e else 'késztermék'
+        verzio = '['+fej['rendelesszam']+']' if javitas_e else 'új'
 #        bom = Bom.create({'cikk_id': cikk.id, 'verzio': verzio, 'gylap_default_e': not javitas_e})
         bom = Bom.create({'cikk_id': cikk.id, 'verzio': verzio})
         for alk in gylap['darabjegyzek']:

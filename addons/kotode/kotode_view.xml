@@ -97,6 +97,8 @@
               <field name="finomsag"/>
               <field name="uzem"/>
               <field name="sor"/>
+              <field name="allapot"/>
+              <field name="jelzes"/>
             </group>
           <div>
           <sheet>
@@ -113,6 +115,18 @@
                 <field name="megjegyzes_id"/>
                 <button name="elso"             type="object" string="Első"/>
                 <button name="utolso"           type="object" string="Utolsó"/>
+              </tree>
+            </field>
+            <div>&#x2063;</div>
+            <field name="status_log_ids">
+              <tree>
+                <field name="jelzes"/>
+                <field name="datum"/>
+                <field name="muszak"/>
+                <field name="muszak3"/>
+                <field name="idotartam"/>
+                <field name="idotartam_perc"/>
+                <field name="idotartam_ora"/>
               </tree>
             </field>
           </sheet>
@@ -132,7 +146,8 @@
           <field name="finomsag"/>
           <field name="uzem"/>
           <field name="sor"/>
-          <field name="active"/>
+          <field name="allapot"/>
+          <field name="jelzes"/>
           <field name="kotogep_log_ids"/>
         </tree>
       </field>
@@ -201,10 +216,9 @@
      <field name="model">kotode.kotogep_log</field>
      <field name="arch" type="xml">
        <graph string="Kötőgép értékelés"  type="pivot">
-         <field name="datum"              type="row"/>
-         <field name="jelzes"             type="row"/>
-         <field name="muszak"             type="col"/>
-         <field name="gep"                type="col"/>
+         <field name="datum"              type="row"          interval="day"/>
+         <field name="gep"                type="row"/>
+         <field name="jelzes"             type="col"/>
          <field name="idotartam_ora"      type="measure"/>
        </graph>
      </field>
@@ -310,11 +324,35 @@
       </field>
     </record>
 
+    <!--####################################################################################################################  Munkaszünet  -->
+    <record id="view_form_munkaszunet"    model="ir.ui.view">
+      <field name="name">Munkaszünet Form</field>
+      <field name="model">kotode.munkaszunet</field>
+      <field name="arch" type="xml">
+        <form>
+          <h3>A megadott időszakban az összes gépen a megjegyzést beállítja.</h3>
+          <br></br>
+          <group col="2">
+            <field name="kezd"/>
+            <field name="zar"/>
+            <field name="idotartam"/>
+            <field name="sorok"/>
+            <field name="megjegyzes_id"/>
+          </group>
+          <footer>
+            <button type="object" name="munkaszunet_ir" string="Mentés" class="oe_highlight" confirm="A kötőgép log érintett soraiba beírja a megjegyzéseket."/>
+            <button special="cancel"  string="Elvet"/>
+          </footer>
+        </form>
+      </field>
+    </record>
+
     <!--####################################################################################################################  Actions  -->
     <act_window id="mecmor"               name="Mecmor"               res_model="kotode.mecmor"                                                       view_mode="tree"/>
     <act_window id="kotogep_log"          name="Kötőgépek"            res_model="kotode.kotogep_log"                                                  view_mode="tree"/>
     <act_window id="status_log"           name="Státusz"              res_model="kotode.status_log"                                                   view_mode="tree"/>
     <act_window id="mqtt_log"             name="MQTT"                 res_model="kotode.mqtt_log"                                                     view_mode="tree"/>
+    <act_window id="munkaszunet"          name="Munkaszünet beírása"  res_model="kotode.munkaszunet"    view_id="view_form_munkaszunet"               view_mode="form"  target="new"/>
 
     <act_window id="kotogep"              name="Kötőgépek"            res_model="kotode.kotogep"                                                      view_mode="tree,form"/>
     <act_window id="dolgozo"              name="Dolgozók"             res_model="kotode.dolgozo"                                                      view_mode="tree,form"/>
@@ -335,6 +373,7 @@
       <menuitem id="menu_status_log"      name="Státusz"                      parent="menu_log"                   sequence="20" action="status_log" />
       <menuitem id="menu_mecmor"          name="Mecmor"                       parent="menu_log"                   sequence="30" action="mecmor" />
       <menuitem id="menu_mqtt_log"        name="MQTT"                         parent="menu_log"                   sequence="40" action="mqtt_log" />
+      <menuitem id="menu_munkaszunet"     name="Munkaszünetek beírása"        parent="menu_log"                   sequence="50" action="munkaszunet" />
 
     <menuitem id="menu_kimutatas"         name="Kimutatások"                  parent="menu_root"                  sequence="20"                         />
       <menuitem id="menu_kotogep_ertekel" name="Kötőgép értékelés"            parent="menu_kimutatas"             sequence="10" action="kotogep_ertekel" />
