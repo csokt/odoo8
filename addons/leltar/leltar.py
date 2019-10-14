@@ -25,7 +25,7 @@ class LeltarParameter(models.Model):
 
     cursor = mssql_conn.cursor()
     cursor.execute("""SELECT bf_lelt, bf_gyszam
-                      FROM DominoSoft.dbo.beftorzs WHERE targyev = 2017 AND status = 0 AND bf_kiido IS NULL AND bf_gyszam IS NOT NULL order by hivszam""")
+                      FROM DominoSoft.dbo.beftorzs WHERE targyev = 2019 AND status = 0 AND bf_kiido IS NULL AND bf_gyszam IS NOT NULL order by hivszam""")
     row = cursor.fetchone()
     while row:
       leltari_szam, gyartasi_szam = trim(row)
@@ -70,7 +70,7 @@ class LeltarParameter(models.Model):
 
     cursor = mssql_conn.cursor()
     cursor.execute("""SELECT hivszam, bf_lelt, bf_megnev, bf_ltkorzet, bf_ltfelelos, bf_ltcsoport, bf_gyszam, bf_param, bf_vonalkod
-                      FROM DominoSoft.dbo.beftorzs WHERE targyev = 2018 AND status = 0 AND bf_kiido IS NULL order by hivszam""")
+                      FROM DominoSoft.dbo.beftorzs WHERE targyev = 2019 AND status = 0 AND bf_kiido IS NULL order by hivszam""")
     row = cursor.fetchone()
     while row:
       leltarcsoport_id    = None

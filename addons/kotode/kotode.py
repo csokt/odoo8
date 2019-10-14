@@ -28,7 +28,7 @@ class Megjegyzes(models.Model):
 ############################################################################################################################  Kötőgép  ###
 class Kotogep(models.Model):
   _name               = 'kotode.kotogep'
-  _order              = 'azonosito'
+  _order              = 'name'
   _sql_constraints    = [('azonosito_unique', 'unique(azonosito)', 'Ez az azonosító már létezik!')]
   name                = fields.Char(u'Név', required=True)
   azonosito           = fields.Char(u'Azonosító', required=True)
@@ -39,10 +39,12 @@ class Kotogep(models.Model):
   min_log_id          = fields.Integer(u'Min log id', default=0)
   max_log_id          = fields.Integer(u'Max log id', default=80)
   megjegyzes_id       = fields.Many2one('kotode.megjegyzes',  u'Megjegyzés')
-  active              = fields.Boolean(u'Aktív?', default=True)
+  allapot             = fields.Selection([('online',u'Elérhető'),('offline',u'Nem elérhető')], u'Állapot', readonly=True)
+  jelzes              = fields.Selection([('termel',u'Termel'),('all',u'Áll'),('hiba',u'Hibával áll'),('ki',u'Kikapcsolva')], u'Jelzés', readonly=True)
+  aktiv               = fields.Boolean(u'Aktív?', default=True)
   # virtual fields
-  allapot             = fields.Selection([('online',u'Elérhető'),('offline',u'Nem elérhető')], u'Állapot', compute='_compute_allapot')
-  jelzes              = fields.Selection([('termel',u'Termel'),('all',u'Áll'),('hiba',u'Hibával áll'),('ki',u'Kikapcsolva')], u'Jelzés', compute='_compute_jelzes')
+  # allapot             = fields.Selection([('online',u'Elérhető'),('offline',u'Nem elérhető')], u'Állapot', compute='_compute_allapot')
+  # jelzes              = fields.Selection([('termel',u'Termel'),('all',u'Áll'),('hiba',u'Hibával áll'),('ki',u'Kikapcsolva')], u'Jelzés', compute='_compute_jelzes')
   kotogep_log_ids     = fields.One2many('kotode.kotogep_log_view', 'kotogep_id', u'Logok')
   status_log_ids      = fields.One2many('kotode.status_log', 'kotogep_id', u'Státusz logok')
 
@@ -94,8 +96,8 @@ class Kotogep(models.Model):
     log_view_ids = self.kotogep_log_ids.mapped('id')
     log_ids = self.env['kotode.kotogep_log'].search([('id','in',log_view_ids)])
     log_ids.write({'megjegyzes_id': self.megjegyzes_id.id})
-    if len(self.kotogep_log_ids) > 100:
-      raise exceptions.Warning(u'Maximum száz sor módosítható egyidejűleg!')
+    if len(self.kotogep_log_ids) > 300:
+      raise exceptions.Warning(u'Maximum háromszáz sor módosítható egyidejűleg!')
     return True
 
 ############################################################################################################################  Dolgozó  ###
@@ -120,6 +122,7 @@ class KotogepLog(models.Model):
   _order              = 'id'
   jelzes              = fields.Selection([('termel',u'Termel'),('all',u'Áll'),('hiba',u'Hibával áll'),('ki',u'Kikapcsolva')], u'Jelzés', readonly=True)
   datum               = fields.Datetime(u'Dátum', readonly=True, index=True)
+  muszak_datum        = fields.Datetime(u'Műszak dátum', readonly=True, index=True)
   uzem                = fields.Selection([('kor',u'Körkötő'),('sik',u'Síkkötő')], u'Üzem', readonly=True)
   kotogep_id          = fields.Many2one('kotode.kotogep',  u'Kötőgép', readonly=True)
   gepazonosito        = fields.Char(u'Gép azonosító', readonly=True)
@@ -159,7 +162,6 @@ class KotogepLogView(models.Model):
         SELECT log.*
         FROM kotode_kotogep_log AS log
         JOIN kotode_kotogep AS gep ON gep.id = log.kotogep_id AND gep.min_log_id <= log.id AND gep.max_log_id >= log.id
-        WHERE active
       )"""
       % (self._table)
     )
@@ -194,6 +196,7 @@ class StatusLog(models.Model):
   _order              = 'id'
   jelzes              = fields.Selection([('online',u'Elérhető'),('offline',u'Nem elérhető')], u'Állapot')
   datum               = fields.Datetime(u'Dátum')
+  muszak_datum        = fields.Datetime(u'Műszak dátum')
   uzem                = fields.Selection([('kor',u'Körkötő'),('sik',u'Síkkötő')], u'Üzem')
   kotogep_id          = fields.Many2one('kotode.kotogep',  u'Kötőgép')
   gepazonosito        = fields.Char(u'Gép azonosító')
@@ -212,6 +215,7 @@ class MqttLog(models.Model):
   topic               = fields.Char(u'Topic')
   payload             = fields.Char(u'Payload')
 
+############################################################################################################################  Munkaszünet  ###
 class Munkaszunet(models.TransientModel):
   _name               = 'kotode.munkaszunet'
   kezd                = fields.Datetime(u'Kezdő idő', required=True)

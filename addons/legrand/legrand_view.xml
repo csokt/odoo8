@@ -882,6 +882,7 @@
           <field  name="id"                 string="Sorszám"/>
           <field  name="termekcsoport"/>
           <field  name="cikknev"/>
+          <field  name="gylap_dbjegyzek_ids"/>
           <filter name="filter_szentes"     string="Szentes"                domain="[('gyartasi_hely_id.azonosito','=','szentes')]"/>
           <filter name="filter_hmvhely"     string="Hmvhely Bocskai"        domain="[('gyartasi_hely_id.azonosito','=','hmvhely')]"/>
           <filter name="filter_hmvhpet"     string="Hmvhely Petőfi"         domain="[('gyartasi_hely_id.azonosito','=','hmvhpet')]"/>
@@ -1011,7 +1012,7 @@
           <field name="rendelesszam"/>
           <field name="termekkod"/>
           <field name="rendelt_db"/>
-          <field name="rendelt_ora"/>
+          <field name="ossz_ido"/>
           <field name="dummy"                 string="Egységár"/>
           <field name="dummy"                 string="Összbér"/>
           <field name="homogen_id"/>
@@ -1320,30 +1321,38 @@
         <form>
           <sheet>
           <group col="4">
-            <field name="hely_id"/>
-            <field name="id"                    string="Jegyzőkönyv száma"  readonly="1"/>
-            <field name="gyartasi_lap_id"/>
-            <field name="write_date"            invisible="1"/>
-            <field name="gylap_szefo_muv_id1"/>
-            <field name="gylap_szefo_muv_id2"/>
-            <field name="logisztikai_hiba_e"/>
-            <field name="szerelesi_hiba_e"/>
+            <field name="hely_id"                 attrs="{'readonly': [('create_date', '!=', False),('legrand_manager_e', '=', False)]}"
+                                                      options="{'no_create': True, 'no_open': True}"/>
+            <field name="id"                      string="Jegyzőkönyv száma"  readonly="1"/>
+            <field name="gyartasi_lap_id"         attrs="{'readonly': [('create_date', '!=', False),('legrand_manager_e', '=', False)]}"
+                                                      options="{'no_create': True, 'no_open': True}"/>
+            <field name="create_date"             invisible="1"/>
+            <field name="gylap_szefo_muv_id1"     attrs="{'readonly': [('create_date', '!=', False),('legrand_manager_e', '=', False)]}"
+                                                      options="{'no_create': True, 'no_open': True}"/>
+            <field name="gylap_szefo_muv_id2"     attrs="{'readonly': [('create_date', '!=', False),('legrand_manager_e', '=', False)]}"
+                                                      options="{'no_create': True, 'no_open': True}"/>
+            <field name="logisztikai_hiba_e"      attrs="{'readonly': [('create_date', '!=', False),('legrand_manager_e', '=', False)]}"/>
+            <field name="szerelesi_hiba_e"        attrs="{'readonly': [('create_date', '!=', False),('legrand_manager_e', '=', False)]}"/>
           </group>
           <group col="2">
-            <field name="hiba_leirasa"/>
+            <field name="hiba_leirasa"            attrs="{'readonly': [('create_date', '!=', False),('legrand_manager_e', '=', False)]}"/>
             <field name="intezkedesek"/>
             <field name="dolgozo_megjegyzese"/>
-            <field name="megjegyzes"/>
+            <field name="megjegyzes"              attrs="{'readonly': [('create_date', '!=', False),('legrand_manager_e', '=', False)]}"/>
           </group>
           <group col="4">
-            <field name="visszaadott_db"/>
-            <field name="javitasi_ido"/>
-            <field name="dolgozo_id"/>
-            <field name="ellenorizte_id"/>
-            <field name="muszakvezeto_id"/>
-            <field name="gyartaskozi_ell_id"/>
-            <field name="keszaru_ell_id"/>
-            <field name="fioktelep_vezeto_id"/>
+            <field name="visszaadott_db"          attrs="{'readonly': [('create_date', '!=', False),('legrand_manager_e', '=', False)]}"/>
+            <field name="javitasi_ido"            attrs="{'readonly': [('create_date', '!=', False),('legrand_manager_e', '=', False)]}"/>
+            <field name="dolgozo_id"                  options="{'no_create': True, 'no_open': True}"/>
+            <field name="ellenorizte_id"          attrs="{'readonly': [('create_date', '!=', False),('legrand_manager_e', '=', False)]}"
+                                                      options="{'no_create': True, 'no_open': True}"/>
+            <field name="muszakvezeto_id"             options="{'no_create': True, 'no_open': True}"/>
+            <field name="gyartaskozi_ell_id"          options="{'no_create': True, 'no_open': True}"/>
+            <field name="keszaru_ell_id"          attrs="{'readonly': [('create_date', '!=', False),('legrand_manager_e', '=', False)]}"
+                                                      options="{'no_create': True, 'no_open': True}"/>
+            <field name="fioktelep_vezeto_id"     attrs="{'readonly': [('create_date', '!=', False),('legrand_manager_e', '=', False)]}"
+                                                      options="{'no_create': True, 'no_open': True}"/>
+            <field name="legrand_manager_e"       invisible="1"/>
           </group>
             <field name="meo_jkv_selejt_ids"/>
           </sheet>
@@ -1376,11 +1385,11 @@
       <field  name="priority" eval="15"/>
       <field  name="arch" type="xml">
         <tree editable="bottom">
-          <field name="cikk_id"/>
+          <field name="cikk_id"               options="{'no_create': True, 'no_open': True}"/>
           <field name="cikknev"/>
           <field name="selejtezett_db"/>
           <field name="bekerulesi_ar"/>
-          <field name="ertek"             sum="összesen"/>
+          <field name="ertek"                 sum="összesen"/>
         </tree>
       </field>
     </record>

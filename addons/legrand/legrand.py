@@ -1289,12 +1289,19 @@ class LegrandMeoJegyzokonyv(models.Model):
   # virtual fields
   selejt_osszertek    = fields.Float(u'Selejt érték összesen', digits=(16, 0), compute='_compute_selejt_osszertek')
   meo_jkv_selejt_ids  = fields.One2many('legrand.meo_jkv_selejt',  'meo_jegyzokonyv_id', u'Selejtezett alkatrészek', auto_join=True)
+  legrand_manager_e   = fields.Boolean(u'Legrand Manager?',   compute='_check_user_group')
+  legrand_director_e  = fields.Boolean(u'Legrand director?',  compute='_check_user_group')
 
   @api.one
   @api.depends('meo_jkv_selejt_ids')
   def _compute_selejt_osszertek(self):
 #    self.selejt_osszertek = sum(map(lambda r: r.ertek, self.meo_jkv_selejt_ids))
     self.selejt_osszertek = sum(self.meo_jkv_selejt_ids.mapped('ertek'))
+
+  @api.one
+  def _check_user_group(self):
+    self.legrand_manager_e = self.env.user.has_group('legrand.group_legrand_manager')
+    self.legrand_director_e = self.env.user.has_group('legrand.group_legrand_director')
 
 ############################################################################################################################  MEO jegyzőkönyv selejt  ###
 class LegrandMeoJkvSelejt(models.Model):

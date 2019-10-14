@@ -78,10 +78,22 @@
       </field>
     </record>
 
-    <record id="view_tree_nexon_szemely"    model="ir.ui.view">
+    <record id="view_tree_nexon_szemely_default"    model="ir.ui.view">
       <field  name="name">Nexon Szemely Tree</field>
       <field  name="model">nexon.szemely</field>
       <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <tree>
+          <field  name="name"/>
+          <field  name="telephely_id"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_tree_nexon_szemely"    model="ir.ui.view">
+      <field  name="name">Nexon Szemely Tree</field>
+      <field  name="model">nexon.szemely</field>
+      <field  name="priority" eval="16"/>
       <field  name="arch" type="xml">
         <tree>
           <field  name="name"/>
@@ -214,13 +226,13 @@
     </record>
 
     <!--####################################################################################################################  Actions  -->
-    <act_window id="szefo_telephely" name="Telephely" res_model="szefo.telephely" view_mode="tree,form" />
-    <act_window id="nexon_szemely" name="Nexon személy" res_model="nexon.szemely" view_mode="tree,form" />
-    <act_window id="szefo_jogosultsag" name="Jogosultság" res_model="szefo.jogosultsag" view_mode="tree,form" context="{'search_default_filter_enged': 1}" />
-    <act_window id="szefo_jogosultsag_masol" name="Jogosultság másol" res_model="szefo.jogosultsag_masol" view_mode="tree,form" />
-    <act_window id="szefo_log" name="Log" res_model="szefo.log" view_mode="tree" />
-    <act_window id="szefo_admin_import" name="Import" res_model="szefo.parameter" view_mode="tree" view_id="view_tree_szefo_admin_import"/>
-    <act_window id="szefo_user" name="Felhasználó" res_model="res.users" view_mode="tree" view_id="view_tree_szefo_user"/>
+    <act_window id="szefo_telephely"          name="Telephely"          res_model="szefo.telephely"         view_mode="tree,form" />
+    <act_window id="nexon_szemely"            name="Nexon személy"      res_model="nexon.szemely"           view_mode="tree,form"   view_id="view_tree_nexon_szemely"/>
+    <act_window id="szefo_jogosultsag"        name="Jogosultság"        res_model="szefo.jogosultsag"       view_mode="tree,form"   context="{'search_default_filter_enged': 1}" />
+    <act_window id="szefo_jogosultsag_masol"  name="Jogosultság másol"  res_model="szefo.jogosultsag_masol" view_mode="tree,form" />
+    <act_window id="szefo_log"                name="Log"                res_model="szefo.log"               view_mode="tree" />
+    <act_window id="szefo_admin_import"       name="Import"             res_model="szefo.parameter"         view_mode="tree"        view_id="view_tree_szefo_admin_import"/>
+    <act_window id="szefo_user"               name="Felhasználó"        res_model="res.users"               view_mode="tree"        view_id="view_tree_szefo_user"/>
 
 
     <!--####################################################################################################################  Menu  items  -->

@@ -90,7 +90,7 @@
               <field name="megjegyzes_id"/>
               <field name="min_log_id"/>
               <field name="max_log_id"/>
-              <field name="active"/>
+              <field name="aktiv"/>
               <field name="name"/>
               <field name="azonosito"/>
               <field name="tipus"/>
@@ -141,6 +141,7 @@
       <field  name="arch" type="xml">
         <tree>
           <field name="name"/>
+          <field name="aktiv"/>
           <field name="azonosito"/>
           <field name="tipus"/>
           <field name="finomsag"/>
@@ -180,6 +181,7 @@
       <field  name="arch" type="xml">
         <search>
           <field  name="gep"/>
+          <field  name="gepazonosito"/>
           <filter name="filter_termel"      string="Termel"                 domain="[('jelzes','=','termel')]"/>
           <filter name="filter_all"         string="Áll"                    domain="[('jelzes','=','all')]"/>
           <filter name="filter_hiba"        string="Hibával áll"            domain="[('jelzes','=','hiba')]"/>
@@ -196,17 +198,23 @@
           <filter name="filter_muszak3_2"   string="Műszak3/2"              domain="[('muszak','=','3/2')]"/>
           <separator/>
           <filter domain="[('datum','&lt;=', datetime.datetime.combine(context_today(), datetime.time(23,59,59))),
+                           ('datum','&gt;=', datetime.datetime.combine(context_today()-datetime.timedelta(days=14), datetime.time(0,0,0)))]"
+                  string="Elmúlt két hét" help="Elmúlt két hétben rögzített adatok"     name="filter_days14"/>
+          <filter domain="[('datum','&lt;=', datetime.datetime.combine(context_today(), datetime.time(23,59,59))),
                            ('datum','&gt;=', datetime.datetime.combine(context_today()-datetime.timedelta(days=7), datetime.time(0,0,0)))]"
-                  string="Elmúlt hét" help="Elmúlt héten rögzített adatok"/>
+                  string="Elmúlt hét"     help="Elmúlt héten rögzített adatok"          name="filter_days7"/>
           <filter domain="[('datum','&lt;=', datetime.datetime.combine(context_today()-datetime.timedelta(days=1), datetime.time(23,59,59))),
                            ('datum','&gt;=', datetime.datetime.combine(context_today()-datetime.timedelta(days=1), datetime.time(0,0,0)))]"
-                  string="Tegnap" help="Tegnap rögzített adatok"/>
+                  string="Tegnap"         help="Tegnap rögzített adatok"/>
           <filter domain="[('datum','&lt;=', datetime.datetime.combine(context_today(), datetime.time(23,59,59))),
                            ('datum','&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0)))]"
-                  string="Ma" help="A mai napon rögzített adatok"/>
+                  string="Ma"             help="A mai napon rögzített adatok"/>
           <separator/>
           <filter name="filter_megjegyzes"  string="Megjegyzések"           domain="[('megjegyzes_id','!=',False)]"/>
           <filter name="filter_nincs_megj"  string="Nincs megjegyzés"       domain="[('megjegyzes_id','=',False)]"/>
+          <separator/>
+          <filter name="filter_aktiv"       string="Aktív"                  domain="[('kotogep_id.aktiv','=',True)]"/>
+          <filter name="filter_nemaktiv"    string="Nem aktív"              domain="[('kotogep_id.aktiv','=',False)]"/>
         </search>
       </field>
     </record>
@@ -264,14 +272,20 @@
           <filter name="filter_muszak3_2"   string="Műszak3/2"              domain="[('muszak','=','3/2')]"/>
           <separator/>
           <filter domain="[('datum','&lt;=', datetime.datetime.combine(context_today(), datetime.time(23,59,59))),
+                           ('datum','&gt;=', datetime.datetime.combine(context_today()-datetime.timedelta(days=14), datetime.time(0,0,0)))]"
+                  string="Elmúlt két hét" help="Elmúlt két hétben rögzített adatok"     name="filter_days7"/>
+          <filter domain="[('datum','&lt;=', datetime.datetime.combine(context_today(), datetime.time(23,59,59))),
                            ('datum','&gt;=', datetime.datetime.combine(context_today()-datetime.timedelta(days=7), datetime.time(0,0,0)))]"
-                  string="Elmúlt hét" help="Elmúlt héten rögzített adatok"/>
+                  string="Elmúlt hét"     help="Elmúlt héten rögzített adatok"          name="filter_days7"/>
           <filter domain="[('datum','&lt;=', datetime.datetime.combine(context_today()-datetime.timedelta(days=1), datetime.time(23,59,59))),
                            ('datum','&gt;=', datetime.datetime.combine(context_today()-datetime.timedelta(days=1), datetime.time(0,0,0)))]"
-                  string="Tegnap" help="Tegnap rögzített adatok"/>
+                  string="Tegnap"         help="Tegnap rögzített adatok"/>
           <filter domain="[('datum','&lt;=', datetime.datetime.combine(context_today(), datetime.time(23,59,59))),
                            ('datum','&gt;=', datetime.datetime.combine(context_today(), datetime.time(0,0,0)))]"
-                  string="Ma" help="A mai napon rögzített adatok"/>
+                  string="Ma"             help="A mai napon rögzített adatok"/>
+          <separator/>
+          <filter name="filter_aktiv"       string="Aktív"                  domain="[('kotogep_id.aktiv','=',True)]"/>
+          <filter name="filter_nemaktiv"    string="Nem aktív"              domain="[('kotogep_id.aktiv','=',False)]"/>
         </search>
       </field>
     </record>
@@ -281,8 +295,10 @@
      <field name="model">kotode.status_log</field>
      <field name="arch" type="xml">
        <graph string="Státusz értékelés"  type="pivot">
-         <field name="datum"              type="row"/>
-         <field name="muszak"             type="col"/>
+         <field name="datum"              type="row"          interval="day"/>
+         <field name="gep"                type="row"/>
+         <field name="jelzes"             type="col"/>
+         <field name="idotartam_ora"      type="measure"/>
        </graph>
      </field>
     </record>
@@ -360,9 +376,9 @@
     <act_window id="megjegyzes"           name="Megjegyzések"         res_model="kotode.megjegyzes"                                                   view_mode="tree,form"/>
 
     <act_window id="kotogep_ertekel"      name="Kötőgép értékelés"    res_model="kotode.kotogep_log"    view_id="view_graph_kotogep_ertekel"          view_mode="graph"
-                                                                      context="{'search_default_filter_sik':1, 'search_default_filter_nincs_megj':1}"/>
+                                          context="{'search_default_filter_aktiv':1, 'search_default_filter_days7':1, 'search_default_filter_sik':1, 'search_default_filter_nincs_megj':1}"/>
     <act_window id="status_ertekel"       name="Státusz értékelés"    res_model="kotode.status_log"     view_id="view_graph_status_ertekel"           view_mode="graph"
-                                                                      context="{'search_default_filter_sik':1}"/>
+                                          context="{'search_default_filter_aktiv':1, 'search_default_filter_days7':1, 'search_default_filter_sik':1}"/>
     <act_window id="mecmor_ertekel"       name="Mecmor értékelés"     res_model="kotode.mecmor"         view_id="view_graph_mecmor_ertekel"           view_mode="graph"/>
 
     <!--####################################################################################################################  Menu  items  -->
