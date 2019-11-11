@@ -32,6 +32,7 @@ class Kotogep(models.Model):
   _sql_constraints    = [('azonosito_unique', 'unique(azonosito)', 'Ez az azonosító már létezik!')]
   name                = fields.Char(u'Név', required=True)
   azonosito           = fields.Char(u'Azonosító', required=True)
+  kotogepkod          = fields.Integer(u'Kötőgépkód')
   tipus               = fields.Selection([('regi',u'Régi'),('uj',u'Új')], u'Típus', required=True)
   finomsag            = fields.Char(u'Finomság', required=True)
   uzem                = fields.Selection([('kor',u'Körkötő'),('sik',u'Síkkötő')], u'Üzem', required=True)

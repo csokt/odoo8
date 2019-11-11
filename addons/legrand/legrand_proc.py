@@ -92,13 +92,13 @@ class LegrandParameter(models.Model):
         hatarido = False
 
       # cikk, bom, bom_line feltöltés #########################################
-      cikk = Cikk.search([('cikkszam', 'ilike', termekkod)], limit=1)
+      cikk = Cikk.search([('cikkszam', '=ilike', termekkod)], limit=1)
       if not len(cikk):
         cikk = Cikk.create({'cikkszam': termekkod, 'cikknev': fej['megnevezes'], 'kesztermek_e': True})
       for alk in gylap['darabjegyzek']:
         cikkszam = alk['cikkszam']
         if cikkszam == 'referencia': continue
-        alk_cikk = Cikk.search([('cikkszam', 'ilike', cikkszam)], limit=1)
+        alk_cikk = Cikk.search([('cikkszam', '=ilike', cikkszam)], limit=1)
         if not len(alk_cikk):
           alk_cikk = Cikk.create({'cikkszam': cikkszam, 'cikknev': alk['megnevezes'], 'alkatresz_e': True, 'bekerulesi_ar': alk['bekerulesi_ar']})
 
@@ -130,7 +130,7 @@ class LegrandParameter(models.Model):
         for alk in gylap['darabjegyzek']:
           cikkszam = alk['cikkszam']
           if cikkszam != 'referencia':
-            bom_cikk = Cikk.search([('cikkszam', 'ilike', cikkszam)], limit=1)
+            bom_cikk = Cikk.search([('cikkszam', '=ilike', cikkszam)], limit=1)
             beepules = alk['ossz_beepules']/fej['rendelt_db']
             BomLine.create({'bom_id': bom.id, 'cikk_id': bom_cikk.id, 'beepules': beepules})
 
@@ -164,7 +164,7 @@ class LegrandParameter(models.Model):
       for alk in gylap['darabjegyzek']:
         cikkszam = alk['cikkszam']
         if cikkszam != 'referencia':
-          alk_cikk = Cikk.search([('cikkszam', 'ilike', cikkszam)], limit=1)
+          alk_cikk = Cikk.search([('cikkszam', '=ilike', cikkszam)], limit=1)
           ossz_beepules = alk['ossz_beepules']
           Dbjegyzek.create({'gyartasi_lap_id': gyartlap.id, 'cikk_id': alk_cikk.id, 'ossz_beepules': ossz_beepules, 'bekerulesi_ar': alk['bekerulesi_ar']})
 
@@ -253,7 +253,7 @@ class LegrandParameter(models.Model):
   def calc_impex(self):
     for impex in self.env['legrand.impex'].search([]):
       gylap = self.env['legrand.gyartasi_lap'].search([('rendelesszam', '=', impex.rendelesszam)], limit=1)
-      cikk  = self.env['legrand.cikk'].search([('cikkszam', 'ilike', impex.cikkszam)], limit=1)
+      cikk  = self.env['legrand.cikk'].search([('cikkszam', '=ilike', impex.cikkszam)], limit=1)
       hom   = self.env['legrand.homogen'].search([('homogen', '=', impex.homogen)], limit=1)
       impex.write({'sorszam': gylap.id, 'gyartasi_lap_id': gylap.id, 'cikk_id': cikk.id, 'homogen_id': hom.id})
     return True

@@ -90,7 +90,7 @@
               <field name="megjegyzes_id"/>
               <field name="min_log_id"/>
               <field name="max_log_id"/>
-              <field name="aktiv"/>
+              <field name="kotogepkod"/>
               <field name="name"/>
               <field name="azonosito"/>
               <field name="tipus"/>
@@ -99,6 +99,7 @@
               <field name="sor"/>
               <field name="allapot"/>
               <field name="jelzes"/>
+              <field name="aktiv"/>
             </group>
           <div>
           <sheet>
@@ -140,6 +141,7 @@
       <field  name="model">kotode.kotogep</field>
       <field  name="arch" type="xml">
         <tree>
+          <field name="kotogepkod"/>
           <field name="name"/>
           <field name="aktiv"/>
           <field name="azonosito"/>
