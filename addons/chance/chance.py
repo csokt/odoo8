@@ -342,6 +342,110 @@ class ChanceMozgastorzs(models.Model):
     if self.mozgaskod and self.mozgasnev:
       self.name = self.mozgaskod+' '+self.mozgasnev
 
+############################################################################################################################  Leltárív  ###
+class ChanceLeltariv(models.Model):
+  _name               = 'chance.leltariv'
+  _order              = 'id'
+  name                = fields.Char(u'Leltárív', compute='_compute_name', store=True)
+  state               = fields.Selection([('terv',u'Tervezet'),('kesz',u'Kész'),('konyvelt',u'Könyvelt')], u'Állapot', default='terv' )
+  hely_id             = fields.Many2one('chance.hely', u'Raktárhely', domain=[('szefo_e', '=', True)], required=True)
+  letrehozva          = fields.Date(u'Létrehozva',  readonly=True)
+  leltarvezeto_id     = fields.Many2one('hr.employee',  u'Leltárvezető',  auto_join=True, states={'kesz': [('readonly', True)], 'konyvelt': [('readonly', True)]})
+  leltarozo_id        = fields.Many2one('hr.employee',  u'Leltározó',  auto_join=True, states={'kesz': [('readonly', True)], 'konyvelt': [('readonly', True)]})
+  leltarozo2_id       = fields.Many2one('hr.employee',  u'Leltározó2', auto_join=True, states={'kesz': [('readonly', True)], 'konyvelt': [('readonly', True)]})
+  leltarozo3_id       = fields.Many2one('hr.employee',  u'Leltározó3', auto_join=True, states={'kesz': [('readonly', True)], 'konyvelt': [('readonly', True)]})
+  # virtual fields
+  pillanatkep_ids     = fields.One2many('chance.leltariv_pillanatkep', 'leltariv_id', u'Pillanatkép', readonly=True)
+  felmeres_ids        = fields.One2many('chance.leltariv_felmeres', 'leltariv_id', u'Felmérés', states={'kesz': [('readonly', True)], 'konyvelt': [('readonly', True)]})
+  elteres_ids         = fields.One2many('chance.leltariv_elteres', 'leltariv_id', u'Eltérés')
+
+  @api.model
+  def create(self, vals):
+    vals['letrehozva'] = fields.Date.today()
+    hely_id = vals['hely_id']
+    elozo_leltariv = self.env['chance.leltariv'].search([('hely_id', '=', hely_id), ('state', '!=', 'konyvelt')])
+    if elozo_leltariv:
+      raise exceptions.Warning(elozo_leltariv.hely_id.name + u' raktárhely már fel van véve!')
+    leltariv = super(ChanceLeltariv, self).create(vals)
+
+    keszlet  = self.env['chance.keszlet'].search([('hely_id', '=', hely_id), ('raktaron', '!=', 0)])
+    for item in keszlet:
+      self.env['chance.leltariv_pillanatkep'].create({'leltariv_id': leltariv.id, 'cikk_id': item.cikk_id.id, 'raktaron': item.raktaron})
+    return leltariv
+
+  @api.one
+  @api.depends('hely_id')
+  def _compute_name(self):
+    self.name = self.hely_id.name
+
+  @api.one
+  def state2kesz(self):
+    if not self.leltarvezeto_id or not self.leltarozo_id:
+      raise exceptions.Warning(u'A leltárfelelősöket fel kell venni!')
+    self.state  = 'kesz'
+    return True
+
+  @api.one
+  def state2terv(self):
+    self.state  = 'terv'
+    return True
+
+############################################################################################################################  Leltárív pillanatkép ###
+class ChanceLeltarivPillanatkep(models.Model):
+  _name               = 'chance.leltariv_pillanatkep'
+  _order              = 'id'
+  _rec_name           = 'cikk_id'
+  leltariv_id         = fields.Many2one('chance.leltariv',  u'Leltárív', readonly=True)
+  cikk_id             = fields.Many2one('chance.cikk', u'Cikkazonosító', readonly=True)
+  raktaron            = fields.Float(u'Raktáron', digits=(16, 0), readonly=True)
+  # virtual fields
+  vonalkod            = fields.Char(u'Vonalkód', related='cikk_id.vonalkod', readonly=True)
+
+############################################################################################################################  Leltárív felmérés ###
+class ChanceLeltarivFelmeres(models.Model):
+  _name               = 'chance.leltariv_felmeres'
+  _order              = 'id'
+  _rec_name           = 'cikk_id'
+  leltariv_id         = fields.Many2one('chance.leltariv',  u'Leltárív', index=True)
+  cikk_id             = fields.Many2one('chance.cikk', u'Cikkazonosító', required=True, index=True)
+  fellelt             = fields.Float(u'Fellelt', digits=(16, 0))
+  # virtual fields
+  vonalkod            = fields.Char(u'Vonalkód', related='cikk_id.vonalkod', readonly=True)
+
+############################################################################################################################  Leltárív eltérés ###
+class ChanceLeltarivElteres(models.Model):
+  _name               = 'chance.leltariv_elteres'
+  _auto               = False
+  _rec_name           = 'cikk_id'
+  _order              = 'id'
+  leltariv_id         = fields.Many2one('chance.leltariv',  u'Leltárív')
+  cikk_id             = fields.Many2one('chance.cikk', u'Cikkazonosító')
+  fellelt             = fields.Float(u'Fellelt', digits=(16, 0))
+  raktaron            = fields.Float(u'Raktáron', digits=(16, 0))
+  elteres             = fields.Float(u'Eltérés', digits=(16, 0))
+  # virtual fields
+  vonalkod            = fields.Char(u'Vonalkód', related='cikk_id.vonalkod')
+
+  def init(self, cr):
+    tools.drop_view_if_exists(cr, self._table)
+    cr.execute(
+      """CREATE or REPLACE VIEW %s AS (
+        WITH cikk AS (
+        SELECT leltariv_id, cikk_id FROM chance_leltariv_pillanatkep
+        JOIN chance_leltariv AS iv ON iv.id = leltariv_id AND iv.state != 'konyvelt'
+        UNION
+        SELECT leltariv_id, cikk_id FROM chance_leltariv_felmeres
+        JOIN chance_leltariv AS iv ON iv.id = leltariv_id AND iv.state != 'konyvelt'
+        )
+        SELECT row_number() over() AS id, cikk.*, coalesce(felmeres.fellelt, 0.0) AS fellelt, coalesce(pillkep.raktaron, 0.0) AS raktaron,
+          coalesce(felmeres.fellelt, 0.0) - coalesce(pillkep.raktaron, 0.0) AS elteres
+        FROM cikk
+        LEFT join chance_leltariv_felmeres AS felmeres ON felmeres.leltariv_id = cikk.leltariv_id and felmeres.cikk_id = cikk.cikk_id
+        LEFT join chance_leltariv_pillanatkep AS pillkep ON pillkep.leltariv_id = cikk.leltariv_id and pillkep.cikk_id = cikk.cikk_id
+      )"""
+      % (self._table)
+    )
+
 ############################################################################################################################  Impex  ###
 class ChanceImpex(models.Model):
   _name               = 'chance.impex'

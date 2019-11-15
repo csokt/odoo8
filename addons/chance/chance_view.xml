@@ -438,6 +438,104 @@
       </field>
     </record>
 
+    <!--####################################################################################################################  Leltárív  -->
+    <record id="view_form_chance_leltariv"    model="ir.ui.view">
+      <field  name="name">Leltárív Form</field>
+      <field  name="model">chance.leltariv</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <form>
+          <header>
+            <button name="state2kesz"         type="object"   string="Raktárhely kész"          class="oe_highlight"
+                                              attrs="{'invisible': [('state','!=','terv')]}"      confirm="Raktárhely felmérése befejeződött"/>
+            <button name="state2terv"         type="object"   string="Leltárív Tervezetbe"
+                                              attrs="{'invisible': [('state','!=','kesz')]}"      groups="chance.group_leltar_manager"
+                                              confirm="Leltárív állapota ismét Tervezet legyen"/>
+            <field  name="state"              widget="statusbar"/>
+          </header>
+          <sheet>
+            <group col="4">
+              <field name="hely_id"             options="{'no_create': True, 'no_open': True}"      attrs="{'readonly': [('create_date', '!=', False)]}"/>
+              <field name="letrehozva"/>
+              <field name="leltarvezeto_id"     options="{'no_create': True, 'no_open': True}"/>
+              <field name="leltarozo_id"        options="{'no_create': True, 'no_open': True}"/>
+              <field name="leltarozo2_id"       options="{'no_create': True, 'no_open': True}"/>
+              <field name="leltarozo3_id"       options="{'no_create': True, 'no_open': True}"/>
+              <field name="create_date"         invisible="1"/>
+            </group>
+            <div>&#x2063;</div>
+            <b>Felmérés</b>
+            <field name="felmeres_ids">
+              <tree editable="top">
+                <field name="vonalkod"/>
+                <field name="cikk_id"/>
+                <field name="fellelt"/>
+              </tree>
+            </field>
+            <b>Készlet eltérés</b>
+            <field name="elteres_ids"/>
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_tree_chance_leltariv"    model="ir.ui.view">
+      <field  name="name">Leltárív Tree</field>
+      <field  name="model">chance.leltariv</field>
+      <field  name="arch" type="xml">
+        <tree>
+          <field name="hely_id"/>
+          <field name="letrehozva"/>
+          <field name="leltarvezeto_id"/>
+          <field name="leltarozo_id"/>
+          <field name="state"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_chance_leltariv"    model="ir.ui.view">
+      <field  name="name">Leltárív Filter</field>
+      <field  name="model">chance.leltariv</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field  name="hely_id"/>
+          <field  name="letrehozva"/>
+          <field  name="leltarvezeto_id"/>
+          <field  name="leltarozo_id"/>
+          <filter name="filter_terv"          string="Tervezet"                 domain="[('state','=','terv')]"/>
+          <filter name="filter_kesz"          string="Kész"                     domain="[('state','=','kesz')]"/>
+          <filter name="filter_konyvelt"      string="Könyvelt"                 domain="[('state','=','konyvelt')]"/>
+        </search>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Leltárív eltérés  -->
+    <record id="view_tree_leltariv_elteres"    model="ir.ui.view">
+      <field name="name">Leltárív eltérés Tree</field>
+      <field name="model">chance.leltariv_elteres</field>
+      <field name="priority" eval="15"/>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="leltariv_id"/>
+          <field name="vonalkod"/>
+          <field name="cikk_id"/>
+          <field name="fellelt"/>
+          <field name="raktaron"/>
+          <field name="elteres"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_leltariv_elteres"    model="ir.ui.view">
+      <field  name="name">Leltárív eltérés Filter</field>
+      <field  name="model">chance.leltariv_elteres</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field name="cikk_id"/>
+        </search>
+      </field>
+    </record>
+
     <!--####################################################################################################################  Actions  -->
     <act_window id="cikk"               name="Cikk"               res_model="chance.cikk"                                                          view_mode="tree,form"/>
     <act_window id="feljegyzes"         name="Feljegyzés"         res_model="chance.feljegyzes"                                                    view_mode="tree"/>
@@ -468,6 +566,9 @@
                 domain="[('mozgasnem','=','indulo')]"             context="{'mozgasnem':'indulo'}"/>
     <act_window id="mozgassor"          name="Tétel"              res_model="chance.mozgassor"            view_id="view_tree_mozgassor"            view_mode="tree"/>
 
+    <act_window id="chance_leltariv"    name="Leltárív"           res_model="chance.leltariv"                                                      view_mode="tree,form"
+                                                                  context="{'search_default_filter_terv': 1}"/>
+    <act_window id="chance_elteres"     name="Készlet eltérés"    res_model="chance.leltariv_elteres"                                              view_mode="tree"/>
 
     <act_window id="hely"               name="Hely"               res_model="chance.hely"                                                          view_mode="tree,form"/>
     <act_window id="mozgastorzs"        name="Mozgástörzs"        res_model="chance.mozgastorzs"                                                   view_mode="tree,form"/>
@@ -494,7 +595,9 @@
       <menuitem id="menu_keszlet_cikk"    name="Vállalati készlet"            parent="menu_termek"                sequence="40" action="keszlet_cikk" />
       <menuitem id="menu_cikkar"          name="Cikk árak"                    parent="menu_termek"                sequence="50" action="cikkar" />
 
-    <menuitem id="menu_egyeb"             name="Egyéb"                        parent="menu_root"                  sequence="80"                         />
+    <menuitem id="menu_leltar"            name="Leltár"                       parent="menu_root"                  sequence="40" />
+      <menuitem id="menu_chance_leltariv" name="Leltárív"                     parent="menu_leltar"                sequence="10" action="chance_leltariv" />
+      <menuitem id="menu_chance_elteres"  name="Készlet eltérés"              parent="menu_leltar"                sequence="20" action="chance_elteres" />
 
     <menuitem id="menu_administrator"     name="Administrator"                parent="menu_root"                  sequence="90"                                 groups="group_chance_admin" />
       <menuitem id="menu_hely"            name="Helyek"                       parent="menu_administrator"         sequence="40" action="hely" />
