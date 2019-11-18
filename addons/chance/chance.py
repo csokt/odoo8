@@ -390,6 +390,32 @@ class ChanceLeltariv(models.Model):
     self.state  = 'terv'
     return True
 
+  @api.one
+  def leltariv_lezaras(self):
+    elteresek = self.elteres_ids.filtered(lambda r: r.elteres != 0)
+    if len(elteresek):
+      fej_row = {
+        'state'             : 'kesz',
+        'mozgasnem'         : 'korrekcio',
+        # 'forrashely_id'     : self.env['chance.hely'].search([('azonosito', '=', 'korrekcio')]).id,
+        'celallomas_id'     : self.hely_id.id,
+        'forrasdokumentum'  : 'Leltárív ' + '#' + str(self.id),
+        'megjegyzes'        : 'leltár'
+      }
+      fej = self.env['chance.mozgasfej'].create(fej_row)
+      for elter in elteresek:
+        sor_row = {
+          'mozgasfej_id'      : fej.id,
+          'vonalkod'          : elter.vonalkod,
+          'cikk_id'           : elter.cikk_id.id,
+          'mennyiseg'         : elter.elteres,
+          'mozgasfej_sorszam' : fej.id
+        }
+        self.env['chance.mozgassor'].create(sor_row)
+      self.env.cr.execute('REFRESH MATERIALIZED VIEW chance_keszlet')
+    self.state  = 'konyvelt'
+    return True
+
 ############################################################################################################################  Leltárív pillanatkép ###
 class ChanceLeltarivPillanatkep(models.Model):
   _name               = 'chance.leltariv_pillanatkep'
@@ -411,6 +437,18 @@ class ChanceLeltarivFelmeres(models.Model):
   fellelt             = fields.Float(u'Fellelt', digits=(16, 0))
   # virtual fields
   vonalkod            = fields.Char(u'Vonalkód', related='cikk_id.vonalkod', readonly=True)
+
+  @api.model
+  def create(self, vals):
+    if self.env['chance.leltariv_felmeres'].search([('leltariv_id', '=', vals['leltariv_id']), ('cikk_id', '=', vals['cikk_id'])]):
+      raise exceptions.Warning(str(oct(vals['cikk_id'] + 4096))[1:].replace('0','8'), 'vonalkódú cikk már fel van véve!')
+    return super(ChanceLeltarivFelmeres, self).create(vals)
+
+  @api.multi
+  def write(self, vals):
+    if 'cikk_id' in vals:
+      raise exceptions.Warning('Csak a fellelt mennyiséget lehet megváltoztatni, cikkszámot nem!')
+    return super(ChanceLeltarivFelmeres, self).write(vals)
 
 ############################################################################################################################  Leltárív eltérés ###
 class ChanceLeltarivElteres(models.Model):

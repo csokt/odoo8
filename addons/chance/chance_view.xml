@@ -446,11 +446,14 @@
       <field  name="arch" type="xml">
         <form>
           <header>
-            <button name="state2kesz"         type="object"   string="Raktárhely kész"          class="oe_highlight"
+            <button name="state2kesz"         type="object"   string="Raktárhely kész"            class="oe_highlight"
                                               attrs="{'invisible': [('state','!=','terv')]}"      confirm="Raktárhely felmérése befejeződött"/>
             <button name="state2terv"         type="object"   string="Leltárív Tervezetbe"
-                                              attrs="{'invisible': [('state','!=','kesz')]}"      groups="chance.group_leltar_manager"
+                                              attrs="{'invisible': [('state','!=','kesz')]}"      groups="chance.group_chance_manager"
                                               confirm="Leltárív állapota ismét Tervezet legyen"/>
+            <button name="leltariv_lezaras"   type="object"   string="Leltárív lezárás"
+                                              attrs="{'invisible': [('state','!=','kesz')]}"      groups="chance.group_chance_director"
+                                              confirm="Készlethelyesbítés generálása, leltárív lezárása és módosíthatatlanná tétele."/>
             <field  name="state"              widget="statusbar"/>
           </header>
           <sheet>
@@ -463,8 +466,6 @@
               <field name="leltarozo3_id"       options="{'no_create': True, 'no_open': True}"/>
               <field name="create_date"         invisible="1"/>
             </group>
-            <div>&#x2063;</div>
-            <b>Felmérés</b>
             <field name="felmeres_ids">
               <tree editable="top">
                 <field name="vonalkod"/>
@@ -472,8 +473,6 @@
                 <field name="fellelt"/>
               </tree>
             </field>
-            <b>Készlet eltérés</b>
-            <field name="elteres_ids"/>
           </sheet>
         </form>
       </field>
@@ -531,7 +530,9 @@
       <field  name="model">chance.leltariv_elteres</field>
       <field  name="arch" type="xml">
         <search>
-          <field name="cikk_id"/>
+          <field  name="leltariv_id"/>
+          <field  name="cikk_id"/>
+          <filter name="filter_elteres"       string="Eltérés van"              domain="[('elteres','!=', 0)]"/>
         </search>
       </field>
     </record>
