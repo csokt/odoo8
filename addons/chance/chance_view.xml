@@ -346,6 +346,7 @@
       <field  name="model">chance.keszlet</field>
       <field  name="arch" type="xml">
         <search>
+          <field name="hely_id"/>
           <field name="cikk_id"/>
           <field name="cikkszam"/>
           <field name="osztaly"/>
