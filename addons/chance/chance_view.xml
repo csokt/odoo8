@@ -533,6 +533,9 @@
         <search>
           <field  name="leltariv_id"/>
           <field  name="cikk_id"/>
+          <filter name="filter_fellelt"       string="Felelt"                   domain="[('fellelt','!=', 0)]"/>
+          <filter name="filter_nem_fellelt"   string="Nem felelt"               domain="[('fellelt','=', 0)]"/>
+          <separator/>
           <filter name="filter_elteres"       string="Eltérés van"              domain="[('elteres','!=', 0)]"/>
         </search>
       </field>

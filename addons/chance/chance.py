@@ -345,7 +345,7 @@ class ChanceMozgastorzs(models.Model):
 ############################################################################################################################  Leltárív  ###
 class ChanceLeltariv(models.Model):
   _name               = 'chance.leltariv'
-  _order              = 'id'
+  _order              = 'sorrend, id desc'
   name                = fields.Char(u'Leltárív', compute='_compute_name', store=True)
   state               = fields.Selection([('terv',u'Tervezet'),('kesz',u'Kész'),('konyvelt',u'Könyvelt')], u'Állapot', default='terv' )
   hely_id             = fields.Many2one('chance.hely', u'Raktárhely', domain=[('szefo_e', '=', True)], required=True)
@@ -354,10 +354,11 @@ class ChanceLeltariv(models.Model):
   leltarozo_id        = fields.Many2one('hr.employee',  u'Leltározó',  auto_join=True, states={'kesz': [('readonly', True)], 'konyvelt': [('readonly', True)]})
   leltarozo2_id       = fields.Many2one('hr.employee',  u'Leltározó2', auto_join=True, states={'kesz': [('readonly', True)], 'konyvelt': [('readonly', True)]})
   leltarozo3_id       = fields.Many2one('hr.employee',  u'Leltározó3', auto_join=True, states={'kesz': [('readonly', True)], 'konyvelt': [('readonly', True)]})
+  sorrend             = fields.Integer(u'Sorrend', related='hely_id.sorrend', readonly=True, store=True)
   # virtual fields
-  pillanatkep_ids     = fields.One2many('chance.leltariv_pillanatkep', 'leltariv_id', u'Pillanatkép', readonly=True)
+  # pillanatkep_ids     = fields.One2many('chance.leltariv_pillanatkep', 'leltariv_id', u'Pillanatkép', readonly=True)
   felmeres_ids        = fields.One2many('chance.leltariv_felmeres', 'leltariv_id', u'Felmérés', states={'kesz': [('readonly', True)], 'konyvelt': [('readonly', True)]})
-  elteres_ids         = fields.One2many('chance.leltariv_elteres', 'leltariv_id', u'Eltérés')
+  # elteres_ids         = fields.One2many('chance.leltariv_elteres', 'leltariv_id', u'Eltérés')
 
   @api.model
   def create(self, vals):
@@ -392,12 +393,11 @@ class ChanceLeltariv(models.Model):
 
   @api.one
   def leltariv_lezaras(self):
-    elteresek = self.elteres_ids.filtered(lambda r: r.elteres != 0)
+    elteresek = self.env['chance.leltariv_elteres'].search([('leltariv_id', '=', self.id), ('elteres', '!=', 0)])
     if len(elteresek):
       fej_row = {
         'state'             : 'kesz',
         'mozgasnem'         : 'korrekcio',
-        # 'forrashely_id'     : self.env['chance.hely'].search([('azonosito', '=', 'korrekcio')]).id,
         'celallomas_id'     : self.hely_id.id,
         'forrasdokumentum'  : 'Leltárív ' + '#' + str(self.id),
         'megjegyzes'        : 'leltár'
