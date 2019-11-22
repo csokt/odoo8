@@ -219,6 +219,7 @@ class LeltarSzett(models.Model):
 ############################################################################################################################  Eszköz  ###
 class LeltarEszkoz(models.Model):
   _name                 = 'leltar.eszkoz'
+  _inherit              = 'mail.thread'
   name                  = fields.Char(u'Eszköz',        compute='_compute_name', store=True)
   hivszam               = fields.Integer(u'Hiv.szám',   readonly=True)
   leltari_szam          = fields.Char(u'Leltári szám',  required=True, index=True)
