@@ -40,6 +40,7 @@
             <field name="megnevezes"/>
             <field name="zarolva"/>
             <field name="leltarozni"/>
+            <field name="hianyzo_eszk_gyujto"/>
             <field name="ds_leltarkorzet"/>
             <field name="ds_korzet_vonalkod"/>
             <field name="active"/>
@@ -656,6 +657,7 @@
           <field name="eszkoz_id"/>
           <field name="leltariv_id"/>
           <field name="fellelheto"/>
+          <field name="hiany"/>
           <field name="serult_cimke"/>
           <field name="selejtezni"/>
           <field name="megjegyzes"/>
@@ -672,6 +674,7 @@
           <field  name="eszkoz_id"/>
           <field  name="leltariv_id"/>
           <filter name="filter_fellelheto"    string="Fellelhető"               domain="[('fellelheto','=',True)]"/>
+          <filter name="filter_hiany"         string="Hiány"                    domain="[('hiany','=',True)]"/>
           <filter name="filter_serult"        string="Sérült címke"             domain="[('serult_cimke','=',True)]"/>
           <filter name="filter_selejtezni"    string="Selejtezni"               domain="[('selejtezni','=',True)]"/>
         </search>

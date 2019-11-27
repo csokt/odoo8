@@ -347,6 +347,95 @@
       </t>
     </template>
 
+    <template id="report_leltariv2">
+      <t t-call="report.html_container">
+        <t t-foreach="docs"  t-as="o">
+          <t t-call="report.internal_layout">
+<!--
+-->
+            <div class="page" style="font-size: 12pt;">
+              <h4>
+              <div class="row">
+                <div  class="col-xs-3">
+                  Leltárív <span t-field="o.letrehozva"/>
+                </div>
+                <div  class="col-xs-7 text-center">
+                  <span t-field="o.leltarkorzet_id.name"/>
+                </div>
+                <div  class="col-xs-2 text-right">
+                  #<span t-field="o.id"/> - <span t-field="o.state"/>
+                </div>
+              </div>
+              </h4>
+
+              <br></br>
+              Fellelt tárgyi eszközök
+              <table class="table table-condensed table-bordered">
+                <tr>
+                  <th>Leltári szám</th>
+                  <th>Eszköz megnevezése</th>
+                  <th>Selejtezni</th>
+                  <th>Megjegyzés</th>
+                </tr>
+                <tr t-foreach="o.ujeszkozok_ids.sorted(key=lambda b: b.eszkoz_id.leltari_szam)" t-as="oo">
+                    <td> <span t-field="oo.eszkoz_id.leltari_szam"/> </td>
+                    <td> <span t-field="oo.eszkoz_id.megnevezes"/> </td>
+                    <td> <span t-if="oo.selejtezni">igen</span> </td>
+                    <td> <span t-field="oo.megjegyzes"/> </td>
+                </tr>
+                <tr t-foreach="o.eszkozok_ids.filtered('fellelheto').sorted(key=lambda b: b.eszkoz_id.leltari_szam)" t-as="oo">
+                    <td> <span t-field="oo.eszkoz_id.leltari_szam"/> </td>
+                    <td> <span t-field="oo.eszkoz_id.megnevezes"/> </td>
+                    <td> <span t-if="oo.selejtezni">igen</span> </td>
+                    <td> <span t-field="oo.megjegyzes"/> </td>
+                </tr>
+              </table>
+
+              <br></br>
+              Hiányzó tárgyi eszközök
+              <table class="table table-condensed table-bordered">
+                <tr>
+                  <th>Leltári szám</th>
+                  <th>Eszköz megnevezése</th>
+                  <th>Selejtezni</th>
+                  <th>Megjegyzés</th>
+                </tr>
+                <tr t-foreach="o.leltariv_osszes_ids.filtered('hiany').sorted(key=lambda b: b.eszkoz_id.leltari_szam)" t-as="oo">
+                    <td> <span t-field="oo.eszkoz_id.leltari_szam"/> </td>
+                    <td> <span t-field="oo.eszkoz_id.megnevezes"/> </td>
+                    <td> <span t-if="oo.selejtezni">igen</span> </td>
+                    <td> <span t-field="oo.megjegyzes"/> </td>
+                </tr>
+              </table>
+
+              <br></br>
+              <br></br>
+              <div class="row text-center">
+                <div  class="col-xs-3">
+                  <span t-field="o.leltarvezeto_id.name"/>
+                </div>
+                <div  class="col-xs-9">
+                  <span t-field="o.leltarozo_id.name"/> &#160; &#160; <span t-field="o.leltarozo2_id.name"/> &#160; &#160; <span t-field="o.leltarozo3_id.name"/>
+                </div>
+              </div>
+              <div class="row text-center">
+                <div  class="col-xs-3">
+                  leltárvezető
+                </div>
+                <div  class="col-xs-9">
+                  leltározó(k)
+                </div>
+              </div>
+              <br></br>
+              Kelt: <span t-field="o.leltarkorzet_id.telephely_id.helyseg"/>, <span t-field="o.write_date"/>
+            </div>
+<!--
+-->
+          </t>
+        </t>
+      </t>
+    </template>
+
     <report
         id="report_leltar_szallitolevel"
         model="leltar.eszkozmozgas"
@@ -374,9 +463,17 @@
     <report
         id="report_leltar_leltariv"
         model="leltar.leltariv"
-        string="Leltárív"
+        string="Leltárív1"
         report_type="qweb-pdf"
         name="leltar.report_leltariv"
+    />
+
+    <report
+        id="report_leltar_leltariv2"
+        model="leltar.leltariv"
+        string="Leltárív2"
+        report_type="qweb-pdf"
+        name="leltar.report_leltariv2"
     />
 
   </data>

@@ -161,6 +161,7 @@ class LeltarKorzet(models.Model):
   leltarozni          = fields.Boolean(u'Leltározni?', default=True)
   ds_leltarkorzet     = fields.Char(u'DS Leltárkörzet',  required=True)
   ds_korzet_vonalkod  = fields.Char(u'DS Leltárkörzet vonalkód',   required=True)
+  hianyzo_eszk_gyujto = fields.Boolean(u'Hiányzó eszközök gyűjtő', default=False)
   active              = fields.Boolean(u'Aktív?', default=True)
   # virtual fields
   eszkozok_ids        = fields.One2many('leltar.eszkoz', 'akt_leltarkorzet_id', u'Eszközök a leltárkörzetben')
@@ -509,10 +510,12 @@ class LeltarLeltariv(models.Model):
   leltarozo2_id       = fields.Many2one('hr.employee',  u'Leltározó2', auto_join=True, states={'kesz': [('readonly', True)], 'konyvelt': [('readonly', True)]})
   leltarozo3_id       = fields.Many2one('hr.employee',  u'Leltározó3', auto_join=True, states={'kesz': [('readonly', True)], 'konyvelt': [('readonly', True)]})
   leltarkorzet_kod    = fields.Char(u'Leltárkörzet kód', related='leltarkorzet_id.leltarkorzet_kod', readonly=True, store=True)
+  hianyzo_eszk_gyujto = fields.Boolean(u'Hiányzó eszközök gyűjtő', related='leltarkorzet_id.hianyzo_eszk_gyujto', readonly=True, store=True)
   # virtual fields
   ujeszkozok_ids      = fields.One2many('leltar.leltariv_ujeszkoz', 'leltariv_id', u'Új eszközök a leltáríven', states={'kesz': [('readonly', True)], 'konyvelt': [('readonly', True)]})
   eszkozok_ids        = fields.One2many('leltar.leltariv_eszkoz', 'leltariv_id', u'Eszközök a leltáríven', states={'kesz': [('readonly', True)], 'konyvelt': [('readonly', True)]})
   ismeretlen_ids      = fields.One2many('leltar.leltariv_ismeretlen', 'leltariv_id', u'Ismeretlen eszközök a leltáríven', states={'kesz': [('readonly', True)], 'konyvelt': [('readonly', True)]})
+  leltariv_osszes_ids = fields.One2many('leltar.leltariv_osszes', 'leltariv_id', u'Összes eszköz a leltáríven', readonly=True)
 
   @api.model
   def create(self, vals):
@@ -590,8 +593,10 @@ class LeltarLeltarivOsszes(models.Model):
   _auto               = False
   _order              = 'eszkoz_id'
   leltariv_id         = fields.Many2one('leltar.leltariv', u'Leltárív', auto_join=True)
+  hianyzo_eszk_gyujto = fields.Boolean(u'Hiányzó eszközök gyűjtő')
   eszkoz_id           = fields.Many2one('leltar.eszkoz', u'Eszköz',     auto_join=True)
   fellelheto          = fields.Boolean(u'Fellelhető')
+  hiany               = fields.Boolean(u'Hiány')
   serult_cimke        = fields.Boolean(u'Sérült címke')
   selejtezni          = fields.Boolean(u'Selejtezni')
   megjegyzes          = fields.Char(u'Megjegyzés')
@@ -605,15 +610,20 @@ class LeltarLeltarivOsszes(models.Model):
       """CREATE or REPLACE VIEW %s as (
         WITH
           osszes AS (
-            SELECT eszkoz.id AS leltariv_eszkoz_id, 0 AS leltariv_ujeszkoz_id, eszkoz.leltariv_id, eszkoz.eszkoz_id, eszkoz.fellelheto, eszkoz.serult_cimke, eszkoz.selejtezni, eszkoz.megjegyzes, eszkoz.write_date
+            SELECT eszkoz.leltariv_id, iv.hianyzo_eszk_gyujto, eszkoz.eszkoz_id, eszkoz.fellelheto, eszkoz.serult_cimke, eszkoz.selejtezni, eszkoz.megjegyzes,
+              eszkoz.id AS leltariv_eszkoz_id, 0 AS leltariv_ujeszkoz_id, eszkoz.write_date
             FROM leltar_leltariv_eszkoz AS eszkoz
             JOIN leltar_leltariv AS iv ON iv.id = leltariv_id AND iv.state != 'konyvelt'
             UNION ALL
-            SELECT 0 AS leltariv_eszkoz_id, eszkoz.id AS leltariv_ujeszkoz_id, eszkoz.leltariv_id, eszkoz.eszkoz_id, true AS fellelheto, eszkoz.serult_cimke, eszkoz.selejtezni, eszkoz.megjegyzes, eszkoz.write_date
+            SELECT eszkoz.leltariv_id, iv.hianyzo_eszk_gyujto, eszkoz.eszkoz_id, true AS fellelheto, eszkoz.serult_cimke, eszkoz.selejtezni, eszkoz.megjegyzes,
+              0 AS leltariv_eszkoz_id, eszkoz.id AS leltariv_ujeszkoz_id, eszkoz.write_date
             FROM leltar_leltariv_ujeszkoz AS eszkoz
             JOIN leltar_leltariv AS iv ON iv.id = leltariv_id AND iv.state != 'konyvelt'
+          ),
+          talalt AS (
+            SELECT DISTINCT eszkoz_id FROM osszes WHERE fellelheto AND NOT hianyzo_eszk_gyujto
           )
-        SELECT row_number() over() AS id, * FROM osszes
+        SELECT row_number() over() AS id, osszes.*, NOT EXISTS (SELECT eszkoz_id from talalt WHERE talalt.eszkoz_id = osszes.eszkoz_id) as hiany FROM osszes
       )"""
       % (self._table)
     )
