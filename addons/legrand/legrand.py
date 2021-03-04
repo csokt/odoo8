@@ -33,6 +33,7 @@ class LegrandCikk(models.Model):
   cikkszam            = fields.Char(u'Cikkszám', required=True)
   cikknev             = fields.Char(u'Cikknév',  required=True)
   termekcsoport       = fields.Char(u'Termékcsoport')
+  kulso_dokumentum    = fields.Char(u'Külső dokumentum')
   alkatresz_e         = fields.Boolean(u'Alkatrész?',   default=False)
   kesztermek_e        = fields.Boolean(u'Késztermék?',  default=False)
   szefo_cikk_e        = fields.Boolean(u'SZEFO cikk?',  default=False)
@@ -167,6 +168,7 @@ class LegrandMozgasfej(models.Model):
                                           u'Mozgásnem', required=True, default=lambda self: self.env.context.get('mozgasnem', ''))
   forrashely_id       = fields.Many2one('legrand.hely', u'Forráshely', index=True, auto_join=True)
   celallomas_id       = fields.Many2one('legrand.hely', u'Célállomás helye', index=True, auto_join=True)
+  kulso_dokumentum    = fields.Char(u'Külső dokumentum')
   forrasdokumentum    = fields.Char(u'Forrásdokumentum')
   megjegyzes          = fields.Char(u'Megjegyzés')
   # virtual fields
@@ -219,9 +221,15 @@ class LegrandMozgasfej(models.Model):
   def export_impex(self):
     self.env['legrand.impex'].search([]).unlink()
     for sor in self.mozgassor_ids:
+      beepules = 0
+      if sor.gyartasi_lap_id and sor.cikk_id:
+        bom_line_ids = sor.gyartasi_lap_id.bom_id.bom_line_ids.filtered(lambda r: r.cikk_id == sor.cikk_id)
+        if len(bom_line_ids):
+          beepules = bom_line_ids[0].beepules
       impex_row = {
         'sorszam'         : sor.gyartasi_lap_id.id,
         'gyartasi_lap_id' : sor.gyartasi_lap_id.id,
+        'db'              : sor.gyartasi_lap_id.modositott_db,
         'cikk_id'         : sor.cikk_id.id,
         'bom_id'          : sor.bom_id.id,
         'mennyiseg'       : sor.mennyiseg,
@@ -229,6 +237,7 @@ class LegrandMozgasfej(models.Model):
         'rendelesszam'    : sor.gyartasi_lap_id.rendelesszam,
         'cikkszam'        : sor.gyartasi_lap_id.termekkod,
         'megjegyzes'      : sor.megjegyzes,
+        'beepules'        : beepules,
       }
       self.env['legrand.impex'].create(impex_row)
     return True
@@ -239,6 +248,13 @@ class LegrandMozgasfej(models.Model):
       raise exceptions.Warning(u'Nincs véglegesíthető mozgás!')
     if self.forrashely_id == self.celallomas_id:
       raise exceptions.Warning(u'A forrás és célállomás helye megegyezik!')
+    if self.mozgasnem == 'be':
+      ossz_uj_igeny_ids = self.env['legrand.anyagigeny'].search([('state', '=', 'uj')])
+      for sor in self.mozgassor_ids:
+        cikk_uj_igeny_ids = ossz_uj_igeny_ids.filtered(lambda r: r.cikk_id == sor.cikk_id)
+        if cikk_uj_igeny_ids:
+          for cikk_uj_igeny in cikk_uj_igeny_ids:
+            cikk_uj_igeny.write({'erkezett': cikk_uj_igeny.erkezett + sor.mennyiseg})
     self.state = 'szallit' if self.mozgasnem == 'belso' else 'kesz'
     return True
 
@@ -379,7 +395,7 @@ class LegrandCikkMozgas(models.Model):
   _name = 'legrand.cikk_mozgas'
   _auto = False
   _rec_name = 'cikk_id'
-  _order = 'mozgasfej_id'
+  _order = 'mozgasfej_id desc, datum'
   state               = fields.Selection([('terv',u'Tervezet'),('szallit',u'Szállítás'),('elter',u'Átszállítva eltérésekkel'),('kesz',u'Átszállítva'),('konyvelt',u'Könyvelve')],
                         u'Állapot', readonly=True)
   mozgasnem           = fields.Selection([('be',u'Alkatrész bevételezés'),('ki',u'Termék kiszállítás'),('belso',u'Belső szállítás'),
@@ -390,7 +406,8 @@ class LegrandCikkMozgas(models.Model):
   celallomas_id       = fields.Many2one('legrand.hely',       u'Célállomás helye',  readonly=True, auto_join=True)
   cikk_id             = fields.Many2one('legrand.cikk',       u'Cikkszám',          readonly=True, auto_join=True)
   bom_id              = fields.Many2one('legrand.bom',        u'Anyagjegyzék',      readonly=True, auto_join=True)
-  mennyiseg           = fields.Float(u'Mennyiség', digits=(16, 2), readonly=True)
+  gyartasi_lap_id     = fields.Many2one('legrand.gyartasi_lap', u'Gyártási lap',    readonly=True, auto_join=True)
+  mennyiseg           = fields.Float(u'Mennyiség', digits=(16, 5), readonly=True)
   datum               = fields.Date(u'Létrehozás ideje', readonly=True)
   # virtual fields
   cikknev             = fields.Char(u'Cikknév', related='cikk_id.cikknev', readonly=True)
@@ -408,15 +425,16 @@ class LegrandCikkMozgas(models.Model):
           celallomas_id,
           cikk_id,
           bom_id,
+          gyartasi_lap_id,
           mennyiseg,
           datum
         FROM (
-          SELECT fej.id AS mozgasfej_id, fej.forrashely_id, fej.celallomas_id, sor.cikk_id, sor.bom_id, sor.mennyiseg AS mennyiseg, fej.state, fej.mozgasnem, sor.create_date AS datum
+          SELECT fej.id AS mozgasfej_id, fej.forrashely_id, fej.celallomas_id, sor.cikk_id, sor.bom_id, sor.gyartasi_lap_id, sor.mennyiseg AS mennyiseg, fej.state, fej.mozgasnem, sor.create_date AS datum
           FROM legrand_mozgassor AS sor
           JOIN legrand_mozgasfej AS fej  ON fej.id  = sor.mozgasfej_id
           WHERE cikk_id > 0
           UNION ALL
-          SELECT fej.id AS mozgasfej_id, fej.forrashely_id, fej.celallomas_id, line.cikk_id, sor.bom_id, sor.mennyiseg*line.beepules AS mennyiseg, fej.state, fej.mozgasnem, sor.create_date
+          SELECT fej.id AS mozgasfej_id, fej.forrashely_id, fej.celallomas_id, line.cikk_id, sor.bom_id, sor.gyartasi_lap_id, sor.mennyiseg*line.beepules AS mennyiseg, fej.state, fej.mozgasnem, sor.create_date
           FROM legrand_mozgassor AS sor
           JOIN legrand_mozgasfej AS fej  ON fej.id  = sor.mozgasfej_id
           JOIN legrand_bom_line  AS line ON sor.bom_id = line.bom_id
@@ -431,12 +449,14 @@ class LegrandAnyagigeny(models.Model):
   _name               = 'legrand.anyagigeny'
   _order              = 'id desc'
   state               = fields.Selection([('terv',u'Tervezet'),('uj',u'Új igény'),('nyugta',u'Nyugtázva')], u'Állapot', default='terv', readonly=True)
-  cikk_id             = fields.Many2one('legrand.cikk', u'Cikkszám',                                                          readonly=True, states={'terv': [('readonly', False)]}, auto_join=True)
-  gyartasi_lap_id     = fields.Many2one('legrand.gyartasi_lap',  u'Gyártási lap',                                             readonly=True, states={'terv': [('readonly', False)]}, auto_join=True)
+  hely_id             = fields.Many2one('legrand.hely', u'Üzem', domain=[('belso_szallitas_e', '=', True)],                   readonly=True, states={'terv': [('readonly', False)]}, required=True)
+  gyartasi_lap_id     = fields.Many2one('legrand.gyartasi_lap',  u'Gyártási lap',                                             readonly=True, states={'terv': [('readonly', False)]})
+  cikk_id             = fields.Many2one('legrand.cikk', u'Cikkszám',                                                          readonly=True, states={'terv': [('readonly', False)]}, required=True)
   mennyiseg           = fields.Float(u'Mennyiség', digits=(16, 2),                                                            readonly=True, states={'terv': [('readonly', False)]}, required=True)
-  hely_id             = fields.Many2one('legrand.hely', u'Üzem', domain=[('belso_szallitas_e', '=', True)],                   readonly=True, states={'terv': [('readonly', False)]}, required=True, auto_join=True)
   igeny_ok            = fields.Selection([('hiany',u'hiánypótlás'),('selejt',u'selejtpótlás')], 'Kérés oka', default='hiany', readonly=True, states={'terv': [('readonly', False)]}, required=True)
-  megjegyzes          = fields.Char(u'Megjegyzés',                                                                            states={'nyugta': [('readonly', True)]})
+  megjegyzes          = fields.Char(u'Megjegyzés',                                                                                           states={'nyugta': [('readonly', True)]})
+  erkezett            = fields.Float(u'Érkezett', digits=(16, 2),                                                             readonly=True, states={'uj': [('readonly', False)]})
+  hatralek            = fields.Float(u'Hátralék', digits=(16, 2), compute='_compute_hatralek', store=True)
   # virtual fields
   cikknev             = fields.Char(u'Cikknév', related='cikk_id.cikknev', readonly=True)
 
@@ -446,6 +466,11 @@ class LegrandAnyagigeny(models.Model):
     ids = self.gyartasi_lap_id.bom_id.bom_line_ids.mapped('cikk_id.id')
     domain = [('id','in',ids)] if self.gyartasi_lap_id else []
     return {'domain': {'cikk_id': domain}}
+
+  @api.one
+  @api.depends('mennyiseg', 'erkezett')
+  def _compute_hatralek(self):
+    self.hatralek = self.mennyiseg - self.erkezett
 
   @api.one
   def veglegesites(self):
@@ -474,6 +499,7 @@ class LegrandKeszlet(models.Model):
   varhato             = fields.Float(string=u'Előrejelzés', readonly=True)
   # virtual fields
   cikknev             = fields.Char(u'Cikknév', related='cikk_id.cikknev', readonly=True)
+  bekerulesi_ar       = fields.Float(u'Bekerülési ár',  digits=(16, 3), related='cikk_id.bekerulesi_ar', readonly=True)
   alkatresz_e         = fields.Boolean(u'Alkatrész',  related='cikk_id.alkatresz_e',  readonly=True)
   kesztermek_e        = fields.Boolean(u'Késztermék', related='cikk_id.kesztermek_e', readonly=True)
 
@@ -711,6 +737,7 @@ class LegrandGyartasiLap(models.Model):
   leallas_ok          = fields.Char(u'Gyártás leállásának oka', readonly=True, states={'gyartas': [('readonly', False)]})
   aktivitas           = fields.Char(u'Gyártás aktivitás', compute='_compute_aktivitas', store=True)
   leallas_felelos     = fields.Selection([('Szefo',u'Szefo'),('Legrand',u'Legrand'),('vis maior',u'vis maior')], u'Felelős', readonly=True, states={'gyartas': [('readonly', False)]})
+  homogen_7127_van_e  = fields.Boolean(u'7127 van benne?', compute='_compute_homogen_7127_van_e', store=True)
   active              = fields.Boolean(u'Aktív?', default=True)
   # statistics
   elso_teljesites     = fields.Date(u'Első teljesítés napja')
@@ -755,6 +782,11 @@ class LegrandGyartasiLap(models.Model):
     else:
       self.aktivitas = ''
       self.leallas_felelos = ''
+
+  @api.one
+  @api.depends('gylap_homogen_ids.sajat')
+  def _compute_homogen_7127_van_e(self):
+    self.homogen_7127_van_e = len(self.gylap_homogen_ids.filtered(lambda r: r.homogen_id.homogen == '7127' and r.sajat)) > 0
 
   @api.one
   @api.depends('szefo_muvelet_ids', 'szefo_muvelet_ids.hiany_db')
@@ -932,6 +964,7 @@ class LegrandGylapDbjegyzek(models.Model):
   state               = fields.Selection([('uj',u'Új'),('mterv',u'Műveletterv'),('gyartas',u'Gyártás'),('gykesz',u'Gyártás kész'),('kesz',u'Rendelés teljesítve')],
                         u'Állapot', related='gyartasi_lap_id.state', readonly=True)
   cimke_e             = fields.Boolean(u'Címke?',  related='cikk_id.cimke_e', readonly=True)
+  homogen_7127_van_e  = fields.Boolean(u'7127 van benne?', related='gyartasi_lap_id.homogen_7127_van_e', readonly=True)
   cikknev             = fields.Char(u'Megnevezés', related='cikk_id.cikknev', readonly=True)
   rendelt_db          = fields.Integer(u'Rendelt termék db', related='gyartasi_lap_id.rendelt_db', readonly=True)
   hatarido            = fields.Date(u'Határidő', related='gyartasi_lap_id.hatarido', readonly=True)
@@ -1274,12 +1307,14 @@ class LegrandMeoJegyzokonyv(models.Model):
   ellenorizte_id      = fields.Many2one('nexon.szemely', u'Ellenőrizte', auto_join=True)
   hiba_leirasa        = fields.Char(u'Hiba leírása', required=True)
   dolgozo_id          = fields.Many2one('nexon.szemely', u'Dolgozó', auto_join=True)
-  gylap_szefo_muv_id1 = fields.Many2one('legrand.gylap_szefo_muvelet', u'Művelet', required=True, domain="[('gyartasi_lap_id', '=', gyartasi_lap_id)]", auto_join=True)
+  gylap_szefo_muv_id1 = fields.Many2one('legrand.gylap_szefo_muvelet', u'Művelet', domain="[('gyartasi_lap_id', '=', gyartasi_lap_id)]", auto_join=True)
   gylap_szefo_muv_id2 = fields.Many2one('legrand.gylap_szefo_muvelet', u'2. Művelet', domain="[('gyartasi_lap_id', '=', gyartasi_lap_id)]", auto_join=True)
   intezkedesek        = fields.Char(u'Intézkedések')
   javitasi_ido        = fields.Float(u'Javításra fordított idő', digits=(16, 2))
   dolgozo_megjegyzese = fields.Char(u'Dolgozó megjegyzése')
   megjegyzes          = fields.Char(u'Megjegyzés')
+  kulso_dokumentum    = fields.Char(u'Külső dokumentum')
+  aql_megfelelo_e     = fields.Boolean(u'AQL szerint megfelelő?')
   logisztikai_hiba_e  = fields.Boolean(u'Logisztikai hiba?')
   szerelesi_hiba_e    = fields.Boolean(u'Szerelési hiba?')
   muszakvezeto_id     = fields.Many2one('nexon.szemely', u'Műszakvezető', auto_join=True)
@@ -1510,8 +1545,8 @@ class LegrandAnyagszukseglet(models.Model):
   state               = fields.Selection([('uj',u'Új'),('mterv',u'Műveletterv'),('gyartas',u'Gyártás'),('gykesz',u'Gyártás kész'),('kesz',u'Rendelés teljesítve')], u'Állapot')
   gyartasi_lap_id     = fields.Many2one('legrand.gyartasi_lap',  u'Gyártási lap', auto_join=True)
   cikk_id             = fields.Many2one('legrand.cikk', string=u'Alkatrész', auto_join=True)
-  rendelt             = fields.Float(u'Rendelt', digits=(16, 2))
-  hatralek            = fields.Float(u'Hátralék',  digits=(16, 2))
+  rendelt             = fields.Float(u'Rendelt', digits=(16, 5))
+  hatralek            = fields.Float(u'Hátralék',  digits=(16, 5))
   # virtual fields
 
   def init(self, cr):
@@ -1638,7 +1673,7 @@ class LegrandImpex(models.Model):
   bom_id              = fields.Many2one('legrand.bom',  u'Anyagjegyzék', auto_join=True)
   homogen_id          = fields.Many2one('legrand.homogen',  u'Homogén', auto_join=True)
   hely_id             = fields.Many2one('legrand.hely', u'Hely id', auto_join=True)
-  hibakod_id          = fields.Many2one('legrand.hibakod', u'Hibakód', auto_join=True)
+  hibakod_id          = fields.Many2one('legrand.hibakod', u'Hiba', auto_join=True)
 #  # computed fields
   ora                 = fields.Float(u'Óra', digits=(16, 2), compute='_compute_ora', store=True)
 #  # virtual fields
@@ -1648,7 +1683,9 @@ class LegrandImpex(models.Model):
   cikknev             = fields.Char(u'Cikknév', compute='_compute_cikknev')
   price               = fields.Float(u'Price', digits=(16, 3), compute='_compute_price')
   gyartasi_hely_id    = fields.Many2one('legrand.hely',  u'Fő gyártási hely', related='gyartasi_lap_id.gyartasi_hely_id', readonly=True)
-  termekcsoport       = fields.Char(u'Termékcsoport',  related='gyartasi_lap_id.termekcsoport', readonly=True)
+  termekcsoport       = fields.Char(u'Termékcsoport', related='gyartasi_lap_id.termekcsoport', readonly=True)
+  hibakod             = fields.Char(u'Hiba kódja',    related='hibakod_id.kod', readonly=True)
+  hibanev             = fields.Char(u'Hiba leírása',  related='hibakod_id.nev', readonly=True)
 
   @api.one
   @api.depends('mennyiseg', 'gyartasi_lap_id')

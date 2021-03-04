@@ -85,6 +85,7 @@
               <field name="cikkszam"/>
               <field name="cikknev"/>
               <field name="termekcsoport"/>
+              <field name="kulso_dokumentum"      widget="url"/>
               <field name="alkatresz_e"/>
               <field name="bekerulesi_ar"/>
               <field name="kesztermek_e"/>
@@ -252,6 +253,7 @@
               <field name="write_date"          readonly="1"    string="Módosítás ideje"/>
             </group>
             <group col="2">
+              <field name="kulso_dokumentum"    widget="url"/>
               <field name="forrasdokumentum"    attrs="{'readonly': [('state','!=','terv')]}"/>
               <field name="megjegyzes"          />
               <field name="mozgassor_irhato_e"  invisible="1"/>
@@ -331,7 +333,7 @@
       <field  name="name">Mozgás Tree</field>
       <field  name="model">legrand.mozgassor</field>
       <field  name="arch" type="xml">
-        <tree>
+        <tree default_order="id desc">
           <field name="mozgasfej_sorszam"/>
           <field name="forrashely_id"/>
           <field name="celallomas_id"/>
@@ -439,11 +441,12 @@
           <field name="mozgasfej_id"/>
           <field name="forrashely_id"/>
           <field name="celallomas_id"/>
+          <field name="gyartasi_lap_id"/>
           <field name="cikk_id"/>
+          <field name="bom_id"/>
           <field name="cikknev"/>
           <field name="mennyiseg"/>
           <field name="mozgasnem"/>
-          <field name="bom_id"/>
           <field name="state"/>
           <field name="datum"/>
         </tree>
@@ -497,13 +500,15 @@
           <field name="mennyiseg"/>
           <field name="igeny_ok"/>
           <field name="megjegyzes"/>
+          <field name="erkezett"/>
+          <field name="hatralek"/>
+          <field name="state"/>
+          <button name="veglegesites"     type="object" string="Véglegesítés"   attrs="{'invisible': [('state','!=','terv')]}"/>
+          <button name="state2nyugta"     type="object" string="Depó nyugtáz"   attrs="{'invisible': [('state','!=','uj')]}"      groups="legrand.group_legrand_manager"/>
           <field name="create_uid"        readonly="1"  string="Felvette"/>
           <field name="create_date"       readonly="1"  string="Létrehozás ideje"/>
           <field name="write_uid"         readonly="1"  string="Módosította"/>
           <field name="write_date"        readonly="1"  string="Módosítás ideje"/>
-          <field name="state"/>
-          <button name="veglegesites"     type="object" string="Véglegesítés"   attrs="{'invisible': [('state','!=','terv')]}"/>
-          <button name="state2nyugta"     type="object" string="Depó nyugtáz"   attrs="{'invisible': [('state','!=','uj')]}"      groups="legrand.group_legrand_manager"/>
         </tree>
       </field>
     </record>
@@ -526,11 +531,16 @@
           <filter name="filter_oroshaza"  string="Orosháza"             domain="[('hely_id.azonosito','=','oroshaza')]"/>
           <filter name="filter_apatfalva" string="Apátfalva"            domain="[('hely_id.azonosito','=','apatfalva')]"/>
           <separator/>
-          <filter name="filter_terv"      string="Tervezet"     domain="[('state','=','terv')]"/>
-          <filter name="filter_uj"        string="Új igény"     domain="[('state','=','uj')]"/>
-          <filter name="filter_nyugta"    string="Nyugtázva"    domain="[('state','=','nyugta')]"/>
+          <filter name="filter_terv"      string="Tervezet"             domain="[('state','=','terv')]"/>
+          <filter name="filter_uj"        string="Új igény"             domain="[('state','=','uj')]"/>
+          <filter name="filter_nyugta"    string="Nyugtázva"            domain="[('state','=','nyugta')]"/>
+          <separator/>
+          <filter name="filter_erkezett"  string="Érkezett"             domain="[('erkezett','!=',0)]"/>
+          <filter name="filter_nerkezett" string="Nem érkezett"         domain="[('erkezett','=',0)]"/>
+          <filter name="filter_hatralek"  string="Hátralék"             domain="[('hatralek','!=',0)]"/>
+          <filter name="filter_nhatralek" string="Nincs hátralék"       domain="[('hatralek','=',0)]"/>
           <group  expand="0" string="Csoportosítás">
-            <filter name="group_uzem"     string="Üzem"         context="{'group_by': 'hely_id'}"/>
+            <filter name="group_uzem"     string="Üzem"                 context="{'group_by': 'hely_id'}"/>
           </group>
         </search>
       </field>
@@ -545,6 +555,7 @@
         <tree>
           <field name="cikk_id"/>
           <field name="cikknev"/>
+          <field name="bekerulesi_ar"/>
           <field name="hely_id"/>
           <field name="terv"/>
           <field name="szallitason"/>
@@ -992,7 +1003,7 @@
           <field name="name"/>
           <field name="rendelesszam"/>
           <field name="termekkod"/>
-          <field name="szamlazhato_db"/>
+          <field name="szamlazhato_db"        string="db"/>
           <field name="szamlazhato_ora"       string="Óra"  sum="munkaóra + beáll.idő összesen"/>
           <field name="homogen_id"/>
           <field name="termekcsalad"/>
@@ -1326,19 +1337,21 @@
             <field name="id"                      string="Jegyzőkönyv száma"  readonly="1"/>
             <field name="gyartasi_lap_id"         attrs="{'readonly': [('create_date', '!=', False),('legrand_manager_e', '=', False)]}"
                                                       options="{'no_create': True, 'no_open': True}"/>
-            <field name="create_date"             invisible="1"/>
+            <field name="aql_megfelelo_e"         attrs="{'readonly': [('create_date', '!=', False),('legrand_manager_e', '=', False)]}"/>
             <field name="gylap_szefo_muv_id1"     attrs="{'readonly': [('create_date', '!=', False),('legrand_manager_e', '=', False)]}"
                                                       options="{'no_create': True, 'no_open': True}"/>
             <field name="gylap_szefo_muv_id2"     attrs="{'readonly': [('create_date', '!=', False),('legrand_manager_e', '=', False)]}"
                                                       options="{'no_create': True, 'no_open': True}"/>
             <field name="logisztikai_hiba_e"      attrs="{'readonly': [('create_date', '!=', False),('legrand_manager_e', '=', False)]}"/>
             <field name="szerelesi_hiba_e"        attrs="{'readonly': [('create_date', '!=', False),('legrand_manager_e', '=', False)]}"/>
+            <field name="create_date"             invisible="1"/>
           </group>
           <group col="2">
             <field name="hiba_leirasa"            attrs="{'readonly': [('create_date', '!=', False),('legrand_manager_e', '=', False)]}"/>
             <field name="intezkedesek"/>
             <field name="dolgozo_megjegyzese"/>
             <field name="megjegyzes"              attrs="{'readonly': [('create_date', '!=', False),('legrand_manager_e', '=', False)]}"/>
+            <field name="kulso_dokumentum"        attrs="{'readonly': [('create_date', '!=', False),('legrand_manager_e', '=', False)]}"      widget="url"/>
           </group>
           <group col="4">
             <field name="visszaadott_db"          attrs="{'readonly': [('create_date', '!=', False),('legrand_manager_e', '=', False)]}"/>
@@ -1784,6 +1797,8 @@
           <field name="homogen_id"/>
           <field name="hely_id"/>
           <field name="hibakod_id"/>
+          <field name="hibakod"/>
+          <field name="hibanev"/>
           <field name="rendelesszam"/>
           <field name="cikkszam"/>
           <field name="homogen"/>
@@ -1859,7 +1874,7 @@
     <act_window id="gylap_lezerez"      name="Lézerez, tamponoz"    res_model="legrand.gylap_lezer_tampon"                                            view_mode="tree,form"
                 domain="[('state','!=','uj')]"                      context="{'search_default_filter_mterv': 1, 'search_default_filter_gyartas': 1, 'search_default_filter_lezer': 1}"/>
     <act_window id="cimkenyomtatas"     name="Címkenyomtatás"       res_model="legrand.gylap_dbjegyzek"   view_id="view_tree_cimkenyomtatas"          view_mode="tree,form"
-                domain="[('cimke_e','=',True)]"                     context="{'search_default_filter_mterv': 1, 'search_default_filter_gyartas': 1}"/>
+                domain="[('cimke_e','=',True),('homogen_7127_van_e','=',True)]" context="{'search_default_filter_mterv': 1, 'search_default_filter_gyartas': 1}"/>
 
     <act_window id="mozgas_kiszall"     name="Kiszállítás"          res_model="legrand.mozgasfej"                                                     view_mode="tree,form"
                 domain="[('mozgasnem','=','ki')]"                   context="{'mozgasnem':'ki'}"/>

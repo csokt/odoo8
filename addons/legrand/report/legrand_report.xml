@@ -236,32 +236,32 @@
                   <td>Ellenőrizte:</td>             <td><span t-field="o.ellenorizte_id"/></td>
                 </tr>
                 <tr>
-                  <td>Hiba leírása:</td>
-                  <td colspan="3"><span t-field="o.hiba_leirasa"/></td>
+                  <td>AQR szerint megfelelő?</td>   <td colspan="3"> <span t-if="o.aql_megfelelo_e">igen</span> <span t-if="not o.aql_megfelelo_e">nem</span></td>
                 </tr>
                 <tr>
-                  <td>A hiba okozója:</td>
-                  <td colspan="3"><span t-field="o.dolgozo_id"/></td>
+                  <td>Logisztikai hiba?</td>        <td> <span t-if="o.logisztikai_hiba_e">igen</span> <span t-if="not o.logisztikai_hiba_e">-</span></td>
+                  <td>Szerelési hiba?</td>          <td> <span t-if="o.szerelesi_hiba_e">igen</span> <span t-if="not o.szerelesi_hiba_e">-</span></td>
                 </tr>
                 <tr>
-                  <td>Művelet(ek):</td>
-                  <td colspan="3"><span t-field="o.gylap_szefo_muv_id1"/>, <span t-field="o.gylap_szefo_muv_id2"/></td>
+                  <td>Hiba leírása:</td>            <td colspan="3"><span t-field="o.hiba_leirasa"/></td>
                 </tr>
                 <tr>
-                  <td>A hiba kijavítására tett intézkedések:</td>
-                  <td colspan="3"><span t-field="o.intezkedesek"/></td>
+                  <td>A hiba okozója:</td>          <td colspan="3"><span t-field="o.dolgozo_id"/></td>
                 </tr>
                 <tr>
-                  <td>A hiba kijavítására fordított idő:</td>
-                  <td colspan="3"><span t-field="o.javitasi_ido"/> óra</td>
+                  <td>Művelet(ek):</td>             <td colspan="3"><span t-field="o.gylap_szefo_muv_id1"/>, <span t-field="o.gylap_szefo_muv_id2"/></td>
                 </tr>
                 <tr>
-                  <td>A dolgozó megjegyzése:</td>
-                  <td colspan="3"><span t-field="o.dolgozo_megjegyzese"/></td>
+                  <td>A hiba kijavítására tett intézkedések:</td>   <td colspan="3"><span t-field="o.intezkedesek"/></td>
                 </tr>
                 <tr>
-                  <td>Megjegyzés:</td>
-                  <td colspan="3"><span t-field="o.megjegyzes"/></td>
+                  <td>A hiba kijavítására fordított idő:</td>       <td colspan="3"><span t-field="o.javitasi_ido"/> óra</td>
+                </tr>
+                <tr>
+                  <td>A dolgozó megjegyzése:</td>   <td colspan="3"><span t-field="o.dolgozo_megjegyzese"/></td>
+                </tr>
+                <tr>
+                  <td>Megjegyzés:</td>              <td colspan="3"><span t-field="o.megjegyzes"/></td>
                 </tr>
                 <tr>
                   <td colspan="4" align="center"><h4>Selejteződött alkatrészek</h4></td>

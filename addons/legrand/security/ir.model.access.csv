@@ -27,6 +27,7 @@ access_legrand_cikk_mozgas_group_viewer,legrand.cikk_mozgas.viewer,model_legrand
 
 access_legrand_anyagigeny_group_viewer,legrand.anyagigeny.viewer,model_legrand_anyagigeny,group_legrand_viewer,1,0,0,0
 access_legrand_anyagigeny_group_user,legrand.anyagigeny.user,model_legrand_anyagigeny,group_legrand_user,1,1,1,0
+access_legrand_anyagigeny_group_admin,legrand.anyagigeny.admin,model_legrand_anyagigeny,group_legrand_admin,1,1,1,1
 
 access_legrand_keszlet_group_viewer,legrand.keszlet.viewer,model_legrand_keszlet,group_legrand_viewer,1,0,0,0
 access_legrand_vall_keszlet_group_viewer,legrand.vall_keszlet.viewer,model_legrand_vall_keszlet,group_legrand_viewer,1,0,0,0

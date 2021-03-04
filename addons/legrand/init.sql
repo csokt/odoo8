@@ -1,3 +1,13 @@
+-- Gyártási lap 'rendelt_ora' beírása 'gylap_homogen' táblából #### nincs kész ####
+WITH
+homogen AS (
+  SELECT gyartasi_lap_id, SUM(rendelt_ora) AS rendelt_ora FROM legrand_gylap_homogen WHERE sajat GROUP BY gyartasi_lap_id
+)
+SELECT gylap.id, homogen.rendelt_ora FROM legrand_gyartasi_lap AS gylap
+JOIN homogen ON homogen.gyartasi_lap_id = gylap.id
+WHERE gylap.active AND gylap.state = 'uj'
+ORDER BY id
+;
 
 -- statisztika adatok beírása
 
