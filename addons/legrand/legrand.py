@@ -249,7 +249,8 @@ class LegrandMozgasfej(models.Model):
     if self.forrashely_id == self.celallomas_id:
       raise exceptions.Warning(u'A forrás és célállomás helye megegyezik!')
     if self.mozgasnem == 'be':
-      ossz_uj_igeny_ids = self.env['legrand.anyagigeny'].search([('state', '=', 'uj')])
+      depo_id = self.env['legrand.hely'].search([('azonosito','=','depo')]).id
+      ossz_uj_igeny_ids = self.env['legrand.anyagigeny'].search([('state', '=', 'uj'), ('forrashely_id', '=', depo_id)])
       for sor in self.mozgassor_ids:
         cikk_uj_igeny_ids = ossz_uj_igeny_ids.filtered(lambda r: r.cikk_id == sor.cikk_id)
         if cikk_uj_igeny_ids:
