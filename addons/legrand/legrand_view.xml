@@ -221,20 +221,23 @@
       <field  name="arch" type="xml">
         <form>
           <header>
-            <button name="veglegesites"   type="object"   string="Véglegesítés"             attrs="{'invisible': [('state','!=','terv')]}"                  class="oe_highlight"
+            <button name="veglegesites"   type="object"   string="Véglegesítés"               attrs="{'invisible': [('state','!=','terv')]}"                  class="oe_highlight"
                                           confirm="A tervezett mozgásokat véglegesíti"/>
-            <button name="state2kesz"     type="object"   string="Átszállítva"              attrs="{'invisible': [('state','not in',('szallit','elter'))]}" class="oe_highlight"
+            <button name="state2kesz"     type="object"   string="Átszállítva"                attrs="{'invisible': [('state','not in',('szallit','elter'))]}" class="oe_highlight"
                                           confirm="A rögzített mozgások egyeznek a leszállított mennyiségekkel."/>
-            <button name="state2elter"    type="object"   string="Átszállítva eltérésekkel" attrs="{'invisible': [('state','!=','szallit')]}"
+            <button name="state2elter"    type="object"   string="Átszállítva eltérésekkel"   attrs="{'invisible': [('state','!=','szallit')]}"
                                           confirm="A leszállított alkatrészek mennyisége a szállítólevélhez képest eltér." />
-            <button name="state2konyvelt" type="object"   string="Könyvelve"                attrs="{'invisible': [('state','!=','kesz')]}"                  class="oe_highlight"
-                                          confirm="A szállítólvelet lezárja."               groups="legrand.group_legrand_manager" />
-            <button name="state2elter"    type="object"   string="Átszállítva eltérésekkel" attrs="{'invisible': [('state','!=','kesz')]}"
+            <button name="state2konyvelt" type="object"   string="Könyvelve"                  attrs="{'invisible': [('state','!=','kesz')]}"                  class="oe_highlight"
+                                          confirm="A szállítólvelet lezárja."                 groups="legrand.group_legrand_manager" />
+            <button name="state2elter"    type="object"   string="Átszállítva eltérésekkel"   attrs="{'invisible': [('state','!=','kesz')]}"
                                           confirm="A rögzített mozgások NEM egyeznek a leszállított mennyiségekkel."  groups="legrand.group_legrand_manager"/>
-            <button name="import_impex"   type="object"   string="Impexből import"          attrs="{'invisible': [('state','!=','terv')]}"
+            <button name="import_impex"   type="object"   string="Impexből import"            attrs="{'invisible': [('state','!=','terv')]}"
                                           confirm="Adatok importálása az impex adattáblából."/>
             <button name="export_impex"   type="object"   string="Impexbe export"
                                           confirm="Adatok exportálása az impex adattáblába."/>
+            <button name="import_bevet"   type="object"   string="Bevételezés összesítő import"
+                                          invisible="context.get('mozgasnem') not in ('be',)" states="terv"
+                                          confirm="Adatok importálása majd törlése a Bevételezés összesítő adattáblából."  groups="legrand.group_legrand_director"/>
             <field  name="state"          widget="statusbar"/>
           </header>
             <group col="6">

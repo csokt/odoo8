@@ -243,6 +243,18 @@ class LegrandMozgasfej(models.Model):
     return True
 
   @api.one
+  def import_bevet(self):
+    for bevet in self.env['legrand.depobevetossz'].search([]):
+      sor_row = {
+        'mozgasfej_id'      : self.id,
+        'cikk_id'           : bevet.cikk_id.id,
+        'mennyiseg'         : bevet.mennyiseg,
+      }
+      self.env['legrand.mozgassor'].create(sor_row)
+    self.env['legrand.depobevet'].search([]).unlink()
+    return True
+
+  @api.one
   def veglegesites(self):
     if not self.mozgassor_ids:
       raise exceptions.Warning(u'Nincs véglegesíthető mozgás!')
