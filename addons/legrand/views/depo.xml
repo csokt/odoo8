@@ -1,0 +1,55 @@
+<?xml version="1.0"?>
+<openerp>
+<!-- <odoo> -->
+  <data>
+    <!--####################################################################################################################  Depó raktáros bevételezés  -->
+    <record id="view_tree_depobevet_default"   model="ir.ui.view">
+      <field  name="name">Depobevét Tree</field>
+      <field  name="model">legrand.depobevet</field>
+      <field  name="arch" type="xml">
+        <tree editable="bottom">
+          <field name="cikk_id"           options="{'no_create': True, 'no_open': True}"/>
+          <field name="cikknev"/>
+          <field name="mennyiseg"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_depobevet"    model="ir.ui.view">
+      <field  name="name">Depobevét Filter</field>
+      <field  name="model">legrand.depobevet</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field  name="cikk_id"/>
+          <group  expand="0" string="Csoportosítás">
+            <filter name="group_cikk"     string="Cikk"                 context="{'group_by': 'cikk_id'}"/>
+          </group>
+        </search>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Bevételezés összesítő  -->
+    <record id="view_tree_depobevetossz_default"   model="ir.ui.view">
+      <field  name="name">Depobevét össz Tree</field>
+      <field  name="model">legrand.depobevetossz</field>
+      <field  name="arch" type="xml">
+        <tree>
+          <field name="cikk_id"/>
+          <field name="cikknev"/>
+          <field name="mennyiseg"/>
+        </tree>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Actions  -->
+    <act_window id="depo_bevet"           name="Bevételezés"                  res_model="legrand.depobevet"                     view_mode="tree"/>
+    <act_window id="depo_bevetossz"       name="Bevételezés összesítő"        res_model="legrand.depobevetossz"                 view_mode="tree"/>
+
+    <!--####################################################################################################################  Menu  items  -->
+    <menuitem id="menu_depo_raktaros"     name="Depo raktáros"                parent="menu_root"                  sequence="23" groups="group_legrand_manager"/>
+      <menuitem id="menu_depo_bevet"      name="Alkatrész bevételezés"        parent="menu_depo_raktaros"         sequence="20" action="depo_bevet"/>
+      <menuitem id="menu_depo_bevetossz"  name="Bevételezés összesítő"        parent="menu_depo_raktaros"         sequence="30" action="depo_bevetossz"/>
+
+  </data>
+<!-- </odoo> -->
+</openerp>

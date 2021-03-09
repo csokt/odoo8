@@ -493,6 +493,7 @@
       <field  name="model">legrand.anyagigeny</field>
       <field  name="arch" type="xml">
         <tree editable="top">
+          <field name="forrashely_id"     options="{'no_create': True, 'no_open': True}"/>
           <field name="hely_id"           options="{'no_create': True, 'no_open': True}"/>
           <field name="gyartasi_lap_id"/>
           <field name="cikk_id"           options="{'no_create': True}"/>
@@ -504,7 +505,8 @@
           <field name="hatralek"/>
           <field name="state"/>
           <button name="veglegesites"     type="object" string="Véglegesítés"   attrs="{'invisible': [('state','!=','terv')]}"/>
-          <button name="state2nyugta"     type="object" string="Depó nyugtáz"   attrs="{'invisible': [('state','!=','uj')]}"      groups="legrand.group_legrand_manager"/>
+          <button name="state2nyugta"     type="object" string="Nyugtázás"      attrs="{'invisible': [('state','!=','uj')]}"      groups="legrand.group_legrand_manager"/>
+          <button name="state2terv"       type="object" string="Tervezetbe"     attrs="{'invisible': [('state','!=','uj')]}"      groups="legrand.group_legrand_director"/>
           <field name="create_uid"        readonly="1"  string="Felvette"/>
           <field name="create_date"       readonly="1"  string="Létrehozás ideje"/>
           <field name="write_uid"         readonly="1"  string="Módosította"/>

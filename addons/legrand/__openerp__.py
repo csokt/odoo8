@@ -13,5 +13,8 @@
     'report/legrand_pivot_view.xml',
     'report/legrand_report.xml',
     'data/cron.xml',
+    'views/views.xml',
+    'views/menus.xml',
+    'views/depo.xml',
   ],
 }
