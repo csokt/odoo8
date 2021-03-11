@@ -1,0 +1,238 @@
+<?xml version="1.0"?>
+<openerp>
+  <data>
+    <!--####################################################################################################################  Mozgásfej  -->
+    <record id="view_form_mozgasfej"    model="ir.ui.view">
+      <field  name="name">Szállítás Form</field>
+      <field  name="model">legrand.mozgasfej</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <form>
+          <header>
+            <button name="veglegesites"   type="object"   string="Véglegesítés"                 states="terv"           class="oe_highlight"
+                                          confirm="A tervezett mozgásokat véglegesíti"/>
+            <button name="state2kesz"     type="object"   string="Átszállítva"                  states="szallit,elter"  class="oe_highlight"
+                                          confirm="A rögzített mozgások egyeznek a leszállított mennyiségekkel."/>
+            <button name="state2elter"    type="object"   string="Átszállítva eltérésekkel"     states="szallit"
+                                          confirm="A leszállított alkatrészek mennyisége a szállítólevélhez képest eltér." />
+            <button name="state2konyvelt" type="object"   string="Könyvelve"                    states="kesz"           class="oe_highlight"
+                                          confirm="A szállítólvelet lezárja."                                           groups="legrand.group_legrand_manager" />
+            <button name="state2elter"    type="object"   string="Átszállítva eltérésekkel"     states="kesz"
+                                          confirm="A rögzített mozgások NEM egyeznek a leszállított mennyiségekkel."    groups="legrand.group_legrand_manager"/>
+            <button name="import_impex"   type="object"   string="Impexből import"              states="terv"
+                                          confirm="Adatok importálása az impex adattáblából."/>
+            <button name="export_impex"   type="object"   string="Impexbe export"
+                                          confirm="Adatok exportálása az impex adattáblába."/>
+            <button name="import_bevet"   type="object"   string="Bevételezés összesítő import" states="terv"   invisible="context.get('mozgasnem') not in ('be',)"
+                                          confirm="Adatok importálása majd törlése a Bevételezés összesítő adattáblából."  groups="legrand.group_legrand_director"/>
+            <field  name="state"          widget="statusbar"/>
+          </header>
+            <group col="6">
+              <field name="id"                  attrs="{'invisible': [('mozgasnem', 'in', ('be',))]}"   string="Szállítólevél száma"/>
+              <field name="mozgasnem"           invisible="1"/>
+              <field name="mozgasnem"           invisible="1"/>
+              <field name="forrashely_id"       attrs="{'readonly': ['|',('mozgassor_irhato_e','=',False),('mozgasnem', 'not in', ('belso',))], 'required': [('mozgasnem', 'in', ('belso',))]}"
+                                                options="{'no_create': True, 'no_open': True}"
+                                                domain="[('belso_szallitas_e', '=', True)]"/>
+              <field name="create_uid"          readonly="1"    string="Felvette"/>
+              <field name="create_date"         readonly="1"    string="Létrehozás ideje"/>
+              <field name="celallomas_id"       attrs="{'readonly': ['|',('mozgassor_irhato_e','=',False),('mozgasnem', 'not in', ('belso','helyesbit'))], 'required': [('mozgasnem', 'in', ('belso','helyesbit'))]}"
+                                                options="{'no_create': True, 'no_open': True}"
+                                                domain="[('belso_szallitas_e', '=', True)]"/>
+              <field name="write_uid"           readonly="1"    string="Módosította"/>
+              <field name="write_date"          readonly="1"    string="Módosítás ideje"/>
+            </group>
+            <group col="2">
+              <field name="kulso_dokumentum"    widget="url"/>
+              <field name="forrasdokumentum"    attrs="{'readonly': [('state','!=','terv')]}"/>
+              <field name="megjegyzes"          />
+              <field name="mozgassor_irhato_e"  invisible="1"/>
+            </group>
+            <field name="mozgassor_ids"         attrs="{'readonly': [('mozgassor_irhato_e','=',False)]}"   context="{'mozgasnem': context.get('mozgasnem')}"/>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_tree_mozgasfej"    model="ir.ui.view">
+      <field  name="name">Szállítás Tree</field>
+      <field  name="model">legrand.mozgasfej</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <tree>
+          <field name="id"                      invisible="context.get('mozgasnem') == 'be'"    string="Szállítólevél"/>
+          <field name="forrashely_id"/>
+          <field name="celallomas_id"           />
+          <field name="megjegyzes"/>
+          <field name="state"/>
+          <field name="create_uid"              string="Felvette"/>
+          <field name="create_date"             string="Létrehozás ideje"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_mozgasfej"    model="ir.ui.view">
+      <field  name="name">Szállítás Filter</field>
+      <field  name="model">legrand.mozgasfej</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field name="id"                    string="Szállítólevél"/>
+          <field name="forrashely_id"/>
+          <field name="celallomas_id"/>
+          <field name="mozgassor_ids"/>
+          <filter name="filter_terv"          string="Tervezet"                 domain="[('state','=','terv')]"/>
+          <filter name="filter_szallit"       string="Szállítás"                domain="[('state','=','szallit')]"/>
+          <filter name="filter_elter"         string="Átszállítva eltérésekkel" domain="[('state','=','elter')]"/>
+          <filter name="filter_kesz"          string="Átszállítva"              domain="[('state','=','kesz')]"/>
+          <filter name="filter_konyvelt"      string="Könyvelve"                domain="[('state','=','konyvelt')]"/>
+          <group expand="0" string="Csoportosítás">
+            <filter name="group_forras"       string="Forráshely"               context="{'group_by': 'forrashely_id'}"/>
+            <filter name="group_cel"          string="Célállomás"               context="{'group_by': 'celallomas_id'}"/>
+          </group>
+        </search>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Mozgássor  -->
+    <record id="view_tree_mozgassor_default"    model="ir.ui.view">
+      <field  name="name">Mozgás Tree</field>
+      <field  name="model">legrand.mozgassor</field>
+      <field  name="priority" eval="15"/>
+      <field  name="arch" type="xml">
+        <tree editable="bottom">
+          <field name="gyartasi_lap_id"         options="{'no_create': True}"   invisible="context.get('mozgasnem') not in ('ki','belso')"    required="context.get('mozgasnem') in ('ki',)"/>
+          <field name="cikk_id"                 options="{'no_create': True}"   invisible="context.get('mozgasnem') in ('ki',)"               string="Cikkszám____"/>
+          <field name="bom_id"                  options="{'no_create': True}"   invisible="context.get('mozgasnem') not in ('ki','belso')"/>
+          <field name="cikknev"/>
+          <field name="forrashelyen"            invisible="context.get('mozgasnem') in ('be',)"   attrs="{'invisible': [('state','in',('szallit','kesz','konyvelt'))]}"/>
+          <field name="mennyiseg"/>
+          <field name="hibakod_id"              options="{'no_create': True}"   invisible="context.get('mozgasnem') not in ('belso','selejt')"/>
+          <field name="megjegyzes"/>
+          <field name="raktar"                  invisible="context.get('mozgasnem') not in ('ki',)"/>
+          <field name="raklap_min"              invisible="context.get('mozgasnem') not in ('ki',)"/>
+          <field name="raklap_max"              invisible="context.get('mozgasnem') not in ('ki',)"/>
+          <field name="create_uid"              invisible="context.get('mozgasnem') in ('ki',)"   readonly="1"  string="Felvette"/>
+          <field name="create_date"             invisible="context.get('mozgasnem') in ('ki',)"   readonly="1"  string="Létrehozás ideje"/>
+          <field name="write_uid"               invisible="context.get('mozgasnem') in ('ki',)"   readonly="1"  string="Módosította"/>
+          <field name="write_date"              invisible="context.get('mozgasnem') in ('ki',)"   readonly="1"  string="Módosítás ideje"/>
+          <field name="state"                   invisible="1"/>
+          <field name="mozgasnem"               invisible="1"/>
+          <field name="mozgasfej_id"            invisible="1"/>
+          <field name="forrashely_id"           invisible="1"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_tree_mozgassor"    model="ir.ui.view">
+      <field  name="name">Mozgás Tree</field>
+      <field  name="model">legrand.mozgassor</field>
+      <field  name="arch" type="xml">
+        <tree default_order="id desc">
+          <field name="mozgasfej_sorszam"/>
+          <field name="forrashely_id"/>
+          <field name="celallomas_id"/>
+          <field name="gyartasi_lap_id"/>
+          <field name="cikk_id"/>
+          <field name="bom_id"/>
+          <field name="cikknev"/>
+          <field name="mennyiseg"/>
+          <field name="hibakod_id"/>
+          <field name="megjegyzes"/>
+          <field name="mozgasnem"/>
+          <field name="state"/>
+          <field name="create_date"             string="Létrehozás ideje"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_mozgassor"    model="ir.ui.view">
+      <field  name="name">Mozgássor Filter</field>
+      <field  name="model">legrand.mozgassor</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field  name="mozgasfej_sorszam"/>
+          <field  name="forrashely_id"/>
+          <field  name="celallomas_id"/>
+          <field  name="gyartasi_lap_id"/>
+          <field  name="cikk_id"/>
+          <field  name="bom_id"/>
+          <filter name="filter_depo"      string="Depó"                       domain="[('|'),('forrashely_id.azonosito','=','depo'),      ('celallomas_id.azonosito','=','depo')]"/>
+          <filter name="filter_szentes"   string="Szentes"                    domain="[('|'),('forrashely_id.azonosito','=','szentes'),   ('celallomas_id.azonosito','=','szentes')]"/>
+          <filter name="filter_hmvhely"   string="Hmvhely Bocskai"            domain="[('|'),('forrashely_id.azonosito','=','hmvhely'),   ('celallomas_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_hmvhpet"   string="Hmvhely Petőfi"             domain="[('|'),('forrashely_id.azonosito','=','hmvhpet'),   ('celallomas_id.azonosito','=','hmvhpet')]"/>
+          <filter name="filter_berkert"   string="Bérkert"                    domain="[('|'),('forrashely_id.azonosito','=','berkert'),   ('celallomas_id.azonosito','=','berkert')]"/>
+          <filter name="filter_mako"      string="Makó"                       domain="[('|'),('forrashely_id.azonosito','=','mako'),      ('celallomas_id.azonosito','=','mako')]"/>
+          <filter name="filter_oroshaza"  string="Orosháza"                   domain="[('|'),('forrashely_id.azonosito','=','oroshaza'),  ('celallomas_id.azonosito','=','oroshaza')]"/>
+          <filter name="filter_apatfalva" string="Apátfalva"                  domain="[('|'),('forrashely_id.azonosito','=','apatfalva'), ('celallomas_id.azonosito','=','apatfalva')]"/>
+          <separator/>
+          <filter name="filter_be"        string="Alkatrész bevételezés"      domain="[('mozgasfej_id.mozgasnem','=','be')]"/>
+          <filter name="filter_ki"        string="Termék kiszállítás"         domain="[('mozgasfej_id.mozgasnem','=','ki')]"/>
+          <filter name="filter_belso"     string="Belső szállítás"            domain="[('mozgasfej_id.mozgasnem','=','belso')]"/>
+          <filter name="filter_leltar"    string="Készlethelyesbítés"         domain="[('mozgasfej_id.mozgasnem','=','helyesbit')]"/>
+          <filter name="filter_vissza"    string="Alkatrész visszaszállítás"  domain="[('mozgasfej_id.mozgasnem','=','vissza')]"/>
+          <filter name="filter_selejt"    string="Selejt visszaszállítás"     domain="[('mozgasfej_id.mozgasnem','=','selejt')]"/>
+          <separator/>
+          <filter name="filter_terv"      string="Tervezet"                   domain="[('mozgasfej_id.state','=','terv')]"/>
+          <filter name="filter_szallit"   string="Szállítás"                  domain="[('mozgasfej_id.state','=','szallit')]"/>
+          <filter name="filter_elter"     string="Átszállítva eltérésekkel"   domain="[('mozgasfej_id.state','=','elter')]"/>
+          <filter name="filter_kesz"      string="Átszállítva"                domain="[('mozgasfej_id.state','=','kesz')]"/>
+          <filter name="filter_konyvelt"  string="Könyvelve"                  domain="[('mozgasfej_id.state','=','konyvelt')]"/>
+        </search>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Cikk mozgás  -->
+    <record id="view_tree_cikk_mozgas"    model="ir.ui.view">
+      <field  name="name">Cikk mozgás Tree</field>
+      <field  name="model">legrand.cikk_mozgas</field>
+      <field  name="arch" type="xml">
+        <tree>
+          <field name="mozgasfej_id"/>
+          <field name="forrashely_id"/>
+          <field name="celallomas_id"/>
+          <field name="gyartasi_lap_id"/>
+          <field name="cikk_id"/>
+          <field name="bom_id"/>
+          <field name="cikknev"/>
+          <field name="mennyiseg"/>
+          <field name="mozgasnem"/>
+          <field name="state"/>
+          <field name="datum"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_cikk_mozgas"    model="ir.ui.view">
+      <field  name="name">Cikk mozgás Filter</field>
+      <field  name="model">legrand.cikk_mozgas</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field  name="cikk_id"/>
+          <field  name="bom_id"/>
+          <field  name="forrashely_id"/>
+          <field  name="celallomas_id"/>
+          <filter name="filter_depo"      string="Depó"                       domain="[('|'),('forrashely_id.azonosito','=','depo'),      ('celallomas_id.azonosito','=','depo')]"/>
+          <filter name="filter_szentes"   string="Szentes"                    domain="[('|'),('forrashely_id.azonosito','=','szentes'),   ('celallomas_id.azonosito','=','szentes')]"/>
+          <filter name="filter_hmvhely"   string="Hmvhely Bocskai"            domain="[('|'),('forrashely_id.azonosito','=','hmvhely'),   ('celallomas_id.azonosito','=','hmvhely')]"/>
+          <filter name="filter_hmvhpet"   string="Hmvhely Petőfi"             domain="[('|'),('forrashely_id.azonosito','=','hmvhpet'),   ('celallomas_id.azonosito','=','hmvhpet')]"/>
+          <filter name="filter_berkert"   string="Bérkert"                    domain="[('|'),('forrashely_id.azonosito','=','berkert'),   ('celallomas_id.azonosito','=','berkert')]"/>
+          <filter name="filter_mako"      string="Makó"                       domain="[('|'),('forrashely_id.azonosito','=','mako'),      ('celallomas_id.azonosito','=','mako')]"/>
+          <filter name="filter_oroshaza"  string="Orosháza"                   domain="[('|'),('forrashely_id.azonosito','=','oroshaza'),  ('celallomas_id.azonosito','=','oroshaza')]"/>
+          <filter name="filter_apatfalva" string="Apátfalva"                  domain="[('|'),('forrashely_id.azonosito','=','apatfalva'), ('celallomas_id.azonosito','=','apatfalva')]"/>
+          <separator/>
+          <filter name="filter_be"        string="Alkatrész bevételezés"      domain="[('mozgasnem','=','be')]"/>
+          <filter name="filter_ki"        string="Termék kiszállítás"         domain="[('mozgasnem','=','ki')]"/>
+          <filter name="filter_belso"     string="Belső szállítás"            domain="[('mozgasnem','=','belso')]"/>
+          <filter name="filter_leltar"    string="Készlethelyesbítés"         domain="[('mozgasnem','=','helyesbit')]"/>
+          <filter name="filter_vissza"    string="Alkatrész visszaszállítás"  domain="[('mozgasnem','=','vissza')]"/>
+          <filter name="filter_selejt"    string="Selejt visszaszállítás"     domain="[('mozgasnem','=','selejt')]"/>
+          <separator/>
+          <filter name="filter_terv"      string="Tervezet"                   domain="[('state','=','terv')]"/>
+          <filter name="filter_szallit"   string="Szállítás"                  domain="[('state','=','szallit')]"/>
+          <filter name="filter_elter"     string="Átszállítva eltérésekkel"   domain="[('state','=','elter')]"/>
+          <filter name="filter_kesz"      string="Átszállítva"                domain="[('state','=','kesz')]"/>
+          <filter name="filter_konyvelt"  string="Könyvelve"                  domain="[('state','=','konyvelt')]"/>
+        </search>
+      </field>
+    </record>
+  </data>
+</openerp>

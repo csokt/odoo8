@@ -8,6 +8,7 @@
 -->
 <openerp>
   <data>
+    <!--####################################################################################################################  Szállítólevél  -->
     <template id="report_szallitolevel">
       <t t-call="report.html_container">
         <t t-foreach="docs"  t-as="o">
@@ -70,6 +71,7 @@
                 <tr>
                   <th>Sorszám</th>
                   <th>Rendelés</th>
+                  <th>Raktár</th>
                   <th>Cikkszám</th>
                   <th>Cikknév</th>
                   <th class="text-right">Mennyiség</th>
@@ -79,6 +81,7 @@
                 <tr t-foreach="o.mozgassor_ids" t-as="oo">
                     <td> <span t-field="oo.gyartasi_lap_id.id"/> </td>
                     <td> <span t-field="oo.gyartasi_lap_id.rendelesszam"/> </td>
+                    <td> <span t-field="oo.gyartasi_lap_id.raktar"/> </td>
                     <td>
                       <span t-field="oo.cikk_id"/>
                       <span t-field="oo.bom_id"/>
@@ -129,6 +132,7 @@
       </t>
     </template>
 
+    <!--####################################################################################################################  Gyártási lap  -->
     <template id="report_gyartasi_lap">
       <t t-call="report.html_container">
         <t t-foreach="docs"  t-as="o">
@@ -208,6 +212,7 @@
       </t>
     </template>
 
+    <!--####################################################################################################################  MEO jegyzőkönyv  -->
     <template id="report_meo_jegyzokonyv">
       <t t-call="report.html_container">
         <t t-foreach="docs"  t-as="o">
@@ -317,6 +322,7 @@
       </t>
     </template>
 
+    <!--####################################################################################################################  Reports  -->
     <report
       id="report_legrand_szallitolevel"
       model="legrand.mozgasfej"
