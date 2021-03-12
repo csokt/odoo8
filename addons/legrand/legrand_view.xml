@@ -258,68 +258,6 @@
       </field>
     </record>
 
-    <!--####################################################################################################################  Anyagigénylés  -->
-    <record id="view_tree_anyagigeny"   model="ir.ui.view">
-      <field  name="name">Anyagigény Tree</field>
-      <field  name="model">legrand.anyagigeny</field>
-      <field  name="arch" type="xml">
-        <tree editable="top">
-          <field name="forrashely_id"     options="{'no_create': True, 'no_open': True}"/>
-          <field name="hely_id"           options="{'no_create': True, 'no_open': True}"/>
-          <field name="gyartasi_lap_id"/>
-          <field name="cikk_id"           options="{'no_create': True}"/>
-          <field name="cikknev"/>
-          <field name="mennyiseg"/>
-          <field name="igeny_ok"/>
-          <field name="megjegyzes"/>
-          <field name="erkezett"/>
-          <field name="hatralek"/>
-          <field name="state"/>
-          <button name="state2uj"         type="object" string="Véglegesítés"   states="terv"/>
-          <button name="state2nyugta"     type="object" string="Nyugtázás"      states="uj"      groups="legrand.group_legrand_user"/>
-          <button name="state2terv"       type="object" string="Tervezetbe"     states="uj"      groups="legrand.group_legrand_director"/>
-          <button name="state2uj"         type="object" string="Új igénybe"     states="nyugta"  groups="legrand.group_legrand_director"/>
-          <field name="create_uid"        readonly="1"  string="Felvette"/>
-          <field name="create_date"       readonly="1"  string="Létrehozás ideje"/>
-          <field name="write_uid"         readonly="1"  string="Módosította"/>
-          <field name="write_date"        readonly="1"  string="Módosítás ideje"/>
-        </tree>
-      </field>
-    </record>
-
-    <record id="view_filter_anyagigeny"    model="ir.ui.view">
-      <field  name="name">Anyagigény Filter</field>
-      <field  name="model">legrand.anyagigeny</field>
-      <field  name="arch" type="xml">
-        <search>
-          <field  name="gyartasi_lap_id"/>
-          <field  name="cikk_id"/>
-          <field  name="igeny_ok"/>
-          <field  name="hely_id"/>
-          <field  name="state"/>
-          <filter name="filter_szentes"   string="Szentes"              domain="[('hely_id.azonosito','=','szentes')]"/>
-          <filter name="filter_hmvhely"   string="Hmvhely Bocskai"      domain="[('hely_id.azonosito','=','hmvhely')]"/>
-          <filter name="filter_hmvhpet"   string="Hmvhely Petőfi"       domain="[('hely_id.azonosito','=','hmvhpet')]"/>
-          <filter name="filter_berkert"   string="Bérkert"              domain="[('hely_id.azonosito','=','berkert')]"/>
-          <filter name="filter_mako"      string="Makó"                 domain="[('hely_id.azonosito','=','mako')]"/>
-          <filter name="filter_oroshaza"  string="Orosháza"             domain="[('hely_id.azonosito','=','oroshaza')]"/>
-          <filter name="filter_apatfalva" string="Apátfalva"            domain="[('hely_id.azonosito','=','apatfalva')]"/>
-          <separator/>
-          <filter name="filter_terv"      string="Tervezet"             domain="[('state','=','terv')]"/>
-          <filter name="filter_uj"        string="Új igény"             domain="[('state','=','uj')]"/>
-          <filter name="filter_nyugta"    string="Nyugtázva"            domain="[('state','=','nyugta')]"/>
-          <separator/>
-          <filter name="filter_erkezett"  string="Érkezett"             domain="[('erkezett','!=',0)]"/>
-          <filter name="filter_nerkezett" string="Nem érkezett"         domain="[('erkezett','=',0)]"/>
-          <filter name="filter_hatralek"  string="Hátralék"             domain="[('hatralek','!=',0)]"/>
-          <filter name="filter_nhatralek" string="Nincs hátralék"       domain="[('hatralek','=',0)]"/>
-          <group  expand="0" string="Csoportosítás">
-            <filter name="group_uzem"     string="Üzem"                 context="{'group_by': 'hely_id'}"/>
-          </group>
-        </search>
-      </field>
-    </record>
-
     <!--####################################################################################################################  Készlet  -->
     <record id="view_tree_keszlet"    model="ir.ui.view">
       <field  name="name">Készlet Tree</field>
@@ -1408,7 +1346,6 @@
                 domain="[('mozgasnem','=','belso')]"                context="{'mozgasnem':'belso'}"/>
     <act_window id="mozgassor"          name="Tétel"                res_model="legrand.mozgassor"         view_id="view_tree_mozgassor"               view_mode="tree"/>
     <act_window id="cikk_mozgas"        name="Cikk mozgás"          res_model="legrand.cikk_mozgas"                                                   view_mode="tree"/>
-    <act_window id="anyagigeny"         name="Anyagkérés"           res_model="legrand.anyagigeny"                                                    view_mode="tree"/>
     <act_window id="anyagszukseglet"    name="Anyagszükséglet"      res_model="legrand.anyagszukseglet"                                               view_mode="tree"/>
 
     <act_window id="mozgas_bevet"       name="Bevételezés"          res_model="legrand.mozgasfej"                                                     view_mode="tree,form"
