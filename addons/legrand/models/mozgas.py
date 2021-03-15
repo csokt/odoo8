@@ -36,8 +36,8 @@ class LegrandMozgasfej(models.Model):
       cel_id  = self.env['legrand.hely'].search([('azonosito', '=', celdict[vals['mozgasnem']])]).id
       vals['forrashely_id'], vals['celallomas_id'] = forr_id, cel_id
     new = super(LegrandMozgasfej, self).create(vals)
-    self.env.cr.execute('REFRESH MATERIALIZED VIEW legrand_keszlet')
-    self.env.cr.execute('REFRESH MATERIALIZED VIEW legrand_vall_keszlet')
+    # self.env.cr.execute('REFRESH MATERIALIZED VIEW legrand_keszlet')
+    # self.env.cr.execute('REFRESH MATERIALIZED VIEW legrand_vall_keszlet')
     return new
 
   @api.multi
@@ -113,6 +113,13 @@ class LegrandMozgasfej(models.Model):
         if cikk_uj_igeny_ids:
           for cikk_uj_igeny in cikk_uj_igeny_ids:
             cikk_uj_igeny.write({'erkezett': cikk_uj_igeny.erkezett + sor.mennyiseg})
+    if self.mozgasnem == 'belso':
+      ossz_uj_igeny_ids = self.env['legrand.anyagigeny'].search([('state', '=', 'uj'), ('forrashely_id', '=', self.forrashely_id.id), ('hely_id', '=', self.celallomas_id.id)])
+      for sor in self.mozgassor_ids:
+        cikk_uj_igeny_ids = ossz_uj_igeny_ids.filtered(lambda r: r.cikk_id == sor.cikk_id)
+        if cikk_uj_igeny_ids:
+          for cikk_uj_igeny in cikk_uj_igeny_ids:
+            cikk_uj_igeny.write({'kuldott': cikk_uj_igeny.kuldott + sor.mennyiseg})
     self.state = 'szallit' if self.mozgasnem == 'belso' else 'kesz'
     return True
 
