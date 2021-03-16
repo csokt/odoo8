@@ -209,5 +209,27 @@
         </search>
       </field>
     </record>
+
+    <!--####################################################################################################################  Actions  -->
+    <act_window id="gylap_uj"               name="Műveletterv"            res_model="legrand.gyartasi_lap"    view_mode="tree,form"
+      view_id="view_tree_gyartasi_lap_uj"
+      domain="[('state','=','uj')]"
+    />
+
+    <act_window id="gylap_mterv"            name="Gyártási lap"           res_model="legrand.gyartasi_lap"    view_mode="tree,form"
+      view_id="view_tree_gyartasi_lap_mterv"
+      domain="[('state','=','mterv')]"
+    />
+
+    <act_window id="gylap_gyartas"          name="Gyártási lap"           res_model="legrand.gyartasi_lap"    view_mode="tree,form"
+      domain="[('state','!=','uj')]"
+      context="{'search_default_filter_gyartas': 1}"
+    />
+
+    <act_window id="gylap_leallas"          name="Gyártás leállás"        res_model="legrand.gyartasi_lap"    view_mode="tree,form"
+      view_id="view_tree_gyartasi_lap_leallas"
+      domain="[('state','=','gyartas')]"
+    />
+
   </data>
 </openerp>

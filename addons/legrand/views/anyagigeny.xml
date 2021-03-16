@@ -76,10 +76,8 @@
     </record>
 
     <!--####################################################################################################################  Actions  -->
-    <act_window id="anyagigeny"
-      name="Anyagkérés"
-      res_model="legrand.anyagigeny"
-      view_mode="tree"
-      context="{'search_default_filter_uj': 1}"/>
+    <act_window id="anyagigeny"             name="Anyagkérés"             res_model="legrand.anyagigeny"     view_mode="tree"
+      context="{'search_default_filter_uj': 1}"
+    />
   </data>
 </openerp>

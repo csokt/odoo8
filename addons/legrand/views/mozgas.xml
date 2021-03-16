@@ -234,5 +234,44 @@
         </search>
       </field>
     </record>
+
+    <!--####################################################################################################################  Actions  -->
+    <act_window id="mozgas_bevet"           name="Bevételezés"            res_model="legrand.mozgasfej"      view_mode="tree,form"
+      domain="[('mozgasnem','=','be')]"
+      context="{'mozgasnem':'be'}"
+    />
+
+    <act_window id="mozgas_kiszall"         name="Kiszállítás"            res_model="legrand.mozgasfej"      view_mode="tree,form"
+      domain="[('mozgasnem','=','ki')]"
+      context="{'mozgasnem':'ki'}"
+    />
+
+    <act_window id="mozgas_belso"           name="Szállítás"              res_model="legrand.mozgasfej"      view_mode="tree,form"
+      domain="[('mozgasnem','=','belso')]"
+      context="{'mozgasnem':'belso'}"
+    />
+
+    <act_window id="mozgas_helyesbit"       name="Készlethelyesbítés"     res_model="legrand.mozgasfej"      view_mode="tree,form"
+      domain="[('mozgasnem','=','helyesbit')]"
+      context="{'mozgasnem':'helyesbit'}"
+    />
+
+    <act_window id="mozgas_vissza"          name="Visszaszállítás"        res_model="legrand.mozgasfej"      view_mode="tree,form"
+      domain="[('mozgasnem','=','vissza')]"
+      context="{'mozgasnem':'vissza'}"
+    />
+
+    <act_window id="mozgas_selejt"          name="Selejt vissza"          res_model="legrand.mozgasfej"      view_mode="tree,form"
+      domain="[('mozgasnem','=','selejt')]"
+      context="{'mozgasnem':'selejt'}"
+    />
+
+    <act_window id="mozgassor"              name="Tétel"                  res_model="legrand.mozgassor"      view_mode="tree"
+      view_id="view_tree_mozgassor"
+    />
+
+    <act_window id="cikk_mozgas"            name="Cikk mozgás"            res_model="legrand.cikk_mozgas"    view_mode="tree"
+    />
+
   </data>
 </openerp>

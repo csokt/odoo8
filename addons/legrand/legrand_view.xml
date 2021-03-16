@@ -1327,6 +1327,10 @@
     </record>
 
     <!--####################################################################################################################  Actions  -->
+    <act_window id="gylap_import"           name="Import"                 res_model="legrand.parameter"       view_mode="tree"
+      view_id="view_tree_gylap_import"
+    />
+
     <act_window id="cikk"               name="Cikk"                 res_model="legrand.cikk"                                                          view_mode="tree,form"/>
     <act_window id="keszlet"            name="Készlet"              res_model="legrand.keszlet"                                                       view_mode="tree"
                                                                     context="{'search_default_filter_szefo_e': 1}"/>
@@ -1336,31 +1340,8 @@
     <act_window id="anyagj_keszlet"     name="Anyagjegyzék készlet" res_model="legrand.anyagjegyzek_keszlet"                                          view_mode="tree"
                                                                     context="{'search_default_filter_depo': 1, 'search_default_filter_raktaron': 1}"/>
 
-    <act_window id="gylap_import"       name="Import"               res_model="legrand.parameter"         view_id="view_tree_gylap_import"            view_mode="tree"/>
-    <act_window id="gylap_uj"           name="Műveletterv"          res_model="legrand.gyartasi_lap"      view_id="view_tree_gyartasi_lap_uj"         view_mode="tree,form"
-                domain="[('state','=','uj')]"/>
-    <act_window id="gylap_mterv"        name="Gyártási lap"         res_model="legrand.gyartasi_lap"      view_id="view_tree_gyartasi_lap_mterv"      view_mode="tree,form"
-                domain="[('state','=','mterv')]"/>
-
-    <act_window id="mozgas_belso"       name="Szállítás"            res_model="legrand.mozgasfej"                                                     view_mode="tree,form"
-                domain="[('mozgasnem','=','belso')]"                context="{'mozgasnem':'belso'}"/>
-    <act_window id="mozgassor"          name="Tétel"                res_model="legrand.mozgassor"         view_id="view_tree_mozgassor"               view_mode="tree"/>
-    <act_window id="cikk_mozgas"        name="Cikk mozgás"          res_model="legrand.cikk_mozgas"                                                   view_mode="tree"/>
     <act_window id="anyagszukseglet"    name="Anyagszükséglet"      res_model="legrand.anyagszukseglet"                                               view_mode="tree"/>
 
-    <act_window id="mozgas_bevet"       name="Bevételezés"          res_model="legrand.mozgasfej"                                                     view_mode="tree,form"
-                domain="[('mozgasnem','=','be')]"                   context="{'mozgasnem':'be'}"/>
-    <act_window id="mozgas_vissza"      name="Visszaszállítás"      res_model="legrand.mozgasfej"                                                     view_mode="tree,form"
-                domain="[('mozgasnem','=','vissza')]"               context="{'mozgasnem':'vissza'}"/>
-    <act_window id="mozgas_selejt"      name="Selejt vissza"        res_model="legrand.mozgasfej"                                                     view_mode="tree,form"
-                domain="[('mozgasnem','=','selejt')]"               context="{'mozgasnem':'selejt'}"/>
-    <act_window id="mozgas_helyesbit"   name="Készlethelyesbítés"   res_model="legrand.mozgasfej"                                                     view_mode="tree,form"
-                domain="[('mozgasnem','=','helyesbit')]"            context="{'mozgasnem':'helyesbit'}"/>
-
-    <act_window id="gylap_gyartas"      name="Gyártási lap"         res_model="legrand.gyartasi_lap"                                                  view_mode="tree,form"
-                domain="[('state','!=','uj')]"                      context="{'search_default_filter_gyartas': 1}"/>
-    <act_window id="gylap_leallas"      name="Gyártás leállás"      res_model="legrand.gyartasi_lap"      view_id="view_tree_gyartasi_lap_leallas"    view_mode="tree,form"
-                domain="[('state','=','gyartas')]"                  context="{'search_default_filter_gyartas': 1}"/>
     <act_window id="gylap_muvelet"      name="Művelet"              res_model="legrand.gylap_legrand_muvelet"                                         view_mode="tree,form"/>
     <act_window id="gylap_homogen"      name="Homogén"              res_model="legrand.gylap_homogen"                                                 view_mode="tree,form"/>
 
@@ -1378,8 +1359,6 @@
     <act_window id="cimkenyomtatas"     name="Címkenyomtatás"       res_model="legrand.gylap_dbjegyzek"   view_id="view_tree_cimkenyomtatas"          view_mode="tree,form"
                 domain="[('cimke_e','=',True),('homogen_7127_van_e','=',True)]" context="{'search_default_filter_mterv': 1, 'search_default_filter_gyartas': 1}"/>
 
-    <act_window id="mozgas_kiszall"     name="Kiszállítás"          res_model="legrand.mozgasfej"                                                     view_mode="tree,form"
-                domain="[('mozgasnem','=','ki')]"                   context="{'mozgasnem':'ki'}"/>
     <act_window id="szlamelleklet"      name="Számlamelléklet"      res_model="legrand.gylap_homogen"     view_id="view_tree_szlamelleklet"           view_mode="tree,form"
                 domain="[('sajat','=',True), ('szamlazhato_db','>',0)]"/>
     <act_window id="szlamellnulla"      name="Számlamelléklet"      res_model="legrand.parameter"         view_id="view_tree_szlamellnulla"           view_mode="tree"/>
