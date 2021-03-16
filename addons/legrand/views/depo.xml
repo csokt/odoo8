@@ -41,14 +41,95 @@
       </field>
     </record>
 
+    <!--####################################################################################################################  Depó kimérés  -->
+    <record id="view_form_depokimer"    model="ir.ui.view">
+      <field name="name">Depó kimérés Form</field>
+      <field name="model">legrand.depokimer</field>
+      <field name="arch" type="xml">
+        <form>
+          <header>
+            <button name="kimeres_indit"          type="object"   string="Kimérés indítása"               states="terv"           class="oe_highlight"/>
+            <button name="alkatresz_lista"        type="object"   string="Alkatrész lista generálás"      states="terv"           />
+            <button name="szallitolevel"          type="object"   string="Szállítólevél készítés"         states="kimer"          class="oe_highlight"/>
+            <button name="state2terv"             type="object"   string="Tervezetbe visszalép"           states="kimer"          />
+            <field  name="state"                  widget="statusbar"/>
+          </header>
+          <sheet>
+            <group col="2">
+              <field name="name"/>
+              <field name="hely_id"               options="{'no_create': True, 'no_open': True}"/>
+              <field name="megjegyzes"/>
+              <field name="mozgasfej_id"/>
+            </group>
+            <field name="kimergylap_ids"          states="terv"/>
+            <div>&#x2063;</div>
+            <field name="kimercikk_ids"           />
+          </sheet>
+        </form>
+      </field>
+    </record>
+
+    <record id="view_tree_depokimer"    model="ir.ui.view">
+      <field name="name">Depó kimérés Tree</field>
+      <field name="model">legrand.depokimer</field>
+      <field name="priority" eval="15"/>
+      <field name="arch" type="xml">
+        <tree>
+          <field name="state"/>
+          <field name="name"/>
+          <field name="megjegyzes"/>
+        </tree>
+      </field>
+    </record>
+
+    <record id="view_filter_depokimer"    model="ir.ui.view">
+      <field  name="name">Depó kimérés Filter</field>
+      <field  name="model">legrand.depokimer</field>
+      <field  name="arch" type="xml">
+        <search>
+          <field name="name"/>
+          <field name="megjegyzes"/>
+        </search>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Kimérés gyártási lap  -->
+    <record id="view_tree_kimergylap"    model="ir.ui.view">
+      <field  name="name">Kimérés gyártási lap Tree</field>
+      <field  name="model">legrand.kimergylap</field>
+      <field  name="arch" type="xml">
+        <tree editable="bottom">
+          <field name="gyartasi_lap_id"/>
+        </tree>
+      </field>
+    </record>
+
+    <!--####################################################################################################################  Kimérés cikkek  -->
+    <record id="view_tree_kimercikk"    model="ir.ui.view">
+      <field  name="name">Kimérés cikkek Tree</field>
+      <field  name="model">legrand.kimercikk</field>
+      <field  name="arch" type="xml">
+        <tree editable="bottom">
+          <field name="cikk_id"/>
+          <field name="cikknev"/>
+          <field name="mennyiseg"/>
+          <field name="kimerve_e"/>
+        </tree>
+      </field>
+    </record>
+
     <!--####################################################################################################################  Actions  -->
     <act_window id="depo_bevet"           name="Bevételezés"                  res_model="legrand.depobevet"                     view_mode="tree"/>
     <act_window id="depo_bevetossz"       name="Bevételezés összesítő"        res_model="legrand.depobevetossz"                 view_mode="tree"/>
+    <act_window id="depo_kimer"           name="Kimérés"                      res_model="legrand.depokimer"                     view_mode="tree,form"/>
+    <act_window id="depo_kimergylap"      name="Gyártási lap"                 res_model="legrand.kimergylap"                    view_mode="tree"/>
+    <act_window id="depo_kimercikk"       name="Cikkek"                       res_model="legrand.kimercikk"                     view_mode="tree"/>
 
     <!--####################################################################################################################  Menu  items  -->
     <menuitem id="menu_depo_raktaros"     name="Depo raktáros"                parent="menu_root"                  sequence="23" groups="group_legrand_manager"/>
       <menuitem id="menu_depo_bevet"      name="Alkatrész bevételezés"        parent="menu_depo_raktaros"         sequence="20" action="depo_bevet"/>
       <menuitem id="menu_depo_bevetossz"  name="Bevételezés összesítő"        parent="menu_depo_raktaros"         sequence="30" action="depo_bevetossz"/>
+      <menuitem id="menu_depo_kimer"      name="Alkatrész kimérés"            parent="menu_depo_raktaros"         sequence="40" action="depo_kimer"/>
 
   </data>
 <!-- </odoo> -->

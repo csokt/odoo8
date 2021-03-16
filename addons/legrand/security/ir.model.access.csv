@@ -34,6 +34,10 @@ access_legrand_depobevet_group_manager,legrand.depobevet.manager,model_legrand_d
 
 access_legrand_depobevetossz_group_viewer,legrand.depobevetossz.viewer,model_legrand_depobevetossz,group_legrand_viewer,1,0,0,0
 
+access_legrand_depokimer_group_admin,legrand.depokimer.admin,model_legrand_depokimer,group_legrand_admin,1,1,1,1
+access_legrand_kimergylap_group_admin,legrand.kimergylap.admin,model_legrand_kimergylap,group_legrand_admin,1,1,1,1
+access_legrand_kimercikk_group_admin,legrand.kimercikk.admin,model_legrand_kimercikk,group_legrand_admin,1,1,1,1
+
 access_legrand_keszlet_group_viewer,legrand.keszlet.viewer,model_legrand_keszlet,group_legrand_viewer,1,0,0,0
 access_legrand_vall_keszlet_group_viewer,legrand.vall_keszlet.viewer,model_legrand_vall_keszlet,group_legrand_viewer,1,0,0,0
 access_legrand_anyagjegyzek_keszlet_group_viewer,legrand.anyagjegyzek_keszlet.viewer,model_legrand_anyagjegyzek_keszlet,group_legrand_viewer,1,0,0,0

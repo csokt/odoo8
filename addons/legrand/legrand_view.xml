@@ -1128,6 +1128,7 @@
         <tree>
           <field name="state"/>
           <field name="gyartasi_lap_id"/>
+          <field name="gyartasi_hely_id"/>
           <field name="cikk_id"/>
           <field name="rendelt"/>
           <field name="hatralek"/>
@@ -1147,8 +1148,9 @@
           <filter name="filter_gyartas"     string="Gyártás"                domain="[('state','=','gyartas')]"/>
           <filter name="filter_gykesz"      string="Gyártás kész"           domain="[('state','=','gykesz')]"/>
           <group expand="0" string="Csoportosítás">
+            <filter name="group_gyhely"     string="Gyártási hely"          context="{'group_by': 'gyartasi_hely_id'}"/>
             <filter name="group_gylap"      string="Gyártási lap"           context="{'group_by': 'gyartasi_lap_id'}"/>
-            <filter name="group_cikk"       string="Cikk"                   context="{'group_by': 'cikk_id'}"/>
+            <filter name="group_cikk"       string="Alkatrész"              context="{'group_by': 'cikk_id'}"/>
           </group>
         </search>
       </field>

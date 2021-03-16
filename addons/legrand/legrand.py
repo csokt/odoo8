@@ -995,7 +995,8 @@ class LegrandAnyagszukseglet(models.Model):
   _order = 'gyartasi_lap_id, cikk_id'
   state               = fields.Selection([('uj',u'Új'),('mterv',u'Műveletterv'),('gyartas',u'Gyártás'),('gykesz',u'Gyártás kész'),('kesz',u'Rendelés teljesítve')], u'Állapot')
   gyartasi_lap_id     = fields.Many2one('legrand.gyartasi_lap',  u'Gyártási lap', auto_join=True)
-  cikk_id             = fields.Many2one('legrand.cikk', string=u'Alkatrész', auto_join=True)
+  gyartasi_hely_id    = fields.Many2one('legrand.hely', u'Fő gyártási hely', auto_join=True)
+  cikk_id             = fields.Many2one('legrand.cikk', u'Alkatrész', auto_join=True)
   rendelt             = fields.Float(u'Rendelt', digits=(16, 5))
   hatralek            = fields.Float(u'Hátralék',  digits=(16, 5))
   # virtual fields
@@ -1008,6 +1009,7 @@ class LegrandAnyagszukseglet(models.Model):
           row_number() over() AS id,
           gylap.state,
           gylap.id AS gyartasi_lap_id,
+          gylap.gyartasi_hely_id AS gyartasi_hely_id,
           line.cikk_id,
           gylap.modositott_db * line.beepules AS rendelt,
           gylap.hatralek_db * line.beepules AS hatralek
