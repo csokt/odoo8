@@ -6,6 +6,7 @@ from openerp import tools, models, fields, api, exceptions
 class LegrandMozgasfej(models.Model):
   _name               = 'legrand.mozgasfej'
   _order              = 'id desc'
+  _rec_name           = 'id'
   state               = fields.Selection([('terv',u'Tervezet'),('szallit',u'Szállítás'),('elter',u'Átszállítva eltérésekkel'),('kesz',u'Átszállítva'),('konyvelt',u'Könyvelve')],
                         u'Állapot', default='terv', readonly=False )
   mozgasnem           = fields.Selection([('be',u'Alkatrész bevételezés'),('ki',u'Termék kiszállítás'),('belso',u'Belső szállítás'),

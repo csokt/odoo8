@@ -42,32 +42,55 @@ class LegrandDepobevetOssz(models.Model):
 class LegrandDepokimer(models.Model):
   _name               = 'legrand.depokimer'
   _order              = 'id desc'
-  name                = fields.Char(u'Megnevezés', compute='_compute_name', store=True)
   state               = fields.Selection([('terv',u'Tervezet'),('kimer',u'Kimérés'),('kesz',u'Lezárva')],u'Állapot', default='terv')
   hely_id             = fields.Many2one('legrand.hely', u'Üzem', domain=[('belso_szallitas_e', '=', True)], readonly=True, states={'terv': [('readonly', False)]}, required=True)
   megjegyzes          = fields.Char(u'Megjegyzés')
   mozgasfej_id        = fields.Many2one('legrand.mozgasfej',  u'Szállítólevél', readonly=True)
   # virtual fields
+  gyartasi_lapok      = fields.Char(u'Gyártási lapok', compute='_compute_gyartasi_lapok')
   kimergylap_ids      = fields.One2many('legrand.kimergylap', 'depokimer_id', u'Gyártási lapok')
   kimercikk_ids       = fields.One2many('legrand.kimercikk', 'depokimer_id', u'Alkatrészek')
 
   @api.one
   @api.depends('hely_id', 'kimergylap_ids')
-  def _compute_name(self):
-    if self.hely_id:
-      self.name = self.hely_id.name+' ('+', '.join(self.kimergylap_ids.mapped(lambda r: str(r.gyartasi_lap_id.id)))+')'
+  def _compute_gyartasi_lapok(self):
+    self.gyartasi_lapok = ', '.join(self.kimergylap_ids.mapped(lambda r: str(r.gyartasi_lap_id.id)))
 
   @api.one
   def alkatresz_lista(self):
+    cikkek = {}
     self.kimercikk_ids.unlink()
     for kimergylap in self.kimergylap_ids:
-      for alk in kimergylap.gyartasi_lap_id.bom_id.bom_line_ids:
+      for bom_line in kimergylap.gyartasi_lap_id.bom_id.bom_line_ids:
+        cikkszam = bom_line.cikk_id.cikkszam
+        mennyiseg = kimergylap.gyartasi_lap_id.modositott_db * bom_line.beepules
+        if cikkszam in cikkek:
+          cikkek[cikkszam]['mennyiseg'] += mennyiseg
+        else:
+          row = {
+            'depokimer_id'    : self.id,
+            'cikk_id'         : bom_line.cikk_id.id,
+            'mennyiseg'       : mennyiseg,
+          }
+          cikkek[cikkszam] = row
+
+    depo_id = self.env['legrand.hely'].search([('azonosito','=','depo')]).id
+    ossz_uj_igeny_ids = self.env['legrand.anyagigeny'].search([('state', '=', 'uj'), ('forrashely_id', '=', depo_id), ('hely_id', '=', self.hely_id.id)])
+    for cikk_uj_igeny in ossz_uj_igeny_ids:
+      cikkszam = cikk_uj_igeny.cikk_id.cikkszam
+      mennyiseg = cikk_uj_igeny.hatralek
+      if cikkszam in cikkek:
+        cikkek[cikkszam]['mennyiseg'] += mennyiseg
+      else:
         row = {
           'depokimer_id'    : self.id,
-          'cikk_id'         : alk.cikk_id.id,
-          'mennyiseg'       : kimergylap.gyartasi_lap_id.modositott_db * alk.beepules,
+          'cikk_id'         : cikk_uj_igeny.cikk_id.id,
+          'mennyiseg'       : mennyiseg,
         }
-        self.kimercikk_ids.create(row)
+        cikkek[cikkszam] = row
+
+    for cikkszam in sorted(cikkek):
+      self.kimercikk_ids.create(cikkek[cikkszam])
     return True
 
   @api.one
@@ -78,6 +101,26 @@ class LegrandDepokimer(models.Model):
 
   @api.one
   def szallitolevel(self):
+    depo_id = self.env['legrand.hely'].search([('azonosito','=','depo')]).id
+    mozgasfej = {
+      'mozgasnem'         : 'belso',
+      'forrashely_id'     : depo_id,
+      'celallomas_id'     : self.hely_id.id,
+      'forrasdokumentum'  : u'Gy.lap(ok): '+self.gyartasi_lapok,
+      'megjegyzes'        : self.megjegyzes,
+    }
+    mozgasfej_id = self.env['legrand.mozgasfej'].create(mozgasfej)
+
+    for kimercikk in self.kimercikk_ids:
+      mozgassor = {
+        'mozgasfej_id'    : mozgasfej_id.id,
+        'cikk_id'         : kimercikk.cikk_id.id,
+        'mennyiseg'       : kimercikk.mennyiseg,
+      }
+      self.env['legrand.mozgassor'].create(mozgassor)
+
+    self.mozgasfej_id = mozgasfej_id.id
+    # raise exceptions.Warning(mozgasfej_id.id)
     return True
 
   @api.one

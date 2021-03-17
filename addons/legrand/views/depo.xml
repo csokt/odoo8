@@ -56,10 +56,10 @@
           </header>
           <sheet>
             <group col="2">
-              <field name="name"/>
               <field name="hely_id"               options="{'no_create': True, 'no_open': True}"/>
               <field name="megjegyzes"/>
               <field name="mozgasfej_id"/>
+              <field name="gyartasi_lapok"/>
             </group>
             <field name="kimergylap_ids"          states="terv"/>
             <div>&#x2063;</div>
@@ -75,9 +75,10 @@
       <field name="priority" eval="15"/>
       <field name="arch" type="xml">
         <tree>
-          <field name="state"/>
-          <field name="name"/>
+          <field name="hely_id"/>
+          <field name="gyartasi_lapok"/>
           <field name="megjegyzes"/>
+          <field name="state"/>
         </tree>
       </field>
     </record>
@@ -87,7 +88,7 @@
       <field  name="model">legrand.depokimer</field>
       <field  name="arch" type="xml">
         <search>
-          <field name="name"/>
+          <field name="gyartasi_lapok"/>
           <field name="megjegyzes"/>
         </search>
       </field>
