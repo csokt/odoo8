@@ -107,19 +107,32 @@ class LegrandMozgasfej(models.Model):
       raise exceptions.Warning(u'A forrás és célállomás helye megegyezik!')
     if self.mozgasnem == 'be':
       depo_id = self.env['legrand.hely'].search([('azonosito','=','depo')]).id
-      ossz_uj_igeny_ids = self.env['legrand.anyagigeny'].search([('state', '=', 'uj'), ('forrashely_id', '=', depo_id)])
+      ossz_uj_igeny_ids = self.env['legrand.anyagigeny'].search([('state', '=', 'uj'), ('forrashely_id', '=', depo_id)], order='id')
       for sor in self.mozgassor_ids:
         cikk_uj_igeny_ids = ossz_uj_igeny_ids.filtered(lambda r: r.cikk_id == sor.cikk_id)
         if cikk_uj_igeny_ids:
+          mennyiseg = sor.mennyiseg
           for cikk_uj_igeny in cikk_uj_igeny_ids:
-            cikk_uj_igeny.write({'erkezett': cikk_uj_igeny.erkezett + sor.mennyiseg})
+            hatralek = 0 if cikk_uj_igeny.mennyiseg - cikk_uj_igeny.erkezett <= 0 else cikk_uj_igeny.mennyiseg - cikk_uj_igeny.erkezett
+            if hatralek == 0:
+              continue
+            erkezhet = mennyiseg if mennyiseg <= hatralek else hatralek
+            cikk_uj_igeny.write({'erkezett': cikk_uj_igeny.erkezett + erkezhet})
+            mennyiseg = mennyiseg - erkezhet
+            if mennyiseg <= 0:
+              break
     if self.mozgasnem == 'belso':
-      ossz_uj_igeny_ids = self.env['legrand.anyagigeny'].search([('state', '=', 'uj'), ('forrashely_id', '=', self.forrashely_id.id), ('hely_id', '=', self.celallomas_id.id)])
+      ossz_uj_igeny_ids = self.env['legrand.anyagigeny'].search([('state', '=', 'uj'), ('forrashely_id', '=', self.forrashely_id.id), ('hely_id', '=', self.celallomas_id.id)], order='id')
       for sor in self.mozgassor_ids:
         cikk_uj_igeny_ids = ossz_uj_igeny_ids.filtered(lambda r: r.cikk_id == sor.cikk_id)
         if cikk_uj_igeny_ids:
+          mennyiseg = sor.mennyiseg
           for cikk_uj_igeny in cikk_uj_igeny_ids:
-            cikk_uj_igeny.write({'kuldott': cikk_uj_igeny.kuldott + sor.mennyiseg})
+            kuldheto = mennyiseg if mennyiseg <= cikk_uj_igeny.hatralek else cikk_uj_igeny.hatralek
+            cikk_uj_igeny.write({'kuldott': cikk_uj_igeny.kuldott + kuldheto})
+            mennyiseg = mennyiseg - kuldheto
+            if mennyiseg <= 0:
+              break
     self.state = 'szallit' if self.mozgasnem == 'belso' else 'kesz'
     return True
 
